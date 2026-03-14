@@ -1,6 +1,6 @@
 ---
 permalink: /
-title: "👋 Hello"
+title: "PhD Student | Phononic Crystals & Elastic Metamaterials"
 author_profile: true
 redirect_from: 
   - /about/
