@@ -7,7 +7,7 @@ redirect_from:
   - /about.html
 ---
 
-![xkcd: Linear Regression](/linear_regression.png){: .align-right width="300px"}
+![xkcd: Linear Regression](images/linear_regression.png){: .align-right width="300px"}
 
 👨🏻‍💻 I am PhD student in Phononic Crystals and Metamaterials.
 
