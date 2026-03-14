@@ -1,6 +1,6 @@
 ---
 permalink: /
-title: "PhD Student | Phononic Crystals & Elastic Metamaterials"
+title: "👋 Hello there"
 author_profile: true
 redirect_from: 
   - /about/
@@ -9,9 +9,11 @@ redirect_from:
 
 <img src="/images/xkcd_linear_regression.png" 
      alt="xkcd: Linear Regression" 
-     style="float:right; width:400px; margin-left:20px; margin-bottom:10px;">
+     style="float:right; width:.300px; margin-left:50px; margin-bottom:10px;">
 
 🔬 My research interests focus on the design and analysis of architected piezoelectric metamaterials for controlling acoustic and elastic waves.
+
+<div style="clear: both;"></div>
 
 I am also interested in the Finite Element Method (COMSOL Multiphysics®) and Deep Learning, including Graph Neural Networks.
 
