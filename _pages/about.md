@@ -11,8 +11,6 @@ redirect_from:
      alt="xkcd: Linear Regression" 
      style="float:right; width:300px; margin-left:20px; margin-bottom:10px;">
 
-👨🏻‍💻 I am a PhD student working on Phononic Crystals and Metamaterials.
-
 🔬 My research interests focus on the design and analysis of architected piezoelectric metamaterials for controlling acoustic and elastic waves.
 
 I am also interested in the Finite Element Method (COMSOL Multiphysics®) and Deep Learning, including Graph Neural Networks.
