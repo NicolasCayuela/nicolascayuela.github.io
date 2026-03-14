@@ -6,7 +6,7 @@ redirect_from:
   - /about/
   - /about.html
 ---
-![xkcd Linear Regression](/images/xkcd_linear_regression.jpg){: .align-right width="350px"}
+![xkcd Linear Regression](/images/xkcd_linear_regression.jpg){: .align-right width="330px"}
 
 🔬 My research interests focus on the design metamaterials for controlling acoustic and elastic waves.
 
