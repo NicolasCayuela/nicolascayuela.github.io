@@ -1,12 +1,12 @@
 ---
 permalink: /
-title: "👋 Hello there"
+title: "👋 Hello there, i'm Nicolas"
 author_profile: true
 redirect_from: 
   - /about/
   - /about.html
 ---
-![xkcd Linear Regression](/images/xkcd_linear_regression.jpg){: .align-right width="300px"}
+![xkcd Linear Regression](/images/Computer_definition_of_extra_hot.png){: .align-right width="300px"}
 
 🔬 My research interests focus on the design metamaterials for controlling acoustic and elastic waves.
 
