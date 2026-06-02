@@ -5,6 +5,6 @@ pages:
 - name: Publications
   name_zh: Publications
   url: publications
-- name: Bored?
-  name_zh: Bored?
-  url: bored
+- name: Playground
+  name_zh: Terrain de jeu
+  url: playground
