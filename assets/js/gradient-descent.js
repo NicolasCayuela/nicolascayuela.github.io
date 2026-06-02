@@ -136,6 +136,11 @@
       ctx.moveTo(tp.X - 12, tp.Y); ctx.lineTo(tp.X + 12, tp.Y);
       ctx.moveTo(tp.X, tp.Y - 12); ctx.lineTo(tp.X, tp.Y + 12);
       ctx.strokeStyle = "rgba(19,161,14,0.6)"; ctx.lineWidth = 1; ctx.stroke();
+      var label = document.documentElement.classList.contains("lang-active-zh") ? "Minimum global" : "Global minimum";
+      ctx.font = "600 12px Lato, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#13a10e";
+      ctx.fillText(label, tp.X, tp.Y + 24);
     }
     // marker (green once it has reached the minimum)
     var mp = project(px, py, worldZ(f(px, py)) + 0.05);
