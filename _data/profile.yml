@@ -49,7 +49,8 @@ education:
     position: '<em>Institut Jean Lamour - C2MP Doctoral School (Chemistry - Mechanics - Materials - Physics)</em>'
     date: 2025.11 - present
   - name: Master Smart Mechanics
-    url: "https://www.eiphi.ubfc.fr/"
+    logo: assets/images/badges/umlp.png
+    url: "https://www.umlp.fr/"
     dept: Besançon
     position: '<em>EIPHI-BFC Graduate School</em><br>Research Master in Smart Structures: vibroacoustic control (NVH), structural health monitoring, shape control and energy harvesting.'
     date: 2023 - 2025
