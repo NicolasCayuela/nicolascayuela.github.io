@@ -9,7 +9,10 @@
 
                 <!-- mode switch: Game of Life / Forest fire / Symmetry groups -->
                 <div class="btn-group btn-group-sm mb-3 flex-wrap" role="group">
-                    <button id="gol-mode-life" type="button" class="btn btn-outline-dark active">
+                    <button id="gol-mode-cifar" type="button" class="btn btn-outline-dark active">
+                        <i class="fas fa-image"></i> <span class="lang-en">CIFAR-10 Latent space</span><span class="lang-fr">Espace latent CIFAR-10</span>
+                    </button>
+                    <button id="gol-mode-life" type="button" class="btn btn-outline-dark">
                         <i class="fas fa-border-all"></i> <span class="lang-en">Game of Life</span><span class="lang-fr">Jeu de la vie</span>
                     </button>
                     <button id="gol-mode-fire" type="button" class="btn btn-outline-dark">
@@ -21,13 +24,10 @@
                     <button id="gol-mode-gd" type="button" class="btn btn-outline-dark">
                         <i class="fas fa-mountain"></i> <span class="lang-en">Gradient descent</span><span class="lang-fr">Descente de gradient</span>
                     </button>
-                    <button id="gol-mode-cifar" type="button" class="btn btn-outline-dark">
-                        <i class="fas fa-image"></i> <span class="lang-en">CIFAR-10 Latent space</span><span class="lang-fr">Espace latent CIFAR-10</span>
-                    </button>
                 </div>
 
                 <!-- ============ Game of Life / Forest fire ============ -->
-                <div id="gol-area">
+                <div id="gol-area" class="d-none">
                     <!-- shared transport controls -->
                     <div class="d-flex flex-wrap mb-2" style="gap:.4rem;">
                         <button id="gol-play" class="btn btn-sm btn-dark">
@@ -248,7 +248,7 @@
                 </div>
 
                 <!-- ============ CIFAR-10 dataset explorer ============ -->
-                <div id="cifar-area" class="d-none">
+                <div id="cifar-area">
                     <p class="small text-muted mx-1 mb-3">
                         <span class="lang-en">A <strong>latent space</strong> is a low-dimensional map where each image is encoded to a point, so that visually similar images land close together. Here every real CIFAR-10 image is a dot, coloured by its class, laid out in 2D. <strong>Drag the cursor</strong> through the space and the left panel shows the image at the nearest point.</span>
                         <span class="lang-fr">Un <strong>espace latent</strong> est une carte en faible dimension où chaque image est encodée en un point, de sorte que les images visuellement proches se retrouvent voisines. Ici chaque vraie image CIFAR-10 est un point, coloré selon sa classe, disposé en 2D. <strong>Déplace le curseur</strong> dans l'espace et le panneau de gauche montre l'image du point le plus proche.</span>
@@ -283,7 +283,7 @@
     </div>
 </div>
 
-<script src="{{ '/assets/js/game-of-life.js' | relative_url }}?v=9"></script>
+<script src="{{ '/assets/js/game-of-life.js' | relative_url }}?v=10"></script>
 <script src="{{ '/assets/js/symmetry.js' | relative_url }}?v=6"></script>
 <script src="{{ '/assets/js/gradient-descent.js' | relative_url }}?v=13"></script>
 <script src="{{ '/assets/js/cifar.js' | relative_url }}?v=2"></script>

@@ -276,6 +276,7 @@
     show("gol-life-controls", m === "life");
     show("gol-fire-controls", m === "fire");
     canvas.style.cursor = "pointer";
+    build();   // gol canvas may have been sized while hidden -> re-fit to the now-visible width
     if (m === "fire") {
       for (var j = 0; j < grid.length; j++) grid[j] = Math.random() < 0.6 ? 1 : 0; // fresh random forest
       fireDirty = true;

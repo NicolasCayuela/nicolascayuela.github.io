@@ -122,7 +122,7 @@
     var ring = d - front;                 // signed distance to the front
     // narrow gaussian envelope -> thin, sharp wavefronts (background stays calm
     // even with many overlapping ripples), plus global time decay
-    var env = Math.exp(-(ring * ring) / (2 * 1600));
+    var env = Math.exp(-(ring * ring) / (2 * 850));
     var decay = 1 - w.t / w.life;
     if (decay < 0) decay = 0;
     return w.amp * decay * env * Math.sin(w.k * ring);
@@ -182,7 +182,8 @@
   var LEVELS = 16;              // colormap quantisation; each level = one batched stroke
   // normalise against a single wave's crest (not the dynamic max) so every
   // wavefront reaches red all the way round; interference just stays clamped at red.
-  var REF = CFG.amp * 0.95;
+  var REF = CFG.amp * 1.6;        // higher -> field mostly sits in blue..yellow, red only at true peaks
+  var HUECAP = 0.82;              // compress colormap so the top is bright orange-red, not dark red
   function draw() {
     ctx.clearRect(0, 0, W, H);
 
@@ -202,7 +203,7 @@
       var arr = paths[bb];
       if (!arr.length) continue;
       var t = bb / (LEVELS - 1);
-      var col = jet(t);
+      var col = jet(t * HUECAP);
       var alpha = CFG.baseAlpha + (CFG.peakAlpha - CFG.baseAlpha) * t;
       ctx.strokeStyle = "rgba(" + col[0] + "," + col[1] + "," + col[2] + "," + alpha.toFixed(3) + ")";
       ctx.lineWidth = 0.6 + t * 1.6;
@@ -218,7 +219,7 @@
     for (var ni = 0; ni < nodes.length; ni++) {
       var nd = nodes[ni];
       var ns = nd.strain / maxStrain; if (ns > 1) ns = 1;
-      var nc = jet(ns);
+      var nc = jet(ns * HUECAP);
       ctx.fillStyle = "rgba(" + nc[0] + "," + nc[1] + "," + nc[2] + "," +
         (CFG.nodeAlpha * (0.4 + 0.6 * ns)).toFixed(3) + ")";
       var rad = 0.9 + ns * 1.9;
