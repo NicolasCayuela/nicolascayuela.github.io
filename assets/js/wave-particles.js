@@ -22,9 +22,9 @@
     wavelength: 190,    // spatial period of a wave (px)
     speed: 130,         // wave phase speed (px/s)
     waveLife: 4.2,      // seconds a ripple stays alive
-    maxWaves: 14,       // hard cap on simultaneous ripples
-    autoMin: 1,         // min seconds between random excitations
-    autoMax: 10,        // max seconds between random excitations
+    maxWaves: 40,       // perf backstop only; high so live ripples are never cut
+    autoMin: 2,         // min seconds between random excitations
+    autoMax: 5,         // max seconds between random excitations
     linkDist: 1.9,      // neighbour link cutoff, in lattice pitches
     baseAlpha: 0.16,    // resting link opacity
     nodeAlpha: 0.5,
