@@ -10,14 +10,14 @@
                             <div class="mx-2">
                                 <ul class="list-unstyled mb-1">
                                     {% for item in site.data.profile.education %}
-                                    <li class="media mb-1">
+                                    <li class="media align-items-center mb-3">
                                         {% if item.logo %}
                                           {% if item.url %}
                                             <a href="{{ item.url }}" target="_blank" class="text-black text-decoration-none">
-                                                <img src="{{ item.logo }}" alt="{{ item.name }}" style="height: 30px; width: auto; max-width: 90px;" class="mr-2 mt-1">
+                                                <img src="{{ item.logo }}" alt="{{ item.name }}" style="height: 48px; width: auto; max-width: 120px;" class="mr-3">
                                             </a>
                                           {% else %}
-                                            <img src="{{ item.logo }}" alt="{{ item.name }}" style="height: 30px; width: auto; max-width: 90px;" class="mr-2 mt-1">
+                                            <img src="{{ item.logo }}" alt="{{ item.name }}" style="height: 48px; width: auto; max-width: 120px;" class="mr-3">
                                           {% endif %}
                                         {% endif %}
                                         <div class="media-body">
@@ -49,14 +49,14 @@
                             <div class="mx-2">
                                 <ul class="list-unstyled mb-1">
                                     {% for item in site.data.profile.experience %}
-                                    <li class="media mb-1">
+                                    <li class="media align-items-center mb-3">
                                         {% if item.logo %}
                                           {% if item.url %}
                                             <a href="{{ item.url }}" target="_blank" class="text-black text-decoration-none">
-                                                <img src="{{ item.logo }}" alt="{{ item.name }}" style="height: 30px; width: auto; max-width: 90px;" class="mr-2 mt-1">
+                                                <img src="{{ item.logo }}" alt="{{ item.name }}" style="height: 48px; width: auto; max-width: 120px;" class="mr-3">
                                             </a>
                                           {% else %}
-                                            <img src="{{ item.logo }}" alt="{{ item.name }}" style="height: 30px; width: auto; max-width: 90px;" class="mr-2 mt-1">
+                                            <img src="{{ item.logo }}" alt="{{ item.name }}" style="height: 48px; width: auto; max-width: 120px;" class="mr-3">
                                           {% endif %}
                                         {% endif %}
                                         <div class="media-body">
