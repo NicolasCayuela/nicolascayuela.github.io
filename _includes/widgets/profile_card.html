@@ -4,7 +4,6 @@
             <div class="card-body p-4">
                 <div class="row">
                     <div class="col">
-                        <img src="{{ '/assets/images/etc/france.svg' | relative_url }}" alt="Nancy, France" class="float-right ml-3 d-none d-sm-block" style="height: 150px;">
                         <p class="h1 font-weight-normal lang-en mb-0">{{ site.data.profile.primary_name }}</p>
                         <p class="h1 font-weight-normal lang-fr mb-0">{{ site.data.profile.secondary_name }}</p>
                         <p class="text-profile-position">
@@ -102,6 +101,9 @@
 
                             </div>
                         </div>
+                    </div>
+                    <div class="col-auto d-none d-sm-flex align-items-center">
+                        <img src="{{ '/assets/images/etc/france.svg' | relative_url }}" alt="Nancy, France" style="height: 150px; width: auto;">
                     </div>
                     {% if site.data.profile.show_portrait %}
                     <div class="col-md-auto d-none d-md-block">
