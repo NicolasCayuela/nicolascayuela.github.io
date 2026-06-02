@@ -26,7 +26,7 @@
   var COLORS = {
     Black: "#000", Red: "#e51c23", Green: "#0a8f1a", Blue: "#1c54e5",
     Cyan: "#10b9c9", Magenta: "#d61fb5", Yellow: "#e6c20a",
-    "Light Gray": "#bdbdbd", Gray: "#7d7d7d", "Dark Gray": "#454545"
+    Orange: "#f57c00", Purple: "#8e24aa", Brown: "#795548"
   };
 
   // ---- group definitions: ops as [m11,m12,m21,m22, t1,t2] in fractional coords ----
