@@ -42,18 +42,40 @@ portrait_caption_fr: >-
   Je suis Nicolas Cayuela. Bienvenue sur ma page !
 
 education:
-  - name: Institut Jean Lamour
+  - name: "PhD: Sustainable architected metamaterials for elastic wave manipulation"
     logo: assets/images/empty_300x200.png
     url: "https://ijl.univ-lorraine.fr/"
-    position: PhD in Phononics & Metamaterials
-    date: 2024 - present
+    dept: Nancy
+    position: '<em>C2MP Doctoral School (Chemistry - Mechanics - Materials - Physics)</em>'
+    date: 2025.11 - present
+  - name: Master Smart Mechanics
+    logo: assets/images/empty_300x200.png
+    url: "https://www.eiphi.ubfc.fr/"
+    dept: Besançon
+    position: '<em>EIPHI-BFC Graduate School</em><br>Research Master in Smart Structures: vibroacoustic control (NVH), structural health monitoring, shape control and energy harvesting.'
+    date: 2023 - 2025
+  - name: Engineering degree
+    logo: assets/images/empty_300x200.png
+    url: "https://www.supmicrotech.fr/"
+    dept: Besançon
+    position: '<em>SUPMICROTECH-ENSMM</em><br>National School of Mechanics and Microtechnology.'
+    date: 2021 - 2025
+  - name: CPGE TSI
+    logo: assets/images/empty_300x200.png
+    url: "https://www.lyceedumas.fr/"
+    dept: Alès
+    position: '<em>Lycée Jean-Baptiste-Dumas</em><br>Preparatory classes for the French Grandes Écoles.'
+    date: 2019 - 2021
 
 education_fr:
-  - name: Institut Jean Lamour
-    logo: assets/images/empty_300x200.png
-    url: "https://ijl.univ-lorraine.fr/"
-    position: Doctorat en phononique & métamatériaux
-    date: 2024 - présent
+  - name: "Doctorat : Métamatériaux à architecture durable pour la manipulation des ondes élastiques"
+    position: '<em>École doctorale C2MP (Chimie - Mécanique - Matériaux - Physique)</em>'
+  - name: Master Smart Mechanics
+    position: '<em>EIPHI-BFC Graduate School</em><br>Master Recherche dans le domaine des Smart Structures, pour le contrôle vibroacoustique (NVH), la surveillance de la santé des structures, le contrôle de forme et la collecte d''énergie.'
+  - name: Diplôme d'ingénieur
+    position: '<em>SUPMICROTECH-ENSMM</em><br>École Nationale Supérieure de Mécanique et des Microtechniques.'
+  - name: CPGE TSI
+    position: '<em>Lycée Jean-Baptiste-Dumas</em><br>Classes Préparatoires aux Grandes Écoles.'
 
 # experience:
 #   - name: Lab / Company
