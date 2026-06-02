@@ -21,7 +21,7 @@
   var group = "p4m";
   var shapes = [];             // committed primitives
   var redo = [];
-  var showGrid = false;
+  var showGrid = true;
 
   var COLORS = {
     Black: "#000", Red: "#e51c23", Green: "#0a8f1a", Blue: "#1c54e5",
