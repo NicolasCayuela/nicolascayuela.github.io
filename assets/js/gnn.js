@@ -19,7 +19,16 @@
   var nodes = [];     // {x,y,h:[..],seed:-1}
   var edges = [];     // [i,j]
   var sel = 0;        // currently selected class for seeding
-  var playing = true, frame = 0;
+  var playing = true, frame = 0, iter = 0;
+
+  function updateIter() { var el = document.getElementById("gnn-iter"); if (el) el.textContent = iter; }
+  function setPlay(on) {
+    playing = on;
+    var b = document.getElementById("gnn-play");
+    if (b) b.innerHTML = on
+      ? '<i class="fas fa-pause"></i> <span class="lang-en">Pause</span><span class="lang-fr">Pause</span>'
+      : '<i class="fas fa-play"></i> <span class="lang-en">Play</span><span class="lang-fr">Lancer</span>';
+  }
 
   function rnd(a, b) { return a + (b - a) * Math.random(); }
 
@@ -77,6 +86,7 @@
       nh[i] = acc;
     }
     for (i = 0; i < nodes.length; i++) nodes[i].h = nh[i];
+    iter++; updateIter();
   }
 
   function nodeColor(n) {
@@ -118,7 +128,7 @@
   function loop() {
     requestAnimationFrame(loop);
     if (canvas.offsetParent === null) return;
-    if (playing) { frame++; if (frame % 6 === 0) step(); }
+    if (playing) { frame++; if (frame % 24 === 0) step(); }   // slow propagation
     render();
   }
 
@@ -174,16 +184,12 @@
       b.classList.add("active");
     });
   })(classBtns[ci]);
-  if ($("gnn-play")) $("gnn-play").addEventListener("click", function () {
-    playing = !playing;
-    this.innerHTML = playing
-      ? '<i class="fas fa-pause"></i> <span class="lang-en">Pause</span><span class="lang-fr">Pause</span>'
-      : '<i class="fas fa-play"></i> <span class="lang-en">Play</span><span class="lang-fr">Lancer</span>';
-  });
-  if ($("gnn-step")) $("gnn-step").addEventListener("click", function () { playing = false; step(); render(); });
-  if ($("gnn-reset")) $("gnn-reset").addEventListener("click", function () { genGraph(); render(); });
+  if ($("gnn-play")) $("gnn-play").addEventListener("click", function () { setPlay(!playing); });
+  if ($("gnn-step")) $("gnn-step").addEventListener("click", function () { setPlay(false); step(); render(); });
+  if ($("gnn-reset")) $("gnn-reset").addEventListener("click", function () { genGraph(); iter = 0; updateIter(); render(); });
   if ($("gnn-clear")) $("gnn-clear").addEventListener("click", function () {
     for (var i = 0; i < nodes.length; i++) { nodes[i].seed = -1; nodes[i].h = new Array(C).fill(0); }
+    iter = 0; updateIter();
   });
 
   // ---- init ----
