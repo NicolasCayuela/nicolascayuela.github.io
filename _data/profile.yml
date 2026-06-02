@@ -61,7 +61,8 @@ education:
     position: '<em>SUPMICROTECH-ENSMM</em><br>National School of Mechanics and Microtechnology.'
     date: 2021 - 2025
   - name: CPGE TSI
-    url: "https://www.lyceedumas.fr/"
+    logo: assets/images/badges/cpge.png
+    url: "https://cpge-tsi-jbdumas.lycee-ales.fr/"
     dept: Alès
     position: '<em>Lycée Jean-Baptiste-Dumas</em><br>Preparatory classes for the French Grandes Écoles.'
     date: 2019 - 2021
