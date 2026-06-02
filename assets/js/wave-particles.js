@@ -21,7 +21,7 @@
     amp: 13,            // peak node displacement (px)
     wavelength: 190,    // spatial period of a wave (px)
     speed: 130,         // wave phase speed (px/s)
-    waveLife: 4.2,      // seconds a ripple stays alive
+    waveLife: 8,        // seconds a ripple stays alive
     maxWaves: 40,       // perf backstop only; high so live ripples are never cut
     autoMin: 2,         // min seconds between random excitations
     autoMax: 5,         // max seconds between random excitations
