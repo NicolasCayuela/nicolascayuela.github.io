@@ -15,7 +15,33 @@
   var COLORS = ["#e6194b", "#3cb44b", "#ff1aff", "#4363d8", "#42d4f4",
                 "#0000ff", "#f58231", "#3cf0a0", "#911eb4", "#bfef45"];
 
-  var data = null, sprite = null, ready = false;
+  var data = null, sprite = null, ready = false, regionCanvas = null;
+
+  function hexToRgb(h) {
+    var n = parseInt(h.slice(1), 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+
+  // precompute the nearest-class "latent regions" once (independent of view size)
+  function buildRegions() {
+    var R = 130, off = document.createElement("canvas");
+    off.width = R; off.height = R;
+    var octx = off.getContext("2d"), img = octx.createImageData(R, R);
+    var it = data.items, cols = COLORS.map(hexToRgb), px, py, i;
+    for (py = 0; py < R; py++) {
+      for (px = 0; px < R; px++) {
+        var x = (px + 0.5) / R, y = (py + 0.5) / R, best = 1e9, bc = 0;
+        for (i = 0; i < it.length; i++) {
+          var dx = it[i].x - x, dy = it[i].y - y, d = dx * dx + dy * dy;
+          if (d < best) { best = d; bc = it[i].c; }
+        }
+        var o = (py * R + px) * 4, c = cols[bc];
+        img.data[o] = c[0]; img.data[o + 1] = c[1]; img.data[o + 2] = c[2]; img.data[o + 3] = 255;
+      }
+    }
+    octx.putImageData(img, 0, 0);
+    regionCanvas = off;
+  }
   var DPR = Math.min(window.devicePixelRatio || 1, 2);
   var SIZE = 360;                  // map logical size (square)
   var cursor = { x: 0.5, y: 0.5 };
@@ -26,6 +52,7 @@
 
   fetch(base).then(function (r) { return r.json(); }).then(function (j) {
     data = j;
+    buildRegions();
     sprite = new Image();
     sprite.onload = function () { ready = true; pickNearest(); render(); drawImg(); };
     sprite.src = spriteUrl;
@@ -61,20 +88,16 @@
   function render() {
     if (!ready) return;
     mctx.clearRect(0, 0, SIZE, SIZE);
-    mctx.fillStyle = "#fafafa"; mctx.fillRect(0, 0, SIZE, SIZE);
-    var it = data.items, i;
-    for (i = 0; i < it.length; i++) {
-      mctx.beginPath();
-      mctx.arc(it[i].x * SIZE, it[i].y * SIZE, i === nearest ? 6 : 3.4, 0, 6.2832);
-      mctx.fillStyle = COLORS[it[i].c];
-      mctx.fill();
-      if (i === nearest) { mctx.strokeStyle = "#000"; mctx.lineWidth = 1.5; mctx.stroke(); }
+    // smooth colour regions (nearest class) -> "latent space" continuity
+    if (regionCanvas) {
+      mctx.imageSmoothingEnabled = true;
+      mctx.drawImage(regionCanvas, 0, 0, SIZE, SIZE);
     }
     // cursor ring
     mctx.beginPath();
     mctx.arc(cursor.x * SIZE, cursor.y * SIZE, 11, 0, 6.2832);
-    mctx.strokeStyle = "rgba(40,40,40,0.85)"; mctx.lineWidth = 3; mctx.stroke();
-    mctx.fillStyle = "rgba(255,255,255,0.25)"; mctx.fill();
+    mctx.strokeStyle = "rgba(40,40,40,0.9)"; mctx.lineWidth = 3; mctx.stroke();
+    mctx.fillStyle = "rgba(255,255,255,0.35)"; mctx.fill();
   }
 
   function drawImg() {
