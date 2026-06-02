@@ -20,15 +20,17 @@ linkedin: nicolas-cayuela
 #resume: assets/cv/Resume_Nicolas_Cayuela.pdf
 
 short_bio: >-
-  Hi, I am <strong>Nicolas Cayuela</strong>, a PhD student in phononics and metamaterials
+  Hi, i am <strong>Nicolas Cayuela</strong>, a PhD student in phononics and metamaterials
   at <strong>Institut Jean Lamour</strong> in Nancy, France. My research focuses on the design
-  and study of phononic crystals and acoustic/elastic metamaterials.
+  and study of phononic crystals and acoustic/elastic metamaterials using
+  <strong>machine learning with graphs</strong>.
   <br> <span style="color: red; font-style: italic;">Feel free to contact me if you are interested in discussing or collaborating.</span>
 
 short_bio_fr: >-
   Bonjour, je suis <strong>Nicolas Cayuela</strong>, doctorant en phononique et métamatériaux
   à l'<strong>Institut Jean Lamour</strong> à Nancy. Mes recherches portent sur la conception
-  et l'étude des cristaux phononiques et des métamatériaux acoustiques/élastiques.
+  et l'étude des cristaux phononiques et des métamatériaux acoustiques/élastiques à l'aide du
+  <strong>machine learning sur graphes</strong>.
   <br> <span style="color: red; font-style: italic;">N'hésitez pas à me contacter pour échanger ou collaborer.</span>
 
 show_portrait: true
