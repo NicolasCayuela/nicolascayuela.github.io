@@ -1,0 +1,55 @@
+<div class="row mt-3">
+    <div class="col">
+        <div class="card border-0 shadow-sm bg-white">
+            <div class="card-body p-4">
+                <h6>
+                    <i class="fas fa-gamepad"></i> &nbsp;
+                    <span class="lang-en">Bored?</span><span class="lang-zh">Tu t'ennuies ?</span>
+                </h6>
+                <p class="small text-muted mx-2 mb-3">
+                    <span class="lang-en">Conway's <strong>Game of Life</strong>. Click or drag the grid to draw black cells. Pick a pattern below, then click to stamp it. The grid wraps around, so gliders fly forever.</span>
+                    <span class="lang-zh">Le <strong>jeu de la vie</strong> de Conway. Clique ou glisse sur la grille pour dessiner des cellules noires. Choisis une forme ci-dessous puis clique pour la poser. La grille est torique : les planeurs tournent à l'infini.</span>
+                </p>
+
+                <div class="d-flex flex-wrap mb-2" style="gap:.4rem;">
+                    <button id="gol-play" class="btn btn-sm btn-dark">
+                        <i class="fas fa-play"></i> <span class="lang-en">Play</span><span class="lang-zh">Lancer</span>
+                    </button>
+                    <button id="gol-step" class="btn btn-sm btn-outline-dark">
+                        <i class="fas fa-step-forward"></i> <span class="lang-en">Step</span><span class="lang-zh">Pas</span>
+                    </button>
+                    <button id="gol-random" class="btn btn-sm btn-outline-dark">
+                        <i class="fas fa-dice"></i> <span class="lang-en">Random</span><span class="lang-zh">Aléatoire</span>
+                    </button>
+                    <button id="gol-clear" class="btn btn-sm btn-outline-dark">
+                        <i class="fas fa-trash"></i> <span class="lang-en">Clear</span><span class="lang-zh">Effacer</span>
+                    </button>
+                </div>
+
+                <div class="d-flex flex-wrap align-items-center mb-3" style="gap:.4rem;">
+                    <span class="small text-muted mr-1">
+                        <span class="lang-en">Patterns:</span><span class="lang-zh">Formes&nbsp;:</span>
+                    </span>
+                    <button data-gol-pattern="" class="btn btn-sm btn-outline-secondary active">
+                        <i class="fas fa-pen"></i> <span class="lang-en">Pen</span><span class="lang-zh">Stylo</span>
+                    </button>
+                    <button data-gol-pattern="glider" class="btn btn-sm btn-outline-secondary">Glider</button>
+                    <button data-gol-pattern="blinker" class="btn btn-sm btn-outline-secondary">Blinker</button>
+                    <button data-gol-pattern="toad" class="btn btn-sm btn-outline-secondary">Toad</button>
+                    <button data-gol-pattern="beacon" class="btn btn-sm btn-outline-secondary">Beacon</button>
+                    <button data-gol-pattern="lwss" class="btn btn-sm btn-outline-secondary">LWSS</button>
+                    <button data-gol-pattern="pulsar" class="btn btn-sm btn-outline-secondary">Pulsar</button>
+                    <button data-gol-pattern="gun" class="btn btn-sm btn-outline-secondary">
+                        <span class="lang-en">Glider gun</span><span class="lang-zh">Canon à planeurs</span>
+                    </button>
+                </div>
+
+                <div id="gol-wrap" style="width:100%; overflow-x:auto;">
+                    <canvas id="gol-canvas" style="background:#fff; border-radius:4px; touch-action:none;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ '/assets/js/game-of-life.js' | relative_url }}?v=1"></script>
