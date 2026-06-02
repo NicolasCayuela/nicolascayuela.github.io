@@ -231,7 +231,7 @@
 
   // static render for reduced-motion users: one frozen wavefront, no animation
   function renderStatic() {
-    spawn(W * 0.5, H * 0.42, CFG.amp);
+    spawn(W * 0.06, H * 0.5, CFG.amp);
     waves[0].t = (CFG.wavelength * 1.2) / CFG.speed;
     var maxStrain = 1e-4, i, n, w, dx, dy, d, disp, ux, uy;
     for (i = 0; i < nodes.length; i++) {
@@ -272,7 +272,7 @@
   if (reduce) {
     renderStatic();
   } else {
-    spawn(W * 0.5, H * 0.4, CFG.amp);
+    spawn(W * 0.06, H * 0.5, CFG.amp);   // start at the left edge, not behind the centred text
     requestAnimationFrame(frame);
   }
 })();
