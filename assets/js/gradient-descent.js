@@ -72,9 +72,10 @@
     var ca = Math.cos(yaw), sa = Math.sin(yaw);
     var x1 = x * ca - y * sa, y1 = x * sa + y * ca, z1 = zheight;
     var cb = Math.cos(pitch), sb = Math.sin(pitch);
-    var y2 = y1 * cb - z1 * sb, z2 = y1 * sb + z1 * cb;
+    var up = y1 * sb + z1 * cb;          // height goes UP on screen
+    var depth = y1 * cb - z1 * sb;        // along the view direction (larger = farther)
     var scale = Math.min(W, H) / (2 * D) * 0.62;
-    return { X: W / 2 + scale * x1, Y: H * 0.56 - scale * y2, depth: z2 };
+    return { X: W / 2 + scale * x1, Y: H * 0.56 - scale * up, depth: depth };
   }
 
   function worldZ(z) { return (zn(z) - 0.45) * (D * 1.25); }   // height in domain units
@@ -106,7 +107,7 @@
         quads.push({ p: [p1, p2, p3, p4], depth: (p1.depth + p2.depth + p3.depth + p4.depth) / 4, t: zn(zc) });
       }
     }
-    quads.sort(function (a, b) { return a.depth - b.depth; });   // painter: far first
+    quads.sort(function (a, b) { return b.depth - a.depth; });   // painter: far (larger depth) first
     for (i = 0; i < quads.length; i++) {
       var q = quads[i].p;
       ctx.beginPath();
