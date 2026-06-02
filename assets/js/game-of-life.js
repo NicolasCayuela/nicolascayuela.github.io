@@ -259,9 +259,7 @@
     show("gol-fire-controls", m === "fire");
     canvas.style.cursor = "pointer";
     if (m === "fire") {
-      var empty = true;
-      for (var i = 0; i < grid.length; i++) if (grid[i]) { empty = false; break; }
-      if (empty) { for (var j = 0; j < grid.length; j++) grid[j] = Math.random() < 0.6 ? 1 : 0; }
+      for (var j = 0; j < grid.length; j++) grid[j] = Math.random() < 0.6 ? 1 : 0; // fresh random forest
     }
     draw();
   }
