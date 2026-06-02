@@ -45,25 +45,25 @@ education:
   - name: "PhD: Sustainable architected metamaterials for elastic wave manipulation"
     logo: assets/images/badges/ijl.jpg
     url: "https://ijl.univ-lorraine.fr/"
-    dept: Nancy
+    dept: Nancy, France
     position: '<em>Institut Jean Lamour - C2MP Doctoral School (Chemistry - Mechanics - Materials - Physics)</em>'
     date: 2025.11 - present
   - name: Master Smart Mechanics
     logo: assets/images/badges/umlp.png
     url: "https://www.umlp.fr/"
-    dept: Besançon
+    dept: Besançon, France
     position: '<em>EIPHI-BFC Graduate School</em><br>Research Master in Smart Structures: vibroacoustic control (NVH), structural health monitoring, shape control and energy harvesting.'
     date: 2023 - 2025
   - name: Engineering degree
     logo: assets/images/badges/ensmm.png
     url: "https://www.supmicrotech.fr/"
-    dept: Besançon
+    dept: Besançon, France
     position: '<em>SUPMICROTECH-ENSMM</em><br>National School of Mechanics and Microtechnology.'
     date: 2021 - 2025
   - name: CPGE TSI
     logo: assets/images/badges/cpge.png
     url: "https://cpge-tsi-jbdumas.lycee-ales.fr/"
-    dept: Alès
+    dept: Alès, France
     position: '<em>Lycée Jean-Baptiste-Dumas</em><br>Preparatory classes for the French Grandes Écoles.'
     date: 2019 - 2021
 
@@ -79,9 +79,13 @@ education_fr:
 
 experience:
   - name: "Internship - Dynamic mechanical characterization of elementary fibres for bio-sourced composites"
+    logo: assets/images/badges/femto.svg
+    url: "https://www.femto-st.fr/fr"
     position: '<em>FEMTO-ST, Applied Mechanics Department</em><br>Dynamic testing (laser vibrometer, high-speed camera, vacuum pump) on flax fibres: identification of damping by logarithmic decrement and of the storage (stiffness) modulus via FE in COMSOL.'
     date: 2024
   - name: "Internship - Multi-physics optomechanical sensor study"
+    logo: assets/images/badges/leti.png
+    url: "https://www.leti-cea.fr/"
     position: '<em>CEA-Leti</em><br>Gas sensing with optomechanical chips and a Mach–Zehnder reference. Built an experimental bench, capping encapsulation (PMMA + tape), RF probe measurements and Comsol/RSoft simulations to analyse the optomechanical coupling and eigenmodes.'
     date: 2025
   - name: "PhD - Sustainable architected metamaterials for elastic wave manipulation"
