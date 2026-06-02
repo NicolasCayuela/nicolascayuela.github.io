@@ -301,4 +301,5 @@
   buildOps();
   updateButtons();
   resize();
+  window.__symResize = resize;   // let the tab switcher re-layout when shown
 })();
