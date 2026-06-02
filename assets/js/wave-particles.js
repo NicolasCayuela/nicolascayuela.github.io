@@ -151,7 +151,7 @@
     if (autoTimer >= nextAuto) {
       autoTimer = 0;
       scheduleAuto();   // new random delay in [autoMin, autoMax] seconds
-      spawn(Math.random() * W, Math.random() * H, CFG.amp * (0.5 + Math.random() * 0.7));
+      spawn(Math.random() * W, Math.random() * H, CFG.amp * (1.4 + Math.random() * 0.8));
     }
     for (var wI = waves.length - 1; wI >= 0; wI--) {
       waves[wI].t += step;
@@ -231,7 +231,7 @@
 
   // static render for reduced-motion users: one frozen wavefront, no animation
   function renderStatic() {
-    spawn(W * 0.06, H * 0.5, CFG.amp);
+    spawn(W * 0.06, H * 0.5, CFG.amp * 1.8);
     waves[0].t = (CFG.wavelength * 1.2) / CFG.speed;
     var maxStrain = 1e-4, i, n, w, dx, dy, d, disp, ux, uy;
     for (i = 0; i < nodes.length; i++) {
@@ -272,7 +272,7 @@
   if (reduce) {
     renderStatic();
   } else {
-    spawn(W * 0.06, H * 0.5, CFG.amp);   // start at the left edge, not behind the centred text
+    spawn(W * 0.06, H * 0.5, CFG.amp * (1.4 + Math.random() * 0.8));   // start at the left edge, not behind the centred text
     requestAnimationFrame(frame);
   }
 })();
