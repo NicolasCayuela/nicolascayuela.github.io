@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Map of France, Nancy">
+  <polygon points="108.5,15.6 117.6,22.7 141.1,36.9 178.2,58.2 172.4,74.2 155.4,100.9 175.0,145.3 147.6,152.4 116.3,166.7 56.3,151.6 61.5,127.6 60.2,100.9 36.8,77.8 14.6,61.8 56.3,38.7 78.5,42.2" fill="#eef3fb" stroke="#9bb4d4" stroke-width="2" stroke-linejoin="round"/>
+  <circle cx="157.8" cy="56.6" r="5.5" fill="#e02424"/>
+  <circle cx="157.8" cy="56.6" r="5.5" fill="none" stroke="#fff" stroke-width="1.5"/>
+  <text x="149.8" y="47.6" text-anchor="end" font-family="Lato,Arial,sans-serif" font-size="12" fill="#333">Nancy</text>
+</svg>
