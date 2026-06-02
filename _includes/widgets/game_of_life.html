@@ -21,6 +21,9 @@
                     <button id="gol-mode-gd" type="button" class="btn btn-outline-dark">
                         <i class="fas fa-mountain"></i> <span class="lang-en">Gradient descent</span><span class="lang-zh">Descente de gradient</span>
                     </button>
+                    <button id="gol-mode-cifar" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-image"></i> <span class="lang-en">CIFAR-10</span><span class="lang-zh">CIFAR-10</span>
+                    </button>
                 </div>
 
                 <!-- ============ Game of Life / Forest fire ============ -->
@@ -226,8 +229,8 @@
                     </div>
                     <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.4rem;">
                         <span class="small text-muted mr-1"><span class="lang-en">Optimiser:</span><span class="lang-zh">Optimiseur&nbsp;:</span></span>
-                        <button data-gd-opt="sgd" class="btn btn-sm btn-outline-secondary">SGD</button>
-                        <button data-gd-opt="momentum" class="btn btn-sm btn-outline-secondary active">Momentum</button>
+                        <button data-gd-opt="sgd" class="btn btn-sm btn-outline-secondary active">SGD</button>
+                        <button data-gd-opt="momentum" class="btn btn-sm btn-outline-secondary">Momentum</button>
                         <button data-gd-opt="adam" class="btn btn-sm btn-outline-secondary">Adam</button>
                         <label class="small text-muted mb-0 ml-2">
                             <span class="lang-en">Learning rate</span><span class="lang-zh">Taux d'apprentissage</span>
@@ -243,11 +246,44 @@
                         <canvas id="gd-canvas" style="background:#fff; border-radius:4px; touch-action:none; cursor:grab; width:100%;"></canvas>
                     </div>
                 </div>
+
+                <!-- ============ CIFAR-10 dataset explorer ============ -->
+                <div id="cifar-area" class="d-none">
+                    <p class="small text-muted mx-1 mb-3">
+                        <span class="lang-en">A 2D map of real CIFAR-10 images, each a dot coloured by its class. <strong>Drag the cursor</strong> around the map — the panel on the left shows the nearest image.</span>
+                        <span class="lang-zh">Une carte 2D de vraies images CIFAR-10, chaque point coloré selon sa classe. <strong>Déplace le curseur</strong> sur la carte — le panneau de gauche montre l'image la plus proche.</span>
+                    </p>
+                    <div class="d-flex flex-wrap align-items-start" style="gap:1rem;">
+                        <div>
+                            <canvas id="cifar-img" width="180" height="180" style="image-rendering:pixelated; border:1px solid #ccc; border-radius:4px; width:180px; height:180px;"></canvas>
+                            <div class="text-center small font-weight-bold mt-1" id="cifar-label">&nbsp;</div>
+                        </div>
+                        <div id="cifar-mapwrap" style="flex:1 1 260px; min-width:220px;">
+                            <canvas id="cifar-map"
+                                    data-sprite="{{ '/assets/images/cifar/cifar_sprite.png' | relative_url }}"
+                                    data-json="{{ '/assets/images/cifar/cifar_data.json' | relative_url }}"
+                                    style="border:1px solid #ccc; border-radius:4px; touch-action:none; cursor:crosshair;"></canvas>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap mt-3" style="gap:.3rem 1rem;">
+                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#e6194b;border-radius:2px;"></span> <span class="lang-en">airplane</span><span class="lang-zh">avion</span></span>
+                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#3cb44b;border-radius:2px;"></span> <span class="lang-en">automobile</span><span class="lang-zh">voiture</span></span>
+                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#ff1aff;border-radius:2px;"></span> <span class="lang-en">bird</span><span class="lang-zh">oiseau</span></span>
+                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#4363d8;border-radius:2px;"></span> <span class="lang-en">cat</span><span class="lang-zh">chat</span></span>
+                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#42d4f4;border-radius:2px;"></span> <span class="lang-en">deer</span><span class="lang-zh">cerf</span></span>
+                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#0000ff;border-radius:2px;"></span> <span class="lang-en">dog</span><span class="lang-zh">chien</span></span>
+                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#f58231;border-radius:2px;"></span> <span class="lang-en">frog</span><span class="lang-zh">grenouille</span></span>
+                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#3cf0a0;border-radius:2px;"></span> <span class="lang-en">horse</span><span class="lang-zh">cheval</span></span>
+                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#911eb4;border-radius:2px;"></span> <span class="lang-en">ship</span><span class="lang-zh">navire</span></span>
+                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#bfef45;border-radius:2px;"></span> <span class="lang-en">truck</span><span class="lang-zh">camion</span></span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<script src="{{ '/assets/js/game-of-life.js' | relative_url }}?v=7"></script>
+<script src="{{ '/assets/js/game-of-life.js' | relative_url }}?v=8"></script>
 <script src="{{ '/assets/js/symmetry.js' | relative_url }}?v=6"></script>
-<script src="{{ '/assets/js/gradient-descent.js' | relative_url }}?v=11"></script>
+<script src="{{ '/assets/js/gradient-descent.js' | relative_url }}?v=12"></script>
+<script src="{{ '/assets/js/cifar.js' | relative_url }}?v=1"></script>

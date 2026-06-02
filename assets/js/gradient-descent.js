@@ -37,7 +37,7 @@
     monkey: { f: function (x, y) { return 0.3 * (x * x * x - 3 * x * y * y); },                 // monkey saddle (no min)
               g: function (x, y) { return [0.3 * (3 * x * x - 3 * y * y), 0.3 * (-6 * x * y)]; }, lr: 0.05, start: 1.4, noMin: true }
   };
-  var surf = "ripples", optimizer = "momentum", lrScale = 1;
+  var surf = "ripples", optimizer = "sgd", lrScale = 1;
 
   // marker state
   var px = 0, py = 0, vx = 0, vy = 0, trail = [], paused = false, settled = false, settleTimer = 0;
@@ -204,7 +204,7 @@
     if (canvas.offsetParent === null) return;     // hidden tab -> idle
     if (!paused) {
       if (!settled) { frame++; if (frame % 3 === 0) step(); }
-      else { settleHold++; if (settleHold > 180) restart(); }   // ~3s after converging -> relaunch
+      else { settleHold++; if (settleHold > 90) restart(); }    // ~1.5s after converging -> relaunch
     }
     render();
   }
