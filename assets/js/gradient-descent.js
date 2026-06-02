@@ -16,7 +16,6 @@
   var D = 2;                 // domain half-width: x,y in [-D, D]
   var N = 30;                // mesh resolution
   var yaw = 0.7, pitch = 0.9;
-  var autoRotate = true;
 
   // ---- loss surfaces (value + gradient) ----
   var SURF = {
@@ -152,7 +151,6 @@
   function loop() {
     requestAnimationFrame(loop);
     if (canvas.offsetParent === null) return;     // hidden tab -> idle
-    if (autoRotate && !dragging) yaw += 0.004;
     if (!paused) { frame++; if (frame % 3 === 0) step(); }
     render();
   }
@@ -207,7 +205,6 @@
       : '<i class="fas fa-pause"></i> <span class="lang-en">Pause</span><span class="lang-zh">Pause</span>';
   });
   if ($("gd-restart")) $("gd-restart").addEventListener("click", restart);
-  if ($("gd-rotate")) $("gd-rotate").addEventListener("change", function () { autoRotate = this.checked; });
 
   // ---- init ----
   var rt;
