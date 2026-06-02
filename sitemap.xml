@@ -14,9 +14,4 @@ layout: null
     <loc>{{ site.url }}{{ pub.url }}</loc>
   </url>
   {% endfor %}
-  {% for proj in site.projects %}
-  <url>
-    <loc>{{ site.url }}{{ proj.url }}</loc>
-  </url>
-  {% endfor %}
 </urlset>
