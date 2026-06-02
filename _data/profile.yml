@@ -43,10 +43,10 @@ portrait_caption_fr: >-
 
 education:
   - name: "PhD: Sustainable architected metamaterials for elastic wave manipulation"
-    logo: assets/images/empty_300x200.png
+    logo: assets/images/badges/ijl.png
     url: "https://ijl.univ-lorraine.fr/"
     dept: Nancy
-    position: '<em>C2MP Doctoral School (Chemistry - Mechanics - Materials - Physics)</em>'
+    position: '<em>Institut Jean Lamour - C2MP Doctoral School (Chemistry - Mechanics - Materials - Physics)</em>'
     date: 2025.11 - present
   - name: Master Smart Mechanics
     logo: assets/images/empty_300x200.png
@@ -55,7 +55,7 @@ education:
     position: '<em>EIPHI-BFC Graduate School</em><br>Research Master in Smart Structures: vibroacoustic control (NVH), structural health monitoring, shape control and energy harvesting.'
     date: 2023 - 2025
   - name: Engineering degree
-    logo: assets/images/empty_300x200.png
+    logo: assets/images/badges/ensmm.png
     url: "https://www.supmicrotech.fr/"
     dept: Besançon
     position: '<em>SUPMICROTECH-ENSMM</em><br>National School of Mechanics and Microtechnology.'
@@ -69,7 +69,7 @@ education:
 
 education_fr:
   - name: "Doctorat : Métamatériaux à architecture durable pour la manipulation des ondes élastiques"
-    position: '<em>École doctorale C2MP (Chimie - Mécanique - Matériaux - Physique)</em>'
+    position: '<em>Institut Jean Lamour - École doctorale C2MP (Chimie - Mécanique - Matériaux - Physique)</em>'
   - name: Master Smart Mechanics
     position: '<em>EIPHI-BFC Graduate School</em><br>Master Recherche dans le domaine des Smart Structures, pour le contrôle vibroacoustique (NVH), la surveillance de la santé des structures, le contrôle de forme et la collecte d''énergie.'
   - name: Diplôme d'ingénieur
@@ -87,7 +87,7 @@ experience:
     position: '<em>CEA-Leti</em><br>Gas sensing with optomechanical chips and a Mach–Zehnder reference. Built an experimental bench, capping encapsulation (PMMA + tape), RF probe measurements and Comsol/RSoft simulations to analyse the optomechanical coupling and eigenmodes.'
     date: 2025
   - name: "PhD - Sustainable architected metamaterials for elastic wave manipulation"
-    logo: assets/images/empty_300x200.png
+    logo: assets/images/badges/ijl.png
     url: "https://ijl.univ-lorraine.fr/"
     position: '<em>Institut Jean Lamour, UMR CNRS 7198</em><br>Design of 3D piezoelectric metamaterials from pillar-based unit cells, with a piezoelectric tensor tunable through the micro-architecture. Characterization of the elastodynamic behaviour (band structures, Willis coupling, electro-momentum coupling) and machine-learning approaches (GNN, inverse design) to speed up prediction and optimization of wave-propagation properties. Targeted applications: defect/impact detection, directional sensing, energy harvesting and non-Hermitian behaviour.'
     date: 2025 - 2028
