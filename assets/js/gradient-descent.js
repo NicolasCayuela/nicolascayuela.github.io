@@ -15,7 +15,8 @@
   var DPR = 1, W = 0, H = 0;
   var D = 2;                 // domain half-width: x,y in [-D, D]
   var N = 30;                // mesh resolution
-  var yaw = 0.7, pitch = 0.9;
+  var ISO_YAW = Math.PI / 4, ISO_PITCH = 0.6155;   // isometric view
+  var yaw = ISO_YAW, pitch = ISO_PITCH;
 
   // ---- loss surfaces (value + gradient) ----
   var SURF = {
@@ -162,7 +163,6 @@
     if (!dragging) return;
     yaw += (e.clientX - lx) * 0.01;
     pitch += (e.clientY - ly) * 0.01;
-    pitch = Math.max(-1.45, Math.min(1.55, pitch));
     lx = e.clientX; ly = e.clientY;
   });
   window.addEventListener("mouseup", function () { dragging = false; });
@@ -171,7 +171,6 @@
     if (!dragging) return;
     yaw += (e.touches[0].clientX - lx) * 0.01;
     pitch += (e.touches[0].clientY - ly) * 0.01;
-    pitch = Math.max(-1.45, Math.min(1.55, pitch));
     lx = e.touches[0].clientX; ly = e.touches[0].clientY;
   }, { passive: true });
   canvas.addEventListener("touchend", function () { dragging = false; });
@@ -205,6 +204,7 @@
       : '<i class="fas fa-pause"></i> <span class="lang-en">Pause</span><span class="lang-zh">Pause</span>';
   });
   if ($("gd-restart")) $("gd-restart").addEventListener("click", restart);
+  if ($("gd-resetview")) $("gd-resetview").addEventListener("click", function () { yaw = ISO_YAW; pitch = ISO_PITCH; });
 
   // ---- init ----
   var rt;
