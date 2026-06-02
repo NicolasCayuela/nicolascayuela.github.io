@@ -3,10 +3,11 @@
         <div class="row my-3">
             <div class="col-6">
                 <div class="text-muted">
-                    {% assign mo = "now" | date: "%-m" | plus: 0 %}
+                    {% assign mo = "now" | date: "%m" | plus: 0 %}
+                    {% assign mi = mo | minus: 1 %}
                     {% assign fr_months = "janvier,février,mars,avril,mai,juin,juillet,août,septembre,octobre,novembre,décembre" | split: "," %}
                     <i>{% include i18n.html key="last_updated" %}
-                        <span class="lang-en">{{ "now" | date: "%B %Y" }}</span><span class="lang-zh">{{ fr_months[mo | minus: 1] }} {{ "now" | date: "%Y" }}</span></i>
+                        <span class="lang-en">{{ "now" | date: "%B %Y" }}</span><span class="lang-zh">{{ fr_months[mi] }} {{ "now" | date: "%Y" }}</span></i>
                 </div>
             </div>
             <div class="col-6">
