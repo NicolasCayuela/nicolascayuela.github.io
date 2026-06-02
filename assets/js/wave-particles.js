@@ -18,7 +18,7 @@
   var CFG = {
     spacing: 46,        // lattice pitch in px (unit-cell size)
     jitter: 0.18,       // random lattice disorder (0 = perfect crystal)
-    amp: 16,            // peak node displacement (px)
+    amp: 19,            // peak node displacement (px)
     wavelength: 190,    // spatial period of a wave (px)
     speed: 130,         // wave phase speed (px/s)
     waveLife: 15,       // seconds a ripple stays alive
@@ -182,7 +182,7 @@
   var LEVELS = 16;              // colormap quantisation; each level = one batched stroke
   // normalise against a single wave's crest (not the dynamic max) so every
   // wavefront reaches red all the way round; interference just stays clamped at red.
-  var REF = CFG.amp * 1.15;       // sets where the colormap saturates; lower -> more orange/yellow at the fronts
+  var REF = CFG.amp * 0.95;       // sets where the colormap saturates; lower -> more orange/yellow at the fronts
   var HUECAP = 0.82;              // compress colormap so the top is bright orange-red, not dark red
   function draw() {
     ctx.clearRect(0, 0, W, H);
