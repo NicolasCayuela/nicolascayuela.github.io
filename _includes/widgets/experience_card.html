@@ -11,12 +11,14 @@
                                 <ul class="list-unstyled mb-1">
                                     {% for item in site.data.profile.education %}
                                     <li class="media mb-1">
-                                        {% if item.url %}
+                                        {% if item.logo %}
+                                          {% if item.url %}
                                             <a href="{{ item.url }}" target="_blank" class="text-black text-decoration-none">
-                                                <img src="{{ item.logo }}" alt="{{ item.name }}" style="width: 18px;" class="mr-1 mt-1">
+                                                <img src="{{ item.logo }}" alt="{{ item.name }}" style="height: 30px; width: auto; max-width: 90px;" class="mr-2 mt-1">
                                             </a>
-                                        {% else %}
-                                            <img src="{{ item.logo }}" alt="{{ item.name }}" style="width: 18px;" class="mr-1 mt-1">
+                                          {% else %}
+                                            <img src="{{ item.logo }}" alt="{{ item.name }}" style="height: 30px; width: auto; max-width: 90px;" class="mr-2 mt-1">
+                                          {% endif %}
                                         {% endif %}
                                         <div class="media-body">
                                             <p class="my-0"><span class="lang-en">{{ item.name }}</span><span class="lang-fr">{{ site.data.profile.education_fr[forloop.index0].name }}</span></p>
@@ -48,12 +50,14 @@
                                 <ul class="list-unstyled mb-1">
                                     {% for item in site.data.profile.experience %}
                                     <li class="media mb-1">
-                                        {% if item.url %}
+                                        {% if item.logo %}
+                                          {% if item.url %}
                                             <a href="{{ item.url }}" target="_blank" class="text-black text-decoration-none">
-                                                <img src="{{ item.logo }}" alt="{{ item.name }}" style="width: 18px;" class="mr-1 mt-1">
+                                                <img src="{{ item.logo }}" alt="{{ item.name }}" style="height: 30px; width: auto; max-width: 90px;" class="mr-2 mt-1">
                                             </a>
-                                        {% else %}
-                                            <img src="{{ item.logo }}" alt="{{ item.name }}" style="width: 18px;" class="mr-1 mt-1">
+                                          {% else %}
+                                            <img src="{{ item.logo }}" alt="{{ item.name }}" style="height: 30px; width: auto; max-width: 90px;" class="mr-2 mt-1">
+                                          {% endif %}
                                         {% endif %}
                                         <div class="media-body">
                                             <p class="my-0"><span class="lang-en">{{ item.name }}</span><span class="lang-fr">{{ site.data.profile.experience_fr[forloop.index0].name }}</span></p>

@@ -49,7 +49,6 @@ education:
     position: '<em>Institut Jean Lamour - C2MP Doctoral School (Chemistry - Mechanics - Materials - Physics)</em>'
     date: 2025.11 - present
   - name: Master Smart Mechanics
-    logo: assets/images/empty_300x200.png
     url: "https://www.eiphi.ubfc.fr/"
     dept: Besançon
     position: '<em>EIPHI-BFC Graduate School</em><br>Research Master in Smart Structures: vibroacoustic control (NVH), structural health monitoring, shape control and energy harvesting.'
@@ -61,7 +60,6 @@ education:
     position: '<em>SUPMICROTECH-ENSMM</em><br>National School of Mechanics and Microtechnology.'
     date: 2021 - 2025
   - name: CPGE TSI
-    logo: assets/images/empty_300x200.png
     url: "https://www.lyceedumas.fr/"
     dept: Alès
     position: '<em>Lycée Jean-Baptiste-Dumas</em><br>Preparatory classes for the French Grandes Écoles.'
@@ -79,11 +77,9 @@ education_fr:
 
 experience:
   - name: "Internship - Dynamic mechanical characterization of elementary fibres for bio-sourced composites"
-    logo: assets/images/empty_300x200.png
     position: '<em>FEMTO-ST, Applied Mechanics Department</em><br>Dynamic testing (laser vibrometer, high-speed camera, vacuum pump) on flax fibres: identification of damping by logarithmic decrement and of the storage (stiffness) modulus via FE in COMSOL.'
     date: 2024
   - name: "Internship - Multi-physics optomechanical sensor study"
-    logo: assets/images/empty_300x200.png
     position: '<em>CEA-Leti</em><br>Gas sensing with optomechanical chips and a Mach–Zehnder reference. Built an experimental bench, capping encapsulation (PMMA + tape), RF probe measurements and Comsol/RSoft simulations to analyse the optomechanical coupling and eigenmodes.'
     date: 2025
   - name: "PhD - Sustainable architected metamaterials for elastic wave manipulation"
