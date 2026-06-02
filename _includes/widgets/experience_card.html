@@ -11,15 +11,17 @@
                                 <ul class="list-unstyled mb-1">
                                     {% for item in site.data.profile.education %}
                                     <li class="media align-items-center mb-3">
-                                        {% if item.logo %}
+                                        <div class="mr-3 d-flex justify-content-center align-items-center" style="flex: 0 0 150px; width: 150px;">
+                                          {% if item.logo %}
                                           {% if item.url %}
                                             <a href="{{ item.url }}" target="_blank" class="text-black text-decoration-none">
-                                                <img src="{{ item.logo }}" alt="{{ item.name }}" style="height: 48px; width: auto; max-width: 170px; object-fit: contain;" class="mr-3">
+                                                <img src="{{ item.logo }}" alt="{{ item.name }}" style="height: 48px; width: auto; max-width: 140px; object-fit: contain;">
                                             </a>
                                           {% else %}
-                                            <img src="{{ item.logo }}" alt="{{ item.name }}" style="height: 48px; width: auto; max-width: 170px; object-fit: contain;" class="mr-3">
+                                            <img src="{{ item.logo }}" alt="{{ item.name }}" style="height: 48px; width: auto; max-width: 140px; object-fit: contain;">
                                           {% endif %}
-                                        {% endif %}
+                                          {% endif %}
+                                        </div>
                                         <div class="media-body">
                                             <p class="my-0"><span class="lang-en">{{ item.name }}</span><span class="lang-fr">{{ site.data.profile.education_fr[forloop.index0].name }}</span></p>
                                             <p class="small my-0">{{ item.dept }}</p>
@@ -50,15 +52,17 @@
                                 <ul class="list-unstyled mb-1">
                                     {% for item in site.data.profile.experience %}
                                     <li class="media align-items-center mb-3">
-                                        {% if item.logo %}
+                                        <div class="mr-3 d-flex justify-content-center align-items-center" style="flex: 0 0 150px; width: 150px;">
+                                          {% if item.logo %}
                                           {% if item.url %}
                                             <a href="{{ item.url }}" target="_blank" class="text-black text-decoration-none">
-                                                <img src="{{ item.logo }}" alt="{{ item.name }}" style="height: 48px; width: auto; max-width: 170px; object-fit: contain;" class="mr-3">
+                                                <img src="{{ item.logo }}" alt="{{ item.name }}" style="height: 48px; width: auto; max-width: 140px; object-fit: contain;">
                                             </a>
                                           {% else %}
-                                            <img src="{{ item.logo }}" alt="{{ item.name }}" style="height: 48px; width: auto; max-width: 170px; object-fit: contain;" class="mr-3">
+                                            <img src="{{ item.logo }}" alt="{{ item.name }}" style="height: 48px; width: auto; max-width: 140px; object-fit: contain;">
                                           {% endif %}
-                                        {% endif %}
+                                          {% endif %}
+                                        </div>
                                         <div class="media-body">
                                             <p class="my-0"><span class="lang-en">{{ item.name }}</span><span class="lang-fr">{{ site.data.profile.experience_fr[forloop.index0].name }}</span></p>
                                             <p class="small my-0">{{ item.dept }}</p>
