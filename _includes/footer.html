@@ -7,13 +7,13 @@
                     {% assign mi = mo | minus: 1 %}
                     {% assign fr_months = "Janvier,Février,Mars,Avril,Mai,Juin,Juillet,Août,Septembre,Octobre,Novembre,Décembre" | split: "," %}
                     <i>{% include i18n.html key="last_updated" %}
-                        <span class="lang-en">{{ "now" | date: "%B %Y" }}</span><span class="lang-zh">{{ fr_months[mi] }} {{ "now" | date: "%Y" }}</span></i>
+                        <span class="lang-en">{{ "now" | date: "%B %Y" }}</span><span class="lang-fr">{{ fr_months[mi] }} {{ "now" | date: "%Y" }}</span></i>
                 </div>
             </div>
             <div class="col-6">
                 <div class="text-right text-muted">
                     <span class="lang-en">{{ site.data.profile.footer_text }}</span>
-                    <span class="lang-zh">{{ site.data.profile.footer_text_zh }}</span>
+                    <span class="lang-fr">{{ site.data.profile.footer_text_fr }}</span>
                 </div>
             </div>
         </div>

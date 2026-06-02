@@ -4,19 +4,19 @@
     // Apply immediately to prevent flash of wrong language
     var html = document.documentElement;
     html.className = html.className.replace(/lang-active-\w+/g, '').trim() + ' lang-active-' + lang;
-    html.setAttribute('lang', lang === 'zh' ? 'zh-CN' : 'en');
+    html.setAttribute('lang', lang === 'fr' ? 'fr' : 'en');
 
     // Update toggle switch visual state
     function updateToggle() {
         var current = localStorage.getItem('site-lang') || 'en';
         var enLabel = document.getElementById('lang-toggle-en');
-        var zhLabel = document.getElementById('lang-toggle-zh');
-        if (enLabel && zhLabel) {
+        var frLabel = document.getElementById('lang-toggle-fr');
+        if (enLabel && frLabel) {
             if (current === 'en') {
                 enLabel.classList.add('lang-toggle-active');
-                zhLabel.classList.remove('lang-toggle-active');
+                frLabel.classList.remove('lang-toggle-active');
             } else {
-                zhLabel.classList.add('lang-toggle-active');
+                frLabel.classList.add('lang-toggle-active');
                 enLabel.classList.remove('lang-toggle-active');
             }
         }
@@ -36,7 +36,7 @@
 
         var html = document.documentElement;
         html.className = html.className.replace(/lang-active-\w+/g, '').trim() + ' lang-active-' + targetLang;
-        html.setAttribute('lang', targetLang === 'zh' ? 'zh-CN' : 'en');
+        html.setAttribute('lang', targetLang === 'fr' ? 'fr' : 'en');
         updateToggle();
     };
 

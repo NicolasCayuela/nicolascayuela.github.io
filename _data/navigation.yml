@@ -1,10 +1,10 @@
 pages:
 - name: Home
-  name_zh: Accueil
+  name_fr: Accueil
   url: ./
 - name: Publications
-  name_zh: Publications
+  name_fr: Publications
   url: publications
 - name: Playground
-  name_zh: Terrain de jeu
+  name_fr: Terrain de jeu
   url: playground

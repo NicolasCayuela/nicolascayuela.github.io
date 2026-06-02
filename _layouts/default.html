@@ -11,7 +11,7 @@
             var html = document.documentElement;
             html.className = html.className.replace(/lang-active-\w+/g, '').trim();
             html.classList.add('lang-active-' + lang);
-            html.setAttribute('lang', lang === 'zh' ? 'zh-CN' : 'en');
+            html.setAttribute('lang', lang === 'fr' ? 'fr' : 'en');
         })();
     </script>
 
@@ -23,7 +23,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Raleway:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/global.css">
+    <link rel="stylesheet" href="assets/css/global.css?v=fr">
     <!-- ICON -->
     <link rel="icon" href="data:,">  <!-- no favicon -->
 
@@ -74,7 +74,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.min.js" integrity="sha512-XKa9Hemdy1Ui3KSGgJdgMyYlUg1gM+QhL6cnlyTe2qzMCYm4nAZ1PsVerQzTTXzonUR+dmswHqgJPuwCq1MaAg==" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/github-buttons/2.14.2/buttons.min.js" integrity="sha512-OYwZx04hKFeFNYrWxIyo3atgGpb+cxU0ENWBZs72X7T9U+NoHPM1ftUn/Mfw7dRDXrqWA6M1wBg6z6fGE32aeA==" crossorigin="anonymous"></script>
     <script src="assets/js/common.js"></script>
-    <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/i18n.js?v=fr"></script>
 
     <!-- Elastic-wave metamaterial background on every page (bump ?v= to bust cache) -->
     <script src="{{ '/assets/js/wave-particles.js' | relative_url }}?v=ring15b"></script>

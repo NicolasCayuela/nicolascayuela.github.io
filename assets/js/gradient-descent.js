@@ -143,7 +143,7 @@
       ctx.moveTo(tp.X - 12, tp.Y); ctx.lineTo(tp.X + 12, tp.Y);
       ctx.moveTo(tp.X, tp.Y - 12); ctx.lineTo(tp.X, tp.Y + 12);
       ctx.strokeStyle = "rgba(19,161,14,0.6)"; ctx.lineWidth = 1; ctx.stroke();
-      var label = document.documentElement.classList.contains("lang-active-zh") ? "Minimum global" : "Global minimum";
+      var label = document.documentElement.classList.contains("lang-active-fr") ? "Minimum global" : "Global minimum";
       ctx.font = "600 12px Lato, sans-serif";
       ctx.textAlign = "center";
       ctx.fillStyle = "#13a10e";
@@ -253,8 +253,8 @@
   if ($("gd-play")) $("gd-play").addEventListener("click", function () {
     paused = !paused;
     this.innerHTML = paused
-      ? '<i class="fas fa-play"></i> <span class="lang-en">Play</span><span class="lang-zh">Lancer</span>'
-      : '<i class="fas fa-pause"></i> <span class="lang-en">Pause</span><span class="lang-zh">Pause</span>';
+      ? '<i class="fas fa-play"></i> <span class="lang-en">Play</span><span class="lang-fr">Lancer</span>'
+      : '<i class="fas fa-pause"></i> <span class="lang-en">Pause</span><span class="lang-fr">Pause</span>';
   });
   if ($("gd-restart")) $("gd-restart").addEventListener("click", restart);
   if ($("gd-resetview")) $("gd-resetview").addEventListener("click", function () { yaw = ISO_YAW; pitch = ISO_PITCH; });

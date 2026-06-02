@@ -2,7 +2,7 @@
     <div class="container">
         <a class="navbar-brand"><strong>{{site.data.profile.navbar_name}}</strong></a>
         <button class="navbar-toggler" style="font-size: 1em; padding: 0.5em;" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-            <i class="fas fa-map"></i> <span class="lang-en">Menu</span><span class="lang-zh">Menu</span>
+            <i class="fas fa-map"></i> <span class="lang-en">Menu</span><span class="lang-fr">Menu</span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarResponsive">
@@ -10,7 +10,7 @@
                 {% for item in site.data.navigation.pages %}
                 <li class="nav-item {% if item.name == page.navbar_name %}active{% endif %}">
                     <a class="nav-link" href="{{ item.url }}">
-                        <span class="lang-en">{{ item.name }}</span><span class="lang-zh">{{ item.name_zh }}</span>
+                        <span class="lang-en">{{ item.name }}</span><span class="lang-fr">{{ item.name_fr }}</span>
                         {% if item.url == page.url %}<span class="sr-only">(current)</span>{% endif %}
                     </a>
                 </li>
@@ -19,7 +19,7 @@
                     <div class="lang-toggle">
                         <span id="lang-toggle-en" class="lang-toggle-label" onclick="toggleLanguage('en')">EN</span>
                         <span class="lang-toggle-divider"></span>
-                        <span id="lang-toggle-zh" class="lang-toggle-label" onclick="toggleLanguage('zh')">FR</span>
+                        <span id="lang-toggle-fr" class="lang-toggle-label" onclick="toggleLanguage('fr')">FR</span>
                     </div>
                 </li>
             </ul>

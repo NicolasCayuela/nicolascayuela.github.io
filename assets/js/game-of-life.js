@@ -157,8 +157,8 @@
   function setRunning(on) {
     running = on; last = 0; acc = 0;
     playBtn.innerHTML = on
-      ? '<i class="fas fa-pause"></i> <span class="lang-en">Pause</span><span class="lang-zh">Pause</span>'
-      : '<i class="fas fa-play"></i> <span class="lang-en">Play</span><span class="lang-zh">Lancer</span>';
+      ? '<i class="fas fa-pause"></i> <span class="lang-en">Pause</span><span class="lang-fr">Pause</span>'
+      : '<i class="fas fa-play"></i> <span class="lang-en">Play</span><span class="lang-fr">Lancer</span>';
     if (on) requestAnimationFrame(loop);
   }
 

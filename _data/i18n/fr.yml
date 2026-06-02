@@ -1,5 +1,5 @@
 # NOTE: this is the "second language" channel of the template.
-# Here it holds FRENCH (the UI label is "FR"). Internal lang code stays "zh".
+# Here it holds FRENCH (the UI label is "FR"). Internal lang code stays "fr".
 
 # Navigation
 nav_home: "Accueil"

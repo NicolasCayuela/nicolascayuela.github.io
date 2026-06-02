@@ -4,25 +4,25 @@
             <div class="card-body p-4">
                 <h6>
                     <i class="fas fa-gamepad"></i> &nbsp;
-                    <span class="lang-en">Playground</span><span class="lang-zh">Terrain de jeu</span>
+                    <span class="lang-en">Playground</span><span class="lang-fr">Terrain de jeu</span>
                 </h6>
 
                 <!-- mode switch: Game of Life / Forest fire / Symmetry groups -->
                 <div class="btn-group btn-group-sm mb-3 flex-wrap" role="group">
                     <button id="gol-mode-life" type="button" class="btn btn-outline-dark active">
-                        <i class="fas fa-border-all"></i> <span class="lang-en">Game of Life</span><span class="lang-zh">Jeu de la vie</span>
+                        <i class="fas fa-border-all"></i> <span class="lang-en">Game of Life</span><span class="lang-fr">Jeu de la vie</span>
                     </button>
                     <button id="gol-mode-fire" type="button" class="btn btn-outline-dark">
-                        <i class="fas fa-fire"></i> <span class="lang-en">Forest fire</span><span class="lang-zh">Feu de forêt</span>
+                        <i class="fas fa-fire"></i> <span class="lang-en">Forest fire</span><span class="lang-fr">Feu de forêt</span>
                     </button>
                     <button id="gol-mode-sym" type="button" class="btn btn-outline-dark">
-                        <i class="fas fa-draw-polygon"></i> <span class="lang-en">Symmetry groups</span><span class="lang-zh">Groupes de symétrie</span>
+                        <i class="fas fa-draw-polygon"></i> <span class="lang-en">Symmetry groups</span><span class="lang-fr">Groupes de symétrie</span>
                     </button>
                     <button id="gol-mode-gd" type="button" class="btn btn-outline-dark">
-                        <i class="fas fa-mountain"></i> <span class="lang-en">Gradient descent</span><span class="lang-zh">Descente de gradient</span>
+                        <i class="fas fa-mountain"></i> <span class="lang-en">Gradient descent</span><span class="lang-fr">Descente de gradient</span>
                     </button>
                     <button id="gol-mode-cifar" type="button" class="btn btn-outline-dark">
-                        <i class="fas fa-image"></i> <span class="lang-en">CIFAR-10</span><span class="lang-zh">CIFAR-10</span>
+                        <i class="fas fa-image"></i> <span class="lang-en">CIFAR-10</span><span class="lang-fr">CIFAR-10</span>
                     </button>
                 </div>
 
@@ -31,16 +31,16 @@
                     <!-- shared transport controls -->
                     <div class="d-flex flex-wrap mb-2" style="gap:.4rem;">
                         <button id="gol-play" class="btn btn-sm btn-dark">
-                            <i class="fas fa-play"></i> <span class="lang-en">Play</span><span class="lang-zh">Lancer</span>
+                            <i class="fas fa-play"></i> <span class="lang-en">Play</span><span class="lang-fr">Lancer</span>
                         </button>
                         <button id="gol-step" class="btn btn-sm btn-outline-dark">
-                            <i class="fas fa-step-forward"></i> <span class="lang-en">Step</span><span class="lang-zh">Pas</span>
+                            <i class="fas fa-step-forward"></i> <span class="lang-en">Step</span><span class="lang-fr">Pas</span>
                         </button>
                         <button id="gol-random" class="btn btn-sm btn-outline-dark">
-                            <i class="fas fa-dice"></i> <span class="lang-en">Random</span><span class="lang-zh">Aléatoire</span>
+                            <i class="fas fa-dice"></i> <span class="lang-en">Random</span><span class="lang-fr">Aléatoire</span>
                         </button>
                         <button id="gol-clear" class="btn btn-sm btn-outline-dark">
-                            <i class="fas fa-trash"></i> <span class="lang-en">Clear</span><span class="lang-zh">Effacer</span>
+                            <i class="fas fa-trash"></i> <span class="lang-en">Clear</span><span class="lang-fr">Effacer</span>
                         </button>
                     </div>
 
@@ -48,10 +48,10 @@
                     <div id="gol-life-controls" class="mb-3">
                       <div class="d-flex flex-wrap align-items-center" style="gap:.4rem;">
                         <span class="small text-muted mr-1">
-                            <span class="lang-en">Patterns:</span><span class="lang-zh">Formes&nbsp;:</span>
+                            <span class="lang-en">Patterns:</span><span class="lang-fr">Formes&nbsp;:</span>
                         </span>
                         <button data-gol-pattern="" class="btn btn-sm btn-outline-secondary active">
-                            <i class="fas fa-pen"></i> <span class="lang-en">Pen</span><span class="lang-zh">Stylo</span>
+                            <i class="fas fa-pen"></i> <span class="lang-en">Pen</span><span class="lang-fr">Stylo</span>
                         </button>
                         <button data-gol-pattern="glider" class="btn btn-sm btn-outline-secondary">Glider</button>
                         <button data-gol-pattern="lwss" class="btn btn-sm btn-outline-secondary">LWSS</button>
@@ -68,7 +68,7 @@
                         <button data-gol-pattern="acorn" class="btn btn-sm btn-outline-secondary">Acorn</button>
                         <button data-gol-pattern="diehard" class="btn btn-sm btn-outline-secondary">Diehard</button>
                         <button data-gol-pattern="gun" class="btn btn-sm btn-outline-secondary">
-                            <span class="lang-en">Glider gun</span><span class="lang-zh">Canon à planeurs</span>
+                            <span class="lang-en">Glider gun</span><span class="lang-fr">Canon à planeurs</span>
                         </button>
                       </div>
                     </div>
@@ -77,22 +77,22 @@
                     <div id="gol-fire-controls" class="d-none mb-3">
                         <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.4rem;">
                             <span class="small text-muted mr-1">
-                                <span class="lang-en">Brush:</span><span class="lang-zh">Pinceau&nbsp;:</span>
+                                <span class="lang-en">Brush:</span><span class="lang-fr">Pinceau&nbsp;:</span>
                             </span>
                             <button data-gol-fire="plant" class="btn btn-sm btn-outline-success active">
-                                <i class="fas fa-tree"></i> <span class="lang-en">Plant trees</span><span class="lang-zh">Planter</span>
+                                <i class="fas fa-tree"></i> <span class="lang-en">Plant trees</span><span class="lang-fr">Planter</span>
                             </button>
                             <button data-gol-fire="ignite" class="btn btn-sm btn-outline-danger">
-                                <i class="fas fa-fire"></i> <span class="lang-en">Ignite</span><span class="lang-zh">Enflammer</span>
+                                <i class="fas fa-fire"></i> <span class="lang-en">Ignite</span><span class="lang-fr">Enflammer</span>
                             </button>
                         </div>
                         <div class="d-flex flex-wrap align-items-center" style="gap:1rem;">
                             <label class="small text-muted mb-0">
-                                <span class="lang-en">Growth</span><span class="lang-zh">Croissance</span>
+                                <span class="lang-en">Growth</span><span class="lang-fr">Croissance</span>
                                 <input id="gol-growth" type="range" min="0" max="100" value="30" style="vertical-align:middle; width:110px;">
                             </label>
                             <label class="small text-muted mb-0">
-                                <span class="lang-en">Lightning</span><span class="lang-zh">Foudre</span>
+                                <span class="lang-en">Lightning</span><span class="lang-fr">Foudre</span>
                                 <input id="gol-light" type="range" min="0" max="100" value="30" style="vertical-align:middle; width:110px;">
                             </label>
                         </div>
@@ -107,16 +107,16 @@
                 <div id="sym-area" class="d-none">
                     <p class="small text-muted mx-1 mb-3">
                         <span class="lang-en">Draw in the white area and watch your strokes mirrored, rotated and tiled in real time. Choose one of the <strong>17 wallpaper groups</strong> or <strong>7 frieze groups</strong>, then design your own kaleidoscopic tiling.</span>
-                        <span class="lang-zh">Dessine dans la zone blanche et regarde tes traits réfléchis, tournés et pavés en temps réel. Choisis l'un des <strong>17 groupes de papier peint</strong> ou des <strong>7 groupes de frise</strong>, puis compose ton propre pavage kaléidoscopique.</span>
+                        <span class="lang-fr">Dessine dans la zone blanche et regarde tes traits réfléchis, tournés et pavés en temps réel. Choisis l'un des <strong>17 groupes de papier peint</strong> ou des <strong>7 groupes de frise</strong>, puis compose ton propre pavage kaléidoscopique.</span>
                     </p>
 
                     <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.5rem;">
                         <label class="small text-muted mb-0">
-                            <span class="lang-en">Translation amount</span><span class="lang-zh">Translation</span>
+                            <span class="lang-en">Translation amount</span><span class="lang-fr">Translation</span>
                             <input id="sym-trans" type="number" min="20" max="600" value="150" style="width:74px;">
                         </label>
                         <button id="sym-apply" class="btn btn-sm btn-outline-dark">
-                            <span class="lang-en">Apply</span><span class="lang-zh">Appliquer</span>
+                            <span class="lang-en">Apply</span><span class="lang-fr">Appliquer</span>
                         </button>
                     </div>
 
@@ -124,7 +124,7 @@
                         <!-- left: group -->
                         <div style="min-width:120px;">
                             <div class="small font-weight-bold mb-1">
-                                <span class="lang-en">Wallpaper group</span><span class="lang-zh">Groupe papier peint</span>
+                                <span class="lang-en">Wallpaper group</span><span class="lang-fr">Groupe papier peint</span>
                             </div>
                             <div id="sym-groups" class="small" style="line-height:1.7;">
                                 <div><label class="mb-0"><input type="radio" name="sym-group" value="p1"> p1</label></div>
@@ -146,7 +146,7 @@
                                 <div><label class="mb-0"><input type="radio" name="sym-group" value="p6m"> p6m</label></div>
 
                                 <div class="font-weight-bold mt-3 mb-1">
-                                    <span class="lang-en">Frieze Symmetry</span><span class="lang-zh">Symétrie de frise</span>
+                                    <span class="lang-en">Frieze Symmetry</span><span class="lang-fr">Symétrie de frise</span>
                                 </div>
                                 <div><label class="mb-0"><input type="radio" name="sym-group" value="f_p111"> p111</label></div>
                                 <div><label class="mb-0"><input type="radio" name="sym-group" value="f_p112"> p112</label></div>
@@ -162,24 +162,24 @@
                         <div id="sym-wrap" style="flex:1 1 320px; min-width:260px;">
                             <canvas id="sym-canvas" style="background:#fff; border:1px solid #ccc; border-radius:4px; touch-action:none; cursor:crosshair; width:100%;"></canvas>
                             <div class="d-flex flex-wrap align-items-center mt-2" style="gap:.6rem;">
-                                <button id="sym-undo" class="btn btn-sm btn-outline-dark"><i class="fas fa-undo"></i> <span class="lang-en">Undo</span><span class="lang-zh">Annuler</span></button>
-                                <button id="sym-redo" class="btn btn-sm btn-outline-dark"><i class="fas fa-redo"></i> <span class="lang-en">Redo</span><span class="lang-zh">Refaire</span></button>
-                                <button id="sym-clear" class="btn btn-sm btn-outline-dark"><i class="fas fa-trash"></i> <span class="lang-en">Clear</span><span class="lang-zh">Effacer</span></button>
-                                <label class="small text-muted mb-0 ml-1"><input id="sym-grid" type="checkbox" checked> <span class="lang-en">Show grid</span><span class="lang-zh">Grille</span></label>
+                                <button id="sym-undo" class="btn btn-sm btn-outline-dark"><i class="fas fa-undo"></i> <span class="lang-en">Undo</span><span class="lang-fr">Annuler</span></button>
+                                <button id="sym-redo" class="btn btn-sm btn-outline-dark"><i class="fas fa-redo"></i> <span class="lang-en">Redo</span><span class="lang-fr">Refaire</span></button>
+                                <button id="sym-clear" class="btn btn-sm btn-outline-dark"><i class="fas fa-trash"></i> <span class="lang-en">Clear</span><span class="lang-fr">Effacer</span></button>
+                                <label class="small text-muted mb-0 ml-1"><input id="sym-grid" type="checkbox" checked> <span class="lang-en">Show grid</span><span class="lang-fr">Grille</span></label>
                             </div>
                         </div>
 
                         <!-- right: tool / width / color -->
                         <div class="small" style="min-width:130px; line-height:1.7;">
-                            <div class="font-weight-bold mb-1"><span class="lang-en">Tool</span><span class="lang-zh">Outil</span></div>
-                            <div><label class="mb-0"><input type="radio" name="sym-tool" value="line"> <span class="lang-en">Line</span><span class="lang-zh">Ligne</span></label></div>
-                            <div><label class="mb-0"><input type="radio" name="sym-tool" value="rect"> <span class="lang-en">Rectangle</span><span class="lang-zh">Rectangle</span></label></div>
-                            <div><label class="mb-0"><input type="radio" name="sym-tool" value="oval"> <span class="lang-en">Oval</span><span class="lang-zh">Ovale</span></label></div>
-                            <div><label class="mb-0"><input type="radio" name="sym-tool" value="frect"> <span class="lang-en">Filled Rect</span><span class="lang-zh">Rect plein</span></label></div>
-                            <div><label class="mb-0"><input type="radio" name="sym-tool" value="foval"> <span class="lang-en">Filled Oval</span><span class="lang-zh">Ovale plein</span></label></div>
-                            <div><label class="mb-0"><input type="radio" name="sym-tool" value="freehand" checked> <span class="lang-en">Freehand</span><span class="lang-zh">Main levée</span></label></div>
+                            <div class="font-weight-bold mb-1"><span class="lang-en">Tool</span><span class="lang-fr">Outil</span></div>
+                            <div><label class="mb-0"><input type="radio" name="sym-tool" value="line"> <span class="lang-en">Line</span><span class="lang-fr">Ligne</span></label></div>
+                            <div><label class="mb-0"><input type="radio" name="sym-tool" value="rect"> <span class="lang-en">Rectangle</span><span class="lang-fr">Rectangle</span></label></div>
+                            <div><label class="mb-0"><input type="radio" name="sym-tool" value="oval"> <span class="lang-en">Oval</span><span class="lang-fr">Ovale</span></label></div>
+                            <div><label class="mb-0"><input type="radio" name="sym-tool" value="frect"> <span class="lang-en">Filled Rect</span><span class="lang-fr">Rect plein</span></label></div>
+                            <div><label class="mb-0"><input type="radio" name="sym-tool" value="foval"> <span class="lang-en">Filled Oval</span><span class="lang-fr">Ovale plein</span></label></div>
+                            <div><label class="mb-0"><input type="radio" name="sym-tool" value="freehand" checked> <span class="lang-en">Freehand</span><span class="lang-fr">Main levée</span></label></div>
 
-                            <div class="font-weight-bold mt-2 mb-1"><span class="lang-en">Line width</span><span class="lang-zh">Épaisseur</span></div>
+                            <div class="font-weight-bold mt-2 mb-1"><span class="lang-en">Line width</span><span class="lang-fr">Épaisseur</span></div>
                             <div class="d-flex flex-wrap" style="gap:.1rem .8rem;">
                                 <label class="mb-0"><input type="radio" name="sym-width" value="1"> 1</label>
                                 <label class="mb-0"><input type="radio" name="sym-width" value="2"> 2</label>
@@ -190,23 +190,23 @@
                                 <label class="mb-0"><input type="radio" name="sym-width" value="20"> 20</label>
                             </div>
 
-                            <div class="font-weight-bold mt-2 mb-1"><span class="lang-en">Color</span><span class="lang-zh">Couleur</span></div>
-                            <div><label class="mb-0" style="color:#000;"><input type="radio" name="sym-color" value="Black" checked> <span class="lang-en">Black</span><span class="lang-zh">Noir</span></label></div>
-                            <div><label class="mb-0" style="color:#e51c23;"><input type="radio" name="sym-color" value="Red"> <span class="lang-en">Red</span><span class="lang-zh">Rouge</span></label></div>
-                            <div><label class="mb-0" style="color:#0a8f1a;"><input type="radio" name="sym-color" value="Green"> <span class="lang-en">Green</span><span class="lang-zh">Vert</span></label></div>
-                            <div><label class="mb-0" style="color:#1c54e5;"><input type="radio" name="sym-color" value="Blue"> <span class="lang-en">Blue</span><span class="lang-zh">Bleu</span></label></div>
+                            <div class="font-weight-bold mt-2 mb-1"><span class="lang-en">Color</span><span class="lang-fr">Couleur</span></div>
+                            <div><label class="mb-0" style="color:#000;"><input type="radio" name="sym-color" value="Black" checked> <span class="lang-en">Black</span><span class="lang-fr">Noir</span></label></div>
+                            <div><label class="mb-0" style="color:#e51c23;"><input type="radio" name="sym-color" value="Red"> <span class="lang-en">Red</span><span class="lang-fr">Rouge</span></label></div>
+                            <div><label class="mb-0" style="color:#0a8f1a;"><input type="radio" name="sym-color" value="Green"> <span class="lang-en">Green</span><span class="lang-fr">Vert</span></label></div>
+                            <div><label class="mb-0" style="color:#1c54e5;"><input type="radio" name="sym-color" value="Blue"> <span class="lang-en">Blue</span><span class="lang-fr">Bleu</span></label></div>
                             <div><label class="mb-0" style="color:#10b9c9;"><input type="radio" name="sym-color" value="Cyan"> Cyan</label></div>
                             <div><label class="mb-0" style="color:#d61fb5;"><input type="radio" name="sym-color" value="Magenta"> Magenta</label></div>
-                            <div><label class="mb-0" style="color:#d4ad00;"><input type="radio" name="sym-color" value="Yellow"> <span class="lang-en">Yellow</span><span class="lang-zh">Jaune</span></label></div>
-                            <div><label class="mb-0" style="color:#f57c00;"><input type="radio" name="sym-color" value="Orange"> <span class="lang-en">Orange</span><span class="lang-zh">Orange</span></label></div>
-                            <div><label class="mb-0" style="color:#8e24aa;"><input type="radio" name="sym-color" value="Purple"> <span class="lang-en">Purple</span><span class="lang-zh">Violet</span></label></div>
-                            <div><label class="mb-0" style="color:#795548;"><input type="radio" name="sym-color" value="Brown"> <span class="lang-en">Brown</span><span class="lang-zh">Marron</span></label></div>
+                            <div><label class="mb-0" style="color:#d4ad00;"><input type="radio" name="sym-color" value="Yellow"> <span class="lang-en">Yellow</span><span class="lang-fr">Jaune</span></label></div>
+                            <div><label class="mb-0" style="color:#f57c00;"><input type="radio" name="sym-color" value="Orange"> <span class="lang-en">Orange</span><span class="lang-fr">Orange</span></label></div>
+                            <div><label class="mb-0" style="color:#8e24aa;"><input type="radio" name="sym-color" value="Purple"> <span class="lang-en">Purple</span><span class="lang-fr">Violet</span></label></div>
+                            <div><label class="mb-0" style="color:#795548;"><input type="radio" name="sym-color" value="Brown"> <span class="lang-en">Brown</span><span class="lang-fr">Marron</span></label></div>
                         </div>
                     </div>
                     <p class="small text-muted mt-3 mb-0">
                         <i class="fab fa-youtube"></i>
                         <a href="https://www.youtube.com/watch?v=C_konuQKGtQ" target="_blank" rel="noopener">
-                            <span class="lang-en">More info</span><span class="lang-zh">En savoir plus</span>
+                            <span class="lang-en">More info</span><span class="lang-fr">En savoir plus</span>
                         </a>
                     </p>
                 </div>
@@ -215,32 +215,32 @@
                 <div id="gd-area" class="d-none">
                     <p class="small text-muted mx-1 mb-3">
                         <span class="lang-en">A marker rolls down a 3D loss surface following its gradient. <strong>Drag</strong> to rotate the view. Pick a surface and an optimiser, and tune the learning rate.</span>
-                        <span class="lang-zh">Une bille descend une surface de perte 3D en suivant son gradient. <strong>Glisse</strong> pour tourner la vue. Choisis une surface, un optimiseur et règle le taux d'apprentissage.</span>
+                        <span class="lang-fr">Une bille descend une surface de perte 3D en suivant son gradient. <strong>Glisse</strong> pour tourner la vue. Choisis une surface, un optimiseur et règle le taux d'apprentissage.</span>
                     </p>
                     <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.4rem;">
-                        <span class="small text-muted mr-1"><span class="lang-en">Surface:</span><span class="lang-zh">Surface&nbsp;:</span></span>
+                        <span class="small text-muted mr-1"><span class="lang-en">Surface:</span><span class="lang-fr">Surface&nbsp;:</span></span>
                         <button data-gd-surf="bowl" class="btn btn-sm btn-outline-dark">Bowl</button>
                         <button data-gd-surf="saddle" class="btn btn-sm btn-outline-dark">Saddle</button>
                         <button data-gd-surf="ripples" class="btn btn-sm btn-outline-dark active">Ripples</button>
                         <button data-gd-surf="rosenbrock" class="btn btn-sm btn-outline-dark">Rosenbrock</button>
                         <button data-gd-surf="volcano" class="btn btn-sm btn-outline-dark">Volcano</button>
-                        <button data-gd-surf="fourwells" class="btn btn-sm btn-outline-dark"><span class="lang-en">Four wells</span><span class="lang-zh">Quatre puits</span></button>
-                        <button data-gd-surf="monkey" class="btn btn-sm btn-outline-dark"><span class="lang-en">Monkey saddle</span><span class="lang-zh">Selle de singe</span></button>
+                        <button data-gd-surf="fourwells" class="btn btn-sm btn-outline-dark"><span class="lang-en">Four wells</span><span class="lang-fr">Quatre puits</span></button>
+                        <button data-gd-surf="monkey" class="btn btn-sm btn-outline-dark"><span class="lang-en">Monkey saddle</span><span class="lang-fr">Selle de singe</span></button>
                     </div>
                     <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.4rem;">
-                        <span class="small text-muted mr-1"><span class="lang-en">Optimiser:</span><span class="lang-zh">Optimiseur&nbsp;:</span></span>
+                        <span class="small text-muted mr-1"><span class="lang-en">Optimiser:</span><span class="lang-fr">Optimiseur&nbsp;:</span></span>
                         <button data-gd-opt="sgd" class="btn btn-sm btn-outline-secondary active">SGD</button>
                         <button data-gd-opt="momentum" class="btn btn-sm btn-outline-secondary">Momentum</button>
                         <button data-gd-opt="adam" class="btn btn-sm btn-outline-secondary">Adam</button>
                         <label class="small text-muted mb-0 ml-2">
-                            <span class="lang-en">Learning rate</span><span class="lang-zh">Taux d'apprentissage</span>
+                            <span class="lang-en">Learning rate</span><span class="lang-fr">Taux d'apprentissage</span>
                             <input id="gd-lr" type="range" min="1" max="100" value="50" style="vertical-align:middle; width:110px;">
                         </label>
                     </div>
                     <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.6rem;">
-                        <button id="gd-play" class="btn btn-sm btn-dark"><i class="fas fa-pause"></i> <span class="lang-en">Pause</span><span class="lang-zh">Pause</span></button>
-                        <button id="gd-restart" class="btn btn-sm btn-outline-dark"><i class="fas fa-redo"></i> <span class="lang-en">Restart</span><span class="lang-zh">Relancer</span></button>
-                        <button id="gd-resetview" class="btn btn-sm btn-outline-dark"><i class="fas fa-cube"></i> <span class="lang-en">Reset view</span><span class="lang-zh">Vue iso</span></button>
+                        <button id="gd-play" class="btn btn-sm btn-dark"><i class="fas fa-pause"></i> <span class="lang-en">Pause</span><span class="lang-fr">Pause</span></button>
+                        <button id="gd-restart" class="btn btn-sm btn-outline-dark"><i class="fas fa-redo"></i> <span class="lang-en">Restart</span><span class="lang-fr">Relancer</span></button>
+                        <button id="gd-resetview" class="btn btn-sm btn-outline-dark"><i class="fas fa-cube"></i> <span class="lang-en">Reset view</span><span class="lang-fr">Vue iso</span></button>
                     </div>
                     <div id="gd-wrap" style="width:100%;">
                         <canvas id="gd-canvas" style="background:#fff; border-radius:4px; touch-action:none; cursor:grab; width:100%;"></canvas>
@@ -251,7 +251,7 @@
                 <div id="cifar-area" class="d-none">
                     <p class="small text-muted mx-1 mb-3">
                         <span class="lang-en">A 2D map of real CIFAR-10 images, each a dot coloured by its class. <strong>Drag the cursor</strong> around the map — the panel on the left shows the nearest image.</span>
-                        <span class="lang-zh">Une carte 2D de vraies images CIFAR-10, chaque point coloré selon sa classe. <strong>Déplace le curseur</strong> sur la carte — le panneau de gauche montre l'image la plus proche.</span>
+                        <span class="lang-fr">Une carte 2D de vraies images CIFAR-10, chaque point coloré selon sa classe. <strong>Déplace le curseur</strong> sur la carte — le panneau de gauche montre l'image la plus proche.</span>
                     </p>
                     <div class="d-flex flex-wrap align-items-start" style="gap:1rem;">
                         <div>
@@ -266,16 +266,16 @@
                         </div>
                     </div>
                     <div class="d-flex flex-wrap mt-3" style="gap:.3rem 1rem;">
-                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#e6194b;border-radius:2px;"></span> <span class="lang-en">airplane</span><span class="lang-zh">avion</span></span>
-                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#3cb44b;border-radius:2px;"></span> <span class="lang-en">automobile</span><span class="lang-zh">voiture</span></span>
-                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#ff1aff;border-radius:2px;"></span> <span class="lang-en">bird</span><span class="lang-zh">oiseau</span></span>
-                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#4363d8;border-radius:2px;"></span> <span class="lang-en">cat</span><span class="lang-zh">chat</span></span>
-                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#42d4f4;border-radius:2px;"></span> <span class="lang-en">deer</span><span class="lang-zh">cerf</span></span>
-                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#0000ff;border-radius:2px;"></span> <span class="lang-en">dog</span><span class="lang-zh">chien</span></span>
-                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#f58231;border-radius:2px;"></span> <span class="lang-en">frog</span><span class="lang-zh">grenouille</span></span>
-                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#3cf0a0;border-radius:2px;"></span> <span class="lang-en">horse</span><span class="lang-zh">cheval</span></span>
-                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#911eb4;border-radius:2px;"></span> <span class="lang-en">ship</span><span class="lang-zh">navire</span></span>
-                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#bfef45;border-radius:2px;"></span> <span class="lang-en">truck</span><span class="lang-zh">camion</span></span>
+                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#e6194b;border-radius:2px;"></span> <span class="lang-en">airplane</span><span class="lang-fr">avion</span></span>
+                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#3cb44b;border-radius:2px;"></span> <span class="lang-en">automobile</span><span class="lang-fr">voiture</span></span>
+                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#ff1aff;border-radius:2px;"></span> <span class="lang-en">bird</span><span class="lang-fr">oiseau</span></span>
+                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#4363d8;border-radius:2px;"></span> <span class="lang-en">cat</span><span class="lang-fr">chat</span></span>
+                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#42d4f4;border-radius:2px;"></span> <span class="lang-en">deer</span><span class="lang-fr">cerf</span></span>
+                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#0000ff;border-radius:2px;"></span> <span class="lang-en">dog</span><span class="lang-fr">chien</span></span>
+                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#f58231;border-radius:2px;"></span> <span class="lang-en">frog</span><span class="lang-fr">grenouille</span></span>
+                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#3cf0a0;border-radius:2px;"></span> <span class="lang-en">horse</span><span class="lang-fr">cheval</span></span>
+                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#911eb4;border-radius:2px;"></span> <span class="lang-en">ship</span><span class="lang-fr">navire</span></span>
+                        <span class="small"><span style="display:inline-block;width:11px;height:11px;background:#bfef45;border-radius:2px;"></span> <span class="lang-en">truck</span><span class="lang-fr">camion</span></span>
                     </div>
                 </div>
             </div>
@@ -283,7 +283,7 @@
     </div>
 </div>
 
-<script src="{{ '/assets/js/game-of-life.js' | relative_url }}?v=8"></script>
+<script src="{{ '/assets/js/game-of-life.js' | relative_url }}?v=9"></script>
 <script src="{{ '/assets/js/symmetry.js' | relative_url }}?v=6"></script>
-<script src="{{ '/assets/js/gradient-descent.js' | relative_url }}?v=12"></script>
+<script src="{{ '/assets/js/gradient-descent.js' | relative_url }}?v=13"></script>
 <script src="{{ '/assets/js/cifar.js' | relative_url }}?v=1"></script>

@@ -5,11 +5,11 @@
                 <div class="row">
                     <div class="col">
                         <p class="h1 font-weight-normal lang-en mb-0">{{ site.data.profile.primary_name }}</p>
-                        <p class="h1 font-weight-normal lang-zh mb-0">{{ site.data.profile.secondary_name }}</p>
+                        <p class="h1 font-weight-normal lang-fr mb-0">{{ site.data.profile.secondary_name }}</p>
                         <p class="text-profile-position">
                             {% for position in site.data.profile.positions %}
                             <span class="lang-en">{{ position }}</span>
-                            <span class="lang-zh">{{ site.data.profile.positions_zh[forloop.index0] }}</span>
+                            <span class="lang-fr">{{ site.data.profile.positions_fr[forloop.index0] }}</span>
                             <br/>
                             {% endfor %}
                             {% if site.data.profile.cv_link %}
@@ -25,77 +25,77 @@
 
                                 {% if site.data.profile.gscholar %}
                                 <a class="pr-3 no-break" target="_blank" href="https://scholar.google.com/citations?user={{ site.data.profile.gscholar }}&hl=en">
-                                    <i class="fab fa-google"></i> <span class="lang-en">Google Scholar</span><span class="lang-zh">Google Scholar</span>
+                                    <i class="fab fa-google"></i> <span class="lang-en">Google Scholar</span><span class="lang-fr">Google Scholar</span>
                                 </a>
                                 {% endif %}
 
                                 {% if site.data.profile.sscholar %}
                                 <a class="pr-3 no-break" target="_blank" href="https://www.semanticscholar.org/author/{{ site.data.profile.sscholar }}">
-                                    <i class="fa fa-book"></i> <span class="lang-en">Semantic Scholar</span><span class="lang-zh">Semantic Scholar</span>
+                                    <i class="fa fa-book"></i> <span class="lang-en">Semantic Scholar</span><span class="lang-fr">Semantic Scholar</span>
                                 </a>
                                 {% endif %}
 
                                 {% if site.data.profile.openreview %}
                                 <a class="pr-3 no-break" target="_blank" href="https://openreview.net/profile?id={{ site.data.profile.openreview }}">
-                                    <i class="fas fa-comments"></i> <span class="lang-en">OpenReview</span><span class="lang-zh">OpenReview</span>
+                                    <i class="fas fa-comments"></i> <span class="lang-en">OpenReview</span><span class="lang-fr">OpenReview</span>
                                 </a>
                                 {% endif %}
                                 
                                 {% if site.data.profile.github %}
                                 <a class="pr-3 no-break" target="_blank" href="https://github.com/{{ site.data.profile.github }}">
-                                    <i class="fab fa-github"></i> <span class="lang-en">GitHub</span><span class="lang-zh">GitHub</span>
+                                    <i class="fab fa-github"></i> <span class="lang-en">GitHub</span><span class="lang-fr">GitHub</span>
                                 </a> 
                                 {% endif %}
                                 
                                 {% if site.data.profile.orcid %}
                                 <a class="pr-3 no-break" target="_blank" href="https://orcid.org/{{ site.data.profile.orcid }}">
-                                    <i class="fab fa-orcid"></i> <span class="lang-en">ORCID</span><span class="lang-zh">ORCID</span>
+                                    <i class="fab fa-orcid"></i> <span class="lang-en">ORCID</span><span class="lang-fr">ORCID</span>
                                 </a>
                                 {% endif %}
                                 
                                 {% if site.data.profile.instagram %}
                                 <a class="pr-3 no-break" target="_blank" href="https://www.instagram.com/{{ site.data.profile.instagram }}">
-                                    <i class="fab fa-instagram"></i> <span class="lang-en">Instagram</span><span class="lang-zh">Instagram</span>
+                                    <i class="fab fa-instagram"></i> <span class="lang-en">Instagram</span><span class="lang-fr">Instagram</span>
                                 </a>
                                 {% endif %}
                                 
                                 {% if site.data.profile.qq_qrcode %}
                                 <a class="pr-3 no-break" data-toggle="modal" data-target="#modal-qq">
-                                    <i class="fab fa-qq"></i> <span class="lang-en">QQ</span><span class="lang-zh">QQ</span>
+                                    <i class="fab fa-qq"></i> <span class="lang-en">QQ</span><span class="lang-fr">QQ</span>
                                 </a>
                                 {% endif %}
                                 
                                 {% if site.data.profile.wechat_qrcode %}
                                 <a class="pr-3 no-break" data-toggle="modal" data-target="#modal-wechat">
-                                    <i class="fab fa-weixin"></i> <span class="lang-en">WeChat</span><span class="lang-zh">WeChat</span>
+                                    <i class="fab fa-weixin"></i> <span class="lang-en">WeChat</span><span class="lang-fr">WeChat</span>
                                 </a>
                                 {% endif %}
 
                                 {% if site.data.profile.x %}
                                 <a class="pr-3 no-break" target="_blank" href="https://x.com/{{ site.data.profile.x }}">
-                                    <i class="fab fa-twitter"></i> <span class="lang-en">X</span><span class="lang-zh">X</span>
+                                    <i class="fab fa-twitter"></i> <span class="lang-en">X</span><span class="lang-fr">X</span>
                                 </a>
                                 {% endif %}
                                 {% if site.data.profile.facebook %}
                                 <a class="pr-3 no-break" target="_blank" href="https://www.facebook.com/{{ site.data.profile.facebook }}">
-                                    <i class="fab fa-facebook"></i> <span class="lang-en">Facebook</span><span class="lang-zh">Facebook</span>
+                                    <i class="fab fa-facebook"></i> <span class="lang-en">Facebook</span><span class="lang-fr">Facebook</span>
                                 </a>
                                 {% endif %}
                                 {% if site.data.profile.zhihu %}
                                 <a class="pr-3 no-break" target="_blank" href="https://www.zhihu.com/people/{{ site.data.profile.zhihu }}">
-                                    <i class="fab fa-zhihu"></i> <span class="lang-en">ZhiHu</span><span class="lang-zh">ZhiHu</span>
+                                    <i class="fab fa-zhihu"></i> <span class="lang-en">ZhiHu</span><span class="lang-fr">ZhiHu</span>
                                 </a>
                                 {% endif %}
 
                                 {% if site.data.profile.resume %}
                                 <a class="pr-3 no-break" target="_blank" href="{{ site.data.profile.resume | relative_url }}">
-                                    <i class="fa fa-file"></i> <span class="lang-en">Resume</span><span class="lang-zh">CV</span>
+                                    <i class="fa fa-file"></i> <span class="lang-en">Resume</span><span class="lang-fr">CV</span>
                                 </a>
                                 {% endif %}
 
                                 {% if site.data.profile.linkedin %}
                                 <a class="pr-3 no-break" target="_blank" href="https://www.linkedin.com/in/{{ site.data.profile.linkedin }}">
-                                    <i class="fab fa-linkedin"></i> <span class="lang-en">LinkedIn</span><span class="lang-zh">LinkedIn</span>
+                                    <i class="fab fa-linkedin"></i> <span class="lang-en">LinkedIn</span><span class="lang-fr">LinkedIn</span>
                                 </a>
                                 {% endif %}
 
@@ -124,7 +124,7 @@
                         if (!img) return;
                         var caps = { en: "Hello!", zh: "Hello !" };   // FR uses a non-breaking space before !
                         function apply() {
-                            var t = (localStorage.getItem('site-lang') || 'en') === 'zh' ? caps.zh : caps.en;
+                            var t = (localStorage.getItem('site-lang') || 'en') === 'fr' ? caps.fr : caps.en;
                             img.setAttribute('title', t);
                             img.setAttribute('data-original-title', t);
                             if (window.jQuery) { try { jQuery(img).tooltip('dispose'); jQuery(img).tooltip(); } catch (e) {} }
@@ -147,10 +147,10 @@
                     {% if site.data.profile.short_bio %}
                     <div class="col-md-12">
                         <div class="my-1">
-                            <h6><i class="fas fa-id-card"></i> &nbsp; <span class="lang-en">Short bio</span><span class="lang-zh">Biographie</span></h6>
+                            <h6><i class="fas fa-id-card"></i> &nbsp; <span class="lang-en">Short bio</span><span class="lang-fr">Biographie</span></h6>
                             <div class="mx-2">
                                 <span class="lang-en">{{ site.data.profile.short_bio }}</span>
-                                <span class="lang-zh">{{ site.data.profile.short_bio_zh }}</span>
+                                <span class="lang-fr">{{ site.data.profile.short_bio_fr }}</span>
                             </div>
                         </div>
                     </div>
