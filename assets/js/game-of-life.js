@@ -61,8 +61,9 @@
   var firePaint = "plant";     // "plant" | "ignite"
 
   function idx(c, r) { return r * cols + c; }
-  function growthP() { var el = document.getElementById("gol-growth"); return el ? (+el.value) / 1000 : 0.02; }
-  function lightP() { var el = document.getElementById("gol-light"); return el ? (+el.value) / 100000 : 0.0005; }
+  // nerfed scales: slider 0..100 -> growth 0..0.01, lightning 0..0.0001
+  function growthP() { var el = document.getElementById("gol-growth"); return el ? (+el.value) / 10000 : 0.003; }
+  function lightP() { var el = document.getElementById("gol-light"); return el ? (+el.value) / 1000000 : 0.00003; }
 
   function build() {
     var w = wrap.clientWidth || 600;
