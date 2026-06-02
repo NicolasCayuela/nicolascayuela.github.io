@@ -23,7 +23,7 @@
     bowl: { f: function (x, y) { return 0.5 * (x * x + y * y); },
             g: function (x, y) { return [x, y]; }, lr: 0.25, start: 1.7 },
     saddle: { f: function (x, y) { return 0.5 * (x * x - y * y); },
-              g: function (x, y) { return [x, -y]; }, lr: 0.12, start: 1.6 },
+              g: function (x, y) { return [x, -y]; }, lr: 0.12, start: 1.6, noMin: true },
     ripples: { f: function (x, y) { return Math.sin(2 * x) * Math.cos(2 * y) + 0.18 * (x * x + y * y); },
                g: function (x, y) { return [2 * Math.cos(2 * x) * Math.cos(2 * y) + 0.36 * x,
                                             -2 * Math.sin(2 * x) * Math.sin(2 * y) + 0.36 * y]; }, lr: 0.06, start: 1.8 },
@@ -34,7 +34,18 @@
   var surf = "ripples", optimizer = "momentum", lrScale = 1;
 
   // marker state
-  var px = 0, py = 0, vx = 0, vy = 0, trail = [], paused = false, settleTimer = 0;
+  var px = 0, py = 0, vx = 0, vy = 0, trail = [], paused = false, settled = false;
+  var target = null;   // global minimum (goal)
+
+  function computeTarget() {
+    if (SURF[surf].noMin) { target = null; return; }
+    var f = SURF[surf].f, best = 1e9, bx = 0, by = 0, M = 180;
+    for (var i = 0; i <= M; i++) for (var j = 0; j <= M; j++) {
+      var x = -D + 2 * D * i / M, y = -D + 2 * D * j / M, z = f(x, y);
+      if (z < best) { best = z; bx = x; by = y; }
+    }
+    target = [bx, by];
+  }
 
   function jet(t) {
     if (t < 0) t = 0; else if (t > 1) t = 1;
@@ -115,17 +126,27 @@
       }
       ctx.strokeStyle = "#111"; ctx.lineWidth = 2; ctx.stroke();
     }
-    // marker
+    // global-minimum target (the goal)
+    if (target) {
+      var tp = project(target[0], target[1], worldZ(f(target[0], target[1])) + 0.04);
+      ctx.beginPath(); ctx.arc(tp.X, tp.Y, 9, 0, 6.2832);
+      ctx.strokeStyle = "#13a10e"; ctx.lineWidth = 2.5; ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(tp.X - 12, tp.Y); ctx.lineTo(tp.X + 12, tp.Y);
+      ctx.moveTo(tp.X, tp.Y - 12); ctx.lineTo(tp.X, tp.Y + 12);
+      ctx.strokeStyle = "rgba(19,161,14,0.6)"; ctx.lineWidth = 1; ctx.stroke();
+    }
+    // marker (green once it has reached the minimum)
     var mp = project(px, py, worldZ(f(px, py)) + 0.05);
     ctx.beginPath(); ctx.arc(mp.X, mp.Y, 6, 0, 6.2832);
-    ctx.fillStyle = "#d61f1f"; ctx.fill();
+    ctx.fillStyle = settled ? "#13a10e" : "#d61f1f"; ctx.fill();
     ctx.strokeStyle = "#fff"; ctx.lineWidth = 1.5; ctx.stroke();
   }
 
   function restart() {
     var s = SURF[surf].start;
     px = (Math.random() * 2 - 1) * s; py = (Math.random() * 2 - 1) * s;
-    vx = 0; vy = 0; trail = [[px, py]]; settleTimer = 0;
+    vx = 0; vy = 0; trail = [[px, py]]; settled = false;
   }
 
   function lr() { var el = document.getElementById("gd-lr"); var v = el ? +el.value : 50; return SURF[surf].lr * (v / 50) * lrScale; }
@@ -140,11 +161,10 @@
     }
     trail.push([px, py]);
     if (trail.length > 400) trail.shift();
-    // restart if it leaves the domain or settles
     var gm = Math.sqrt(g[0] * g[0] + g[1] * g[1]);
-    if (Math.abs(px) > D * 1.6 || Math.abs(py) > D * 1.6) restart();
-    else if (gm < 0.02) { settleTimer++; if (settleTimer > 60) restart(); }
-    else settleTimer = 0;
+    var vm = Math.sqrt(vx * vx + vy * vy);
+    if (Math.abs(px) > D * 1.6 || Math.abs(py) > D * 1.6) restart();   // ran off (e.g. saddle)
+    else if (gm < 0.015 && vm < 0.01) settled = true;                  // reached a minimum -> stay
   }
 
   // ---- animation ----
@@ -152,7 +172,7 @@
   function loop() {
     requestAnimationFrame(loop);
     if (canvas.offsetParent === null) return;     // hidden tab -> idle
-    if (!paused) { frame++; if (frame % 3 === 0) step(); }
+    if (!paused && !settled) { frame++; if (frame % 3 === 0) step(); }
     render();
   }
 
@@ -181,7 +201,7 @@
     surf = name;
     var bs = document.querySelectorAll("[data-gd-surf]");
     for (var i = 0; i < bs.length; i++) bs[i].classList.toggle("active", bs[i] === btn);
-    computeZRange(); restart();
+    computeZRange(); computeTarget(); restart();
   }
   var sbtn = document.querySelectorAll("[data-gd-surf]");
   for (var si = 0; si < sbtn.length; si++) (function (b) {
@@ -210,6 +230,7 @@
   var rt;
   window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(resize, 200); });
   computeZRange();
+  computeTarget();
   restart();
   resize();
   requestAnimationFrame(loop);
