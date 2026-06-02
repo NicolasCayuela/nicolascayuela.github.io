@@ -35,6 +35,7 @@
 
   // marker state
   var px = 0, py = 0, vx = 0, vy = 0, trail = [], paused = false, settled = false;
+  var aMx = 0, aMy = 0, aVx = 0, aVy = 0, aT = 0;   // Adam moments
   var target = null;   // global minimum (goal)
 
   function computeTarget() {
@@ -152,18 +153,31 @@
   function restart() {
     var s = SURF[surf].start;
     px = (Math.random() * 2 - 1) * s; py = (Math.random() * 2 - 1) * s;
-    vx = 0; vy = 0; trail = [[px, py]]; settled = false;
+    vx = 0; vy = 0; aMx = 0; aMy = 0; aVx = 0; aVy = 0; aT = 0;
+    trail = [[px, py]]; settled = false;
   }
 
-  function lr() { var el = document.getElementById("gd-lr"); var v = el ? +el.value : 50; return SURF[surf].lr * (v / 50) * lrScale; }
+  function sliderFrac() { var el = document.getElementById("gd-lr"); return (el ? +el.value : 50) / 100; }   // 0.01..1
 
   function step() {
-    var g = SURF[surf].g(px, py), L = lr(), m = 0.85;
-    if (optimizer === "momentum") {
-      vx = m * vx - L * g[0]; vy = m * vy - L * g[1];
-      px += vx; py += vy;
+    var g = SURF[surf].g(px, py), m = 0.85, f = sliderFrac();
+    if (optimizer === "adam") {
+      var b1 = 0.9, b2 = 0.999, eps = 1e-8, a = 0.05 * f;   // small Adam step
+      aT++;
+      aMx = b1 * aMx + (1 - b1) * g[0]; aMy = b1 * aMy + (1 - b1) * g[1];
+      aVx = b2 * aVx + (1 - b2) * g[0] * g[0]; aVy = b2 * aVy + (1 - b2) * g[1] * g[1];
+      var mhx = aMx / (1 - Math.pow(b1, aT)), mhy = aMy / (1 - Math.pow(b1, aT));
+      var vhx = aVx / (1 - Math.pow(b2, aT)), vhy = aVy / (1 - Math.pow(b2, aT));
+      px -= a * mhx / (Math.sqrt(vhx) + eps);
+      py -= a * mhy / (Math.sqrt(vhy) + eps);
     } else {
-      px -= L * g[0]; py -= L * g[1];
+      var L = SURF[surf].lr * f * 0.3;                      // drastically reduced lr
+      if (optimizer === "momentum") {
+        vx = m * vx - L * g[0]; vy = m * vy - L * g[1];
+        px += vx; py += vy;
+      } else {
+        px -= L * g[0]; py -= L * g[1];
+      }
     }
     trail.push([px, py]);
     if (trail.length > 400) trail.shift();
