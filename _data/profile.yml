@@ -43,7 +43,7 @@ portrait_caption_fr: >-
 
 education:
   - name: "PhD: Sustainable architected metamaterials for elastic wave manipulation"
-    logo: assets/images/badges/ijl.png
+    logo: assets/images/badges/ijl.jpg
     url: "https://ijl.univ-lorraine.fr/"
     dept: Nancy
     position: '<em>Institut Jean Lamour - C2MP Doctoral School (Chemistry - Mechanics - Materials - Physics)</em>'
@@ -83,7 +83,7 @@ experience:
     position: '<em>CEA-Leti</em><br>Gas sensing with optomechanical chips and a Mach–Zehnder reference. Built an experimental bench, capping encapsulation (PMMA + tape), RF probe measurements and Comsol/RSoft simulations to analyse the optomechanical coupling and eigenmodes.'
     date: 2025
   - name: "PhD - Sustainable architected metamaterials for elastic wave manipulation"
-    logo: assets/images/badges/ijl.png
+    logo: assets/images/badges/ijl.jpg
     url: "https://ijl.univ-lorraine.fr/"
     position: '<em>Institut Jean Lamour, UMR CNRS 7198</em><br>Design of 3D piezoelectric metamaterials from pillar-based unit cells, with a piezoelectric tensor tunable through the micro-architecture. Characterization of the elastodynamic behaviour (band structures, Willis coupling, electro-momentum coupling) and machine-learning approaches (GNN, inverse design) to speed up prediction and optimization of wave-propagation properties. Targeted applications: defect/impact detection, directional sensing, energy harvesting and non-Hermitian behaviour.'
     date: 2025 - 2028
