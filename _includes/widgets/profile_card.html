@@ -1,0 +1,185 @@
+<div class="row">
+    <div class="col">
+        <div class="card border-0 shadow-sm bg-white">
+            <div class="card-body p-4">
+                <div class="row">
+                    <div class="col">
+                        <p class="h1 font-weight-normal lang-en" style="display: inline-block;">{{ site.data.profile.primary_name }}</p>
+                        <p class="h1 font-weight-normal lang-zh" style="font-family: '行楷', 'STXingkai', 'Xingkai SC', serif; display: inline-block;">{{ site.data.profile.secondary_name }}</p>
+                        <p class="text-profile-position">
+                            {% for position in site.data.profile.positions %}
+                            <span class="lang-en">{{ position }}</span>
+                            <span class="lang-zh">{{ site.data.profile.positions_zh[forloop.index0] }}</span>
+                            <br/>
+                            {% endfor %}
+                            {% if site.data.profile.cv_link %}
+                            <a target="_blank" href="{{ site.data.profile.cv_link }}"><i class="fas fa-file-alt"></i> [{% include i18n.html key="cv" %}]</a> <br/>
+                            {% endif %}
+                        </p>
+                        <!-- 将联系方式放在原short-bio的位置 -->
+                        <div class="row">
+                            <div class="col">
+                                <a class="pr-3 no-break" href="mailto:{{ site.data.profile.email | encode_email }}">
+                                    <i class="fas fa-at"></i> <span class="email-text">{{ site.data.profile.email | replace: "@", "(at)" }}</span>
+                                </a>
+
+                                {% if site.data.profile.gscholar %}
+                                <a class="pr-3 no-break" target="_blank" href="https://scholar.google.com/citations?user={{ site.data.profile.gscholar }}&hl=en">
+                                    <i class="fab fa-google"></i> <span class="lang-en">Google Scholar</span><span class="lang-zh">谷歌学术</span>
+                                </a>
+                                {% endif %}
+
+                                {% if site.data.profile.sscholar %}
+                                <a class="pr-3 no-break" target="_blank" href="https://www.semanticscholar.org/author/{{ site.data.profile.sscholar }}">
+                                    <i class="fa fa-book"></i> <span class="lang-en">Semantic Scholar</span><span class="lang-zh">Semantic Scholar</span>
+                                </a>
+                                {% endif %}
+
+                                {% if site.data.profile.openreview %}
+                                <a class="pr-3 no-break" target="_blank" href="https://openreview.net/profile?id={{ site.data.profile.openreview }}">
+                                    <i class="fas fa-comments"></i> <span class="lang-en">OpenReview</span><span class="lang-zh">OpenReview</span>
+                                </a>
+                                {% endif %}
+                                
+                                {% if site.data.profile.github %}
+                                <a class="pr-3 no-break" target="_blank" href="https://github.com/{{ site.data.profile.github }}">
+                                    <i class="fab fa-github"></i> <span class="lang-en">GitHub</span><span class="lang-zh">GitHub</span>
+                                </a> 
+                                {% endif %}
+                                
+                                {% if site.data.profile.orcid %}
+                                <a class="pr-3 no-break" target="_blank" href="https://orcid.org/{{ site.data.profile.orcid }}">
+                                    <i class="fab fa-orcid"></i> <span class="lang-en">ORCID</span><span class="lang-zh">ORCID</span>
+                                </a>
+                                {% endif %}
+                                
+                                {% if site.data.profile.instagram %}
+                                <a class="pr-3 no-break" target="_blank" href="https://www.instagram.com/{{ site.data.profile.instagram }}">
+                                    <i class="fab fa-instagram"></i> <span class="lang-en">Instagram</span><span class="lang-zh">Instagram</span>
+                                </a>
+                                {% endif %}
+                                
+                                {% if site.data.profile.qq_qrcode %}
+                                <a class="pr-3 no-break" data-toggle="modal" data-target="#modal-qq">
+                                    <i class="fab fa-qq"></i> <span class="lang-en">QQ</span><span class="lang-zh">QQ</span>
+                                </a>
+                                {% endif %}
+                                
+                                {% if site.data.profile.wechat_qrcode %}
+                                <a class="pr-3 no-break" data-toggle="modal" data-target="#modal-wechat">
+                                    <i class="fab fa-weixin"></i> <span class="lang-en">WeChat</span><span class="lang-zh">WeChat</span>
+                                </a>
+                                {% endif %}
+
+                                {% if site.data.profile.x %}
+                                <a class="pr-3 no-break" target="_blank" href="https://x.com/{{ site.data.profile.x }}">
+                                    <i class="fab fa-twitter"></i> <span class="lang-en">X</span><span class="lang-zh">X</span>
+                                </a>
+                                {% endif %}
+                                {% if site.data.profile.facebook %}
+                                <a class="pr-3 no-break" target="_blank" href="https://www.facebook.com/{{ site.data.profile.facebook }}">
+                                    <i class="fab fa-facebook"></i> <span class="lang-en">Facebook</span><span class="lang-zh">Facebook</span>
+                                </a>
+                                {% endif %}
+                                {% if site.data.profile.zhihu %}
+                                <a class="pr-3 no-break" target="_blank" href="https://www.zhihu.com/people/{{ site.data.profile.zhihu }}">
+                                    <i class="fab fa-zhihu"></i> <span class="lang-en">ZhiHu</span><span class="lang-zh">ZhiHu</span>
+                                </a>
+                                {% endif %}
+
+                                {% if site.data.profile.resume %}
+                                <a class="pr-3 no-break" target="_blank" href="{{ site.data.profile.resume | relative_url }}">
+                                    <i class="fa fa-file"></i> <span class="lang-en">Resume</span><span class="lang-zh">CV</span>
+                                </a>
+                                {% endif %}
+
+                                {% if site.data.profile.linkedin %}
+                                <a class="pr-3 no-break" target="_blank" href="https://www.linkedin.com/in/{{ site.data.profile.linkedin }}">
+                                    <i class="fab fa-linkedin"></i> <span class="lang-en">LinkedIn</span><span class="lang-zh">LinkedIn</span>
+                                </a>
+                                {% endif %}
+
+                            </div>
+                        </div>
+                    </div>
+                    {% if site.data.profile.show_portrait %}
+                    <div class="col-md-auto d-none d-md-block">
+                        <figure class="figure">
+                            <img 
+                                src="{{ site.data.profile.portrait_url }}" 
+                                class="figure-img img-fluid img-thumbnail" 
+                                style="height: 200px;"
+                                data-toggle="tooltip" 
+                                data-placement="top" 
+                                title="{{ site.data.profile.portrait_caption }}"
+                            >
+                            <figcaption class="figure-caption text-right"></figcaption>
+                        </figure>
+                    </div>
+                    {% endif %}
+        
+                </div>
+            </div>
+        </div>        
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col">
+        <div class="card border-0 shadow-sm bg-white">
+            <div class="card-body p-4">
+                <div class="row">
+                    {% if site.data.profile.short_bio %}
+                    <div class="col-md-12">
+                        <div class="my-1">
+                            <h6><i class="fas fa-id-card"></i> &nbsp; <span class="lang-en">Short-bio</span><span class="lang-zh">个人简介</span></h6>
+                            <div class="mx-2">
+                                <span class="lang-en">{{ site.data.profile.short_bio }}</span>
+                                <span class="lang-zh">{{ site.data.profile.short_bio_zh }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% if site.data.profile.wechat_qrcode %}
+<div class="modal fade" id="modal-wechat" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-body p-0">
+                <img src="{{ site.data.profile.wechat_qrcode }}" class="img-fluid">
+            </div>
+            {% if site.data.profile.wechat_prompt %}
+            <div class="modal-body p-1">
+                {{ site.data.profile.wechat_prompt }}
+            </div>
+            {% endif %}
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">{% include i18n.html key="close" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if site.data.profile.qq_qrcode %}
+<div class="modal fade" id="modal-qq" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-body p-0">
+                <img src="{{ site.data.profile.qq_qrcode }}" class="img-fluid">
+            </div>
+            {% if site.data.profile.qq_prompt %}
+            <div class="modal-body p-1">
+                {{ site.data.profile.qq_prompt }}
+            </div>
+            {% endif %}
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">{% include i18n.html key="close" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}

@@ -1,0 +1,28 @@
+<nav class="navbar navbar-expand-sm navbar-light bg-light fixed-top mb-5 shadow-sm">
+    <div class="container">
+        <a class="navbar-brand"><strong>{{site.data.profile.navbar_name}}</strong></a>
+        <button class="navbar-toggler" style="font-size: 1em; padding: 0.5em;" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="fas fa-map"></i> <span class="lang-en">Menu</span><span class="lang-zh">Menu</span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+                {% for item in site.data.navigation.pages %}
+                <li class="nav-item {% if item.name == page.navbar_name %}active{% endif %}">
+                    <a class="nav-link" href="{{ item.url }}">
+                        <span class="lang-en">{{ item.name }}</span><span class="lang-zh">{{ item.name_zh }}</span>
+                        {% if item.url == page.url %}<span class="sr-only">(current)</span>{% endif %}
+                    </a>
+                </li>
+                {% endfor %}
+                <li class="nav-item d-flex align-items-center">
+                    <div class="lang-toggle">
+                        <span id="lang-toggle-en" class="lang-toggle-label" onclick="toggleLanguage('en')">EN</span>
+                        <span class="lang-toggle-divider"></span>
+                        <span id="lang-toggle-zh" class="lang-toggle-label" onclick="toggleLanguage('zh')">FR</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

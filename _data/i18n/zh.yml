@@ -1,0 +1,45 @@
+# NOTE: this is the "second language" channel of the template.
+# Here it holds FRENCH (the UI label is "FR"). Internal lang code stays "zh".
+
+# Navigation
+nav_home: "Accueil"
+nav_publications: "Publications"
+nav_blogs: "Blog"
+nav_menu: "Menu"
+
+# Profile card
+cv: "CV"
+google_scholar: "Google Scholar"
+github: "GitHub"
+wechat: "WeChat"
+twitter: "Twitter"
+linkedin: "LinkedIn"
+orcid: "ORCID"
+close: "Fermer"
+
+# Experience card
+education: "Formation"
+experience: "Expérience"
+service: "Activités"
+honors_awards: "Distinctions & prix"
+
+# News card
+news: "Actualités"
+
+# Publication card
+selected_publications: "Publications sélectionnées"
+view_all: "(tout voir)"
+all_publications: "Toutes les publications"
+marks: "Notes :"
+equal_contribution: "contribution égale"
+corresponding_author: "auteur correspondant"
+
+# Blog card
+read_more: "Lire la suite"
+
+# Blog layout
+back_to_blogs: "Retour aux articles"
+toc_title: "Sommaire"
+
+# Footer
+last_updated: "Dernière mise à jour :"

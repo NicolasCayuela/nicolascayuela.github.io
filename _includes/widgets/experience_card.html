@@ -1,0 +1,179 @@
+<div class="row mt-3">
+    <div class="col">
+        <div class="card border-0 shadow-sm bg-white">
+            <div class="card-body p-4">
+                <div class="row">
+                    {% if site.data.profile.education %}
+                    <div class="col-md-12">
+                        <div class="my-1">
+                            <h6><i class="fas fa-school"></i> &nbsp; {% include i18n.html key="education" %}</h6>
+                            <div class="mx-2">
+                                <ul class="list-unstyled mb-1">
+                                    {% for item in site.data.profile.education %}
+                                    <li class="media mb-1">
+                                        {% if item.url %}
+                                            <a href="{{ item.url }}" target="_blank" class="text-black text-decoration-none">
+                                                <img src="{{ item.logo }}" alt="{{ item.name }}" style="width: 18px;" class="mr-1 mt-1">
+                                            </a>
+                                        {% else %}
+                                            <img src="{{ item.logo }}" alt="{{ item.name }}" style="width: 18px;" class="mr-1 mt-1">
+                                        {% endif %}
+                                        <div class="media-body">
+                                            <p class="my-0"><span class="lang-en">{{ item.name }}</span><span class="lang-zh">{{ site.data.profile.education_zh[forloop.index0].name }}</span></p>
+                                            <p class="small my-0">{{ item.dept }}</p>
+                                            <p class="small my-0"><span class="lang-en">{{ item.position }}</span><span class="lang-zh">{{ site.data.profile.education_zh[forloop.index0].position }}</span> <em class="float-right">{{ item.date }}</em></p>
+                                        </div>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col">
+        <div class="card border-0 shadow-sm bg-white">
+            <div class="card-body p-4">
+                <div class="row">
+                    {% if site.data.profile.experience %}
+                    <div class="col-md-12">
+                        <div class="my-1">
+                            <h6><i class="fas fa-laptop-code"></i> &nbsp; {% include i18n.html key="experience" %}</h6>
+                            <div class="mx-2">
+                                <ul class="list-unstyled mb-1">
+                                    {% for item in site.data.profile.experience %}
+                                    <li class="media mb-1">
+                                        {% if item.url %}
+                                            <a href="{{ item.url }}" target="_blank" class="text-black text-decoration-none">
+                                                <img src="{{ item.logo }}" alt="{{ item.name }}" style="width: 18px;" class="mr-1 mt-1">
+                                            </a>
+                                        {% else %}
+                                            <img src="{{ item.logo }}" alt="{{ item.name }}" style="width: 18px;" class="mr-1 mt-1">
+                                        {% endif %}
+                                        <div class="media-body">
+                                            <p class="my-0"><span class="lang-en">{{ item.name }}</span><span class="lang-zh">{{ site.data.profile.experience_zh[forloop.index0].name }}</span></p>
+                                            <p class="small my-0">{{ item.dept }}</p>
+                                            <p class="small my-0"><span class="lang-en">{{ item.position }}</span><span class="lang-zh">{{ site.data.profile.experience_zh[forloop.index0].position }}</span> <em class="float-right">{{ item.date }}</em></p>
+                                        </div>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col">
+        <div class="card border-0 shadow-sm bg-white">
+            <div class="card-body p-4">
+                <div class="row">
+                    {% if site.data.profile.service %}
+                    <div class="col-md-12">
+                        <div class="my-1">
+                            <h6><i class="fas fa-handshake"></i> &nbsp; {% include i18n.html key="service" %}</h6>
+                            <div class="mx-2">
+                                <ul class="list small pl-3 mb-1">
+                                    <div class="row">
+                                        {% for item in site.data.profile.service %}
+                                        <div class="col-md-12"> <!-- 每行一个元素 -->
+                                            <li> <!-- 使用flex布局让date和name在一行 -->
+                                                <!-- <strong class="mr-1">{{item.date}}.</strong> 加粗日期 -->
+                                                <em class="lang-en">{{ item.name }}</em><span class="lang-zh">{{ site.data.profile.service_zh[forloop.index0].name }}</span>
+                                            </li>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col">
+        <div class="card border-0 shadow-sm bg-white">
+            <div class="card-body p-4">
+                <div class="row">
+                    {% if site.data.profile.awards %}
+                    <div class="col-md-12">
+                        <div class="my-1">
+                            <h6><i class="fas fa-trophy"></i> &nbsp; {% include i18n.html key="honors_awards" %}</h6>
+                            <div class="mx-2">
+                                <ul class="list small pl-3 mb-1">
+                                    <div class="row">
+                                        {% for item in site.data.profile.awards %}
+                                        <div class="col-md-12">
+                                            <li>
+                                                <strong class="mr-1">{{item.date}}.</strong>
+                                                {% if item.url %}
+                                                    <a href="{{ item.url }}" target="_blank" class="text-black text-decoration-none">
+                                                        <em class="lang-en">{{ item.name }}</em><span class="lang-zh">{{ site.data.profile.awards_zh[forloop.index0].name }}</span>
+                                                    </a>
+                                                {% else %}
+                                                    <em class="lang-en">{{ item.name }}</em><span class="lang-zh">{{ site.data.profile.awards_zh[forloop.index0].name }}</span>
+                                                {% endif %}
+                                            </li>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col">
+        <div class="card border-0 shadow-sm bg-white">
+            <div class="card-body p-4">
+                <div class="row">
+                    {% if site.data.profile.news %}
+                    <div class="col-md-12">
+                        <div class="my-1">
+                            <h6><i class="fas fa-rss"></i> &nbsp; {% include i18n.html key="news" %}</h6>
+                            <div class="mx-2">
+                                <ul class="list small pl-3 mb-1">
+                                    <div class="row">
+                                        {% for item in site.data.profile.news %}
+                                        <div class="col-md-12">
+                                            <li>
+                                                <strong class="mr-1">{{item.date}}.</strong>
+                                                {% if item.url %}
+                                                    <a href="{{ item.url }}" target="_blank" class="text-black text-decoration-none">
+                                                        <em class="lang-en">{{ item.name }}</em><span class="lang-zh">{{ site.data.profile.news_zh[forloop.index0].name }}</span>
+                                                    </a>
+                                                {% else %}
+                                                    <em class="lang-en">{{ item.name }}</em><span class="lang-zh">{{ site.data.profile.news_zh[forloop.index0].name }}</span>
+                                                {% endif %}
+                                            </li>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

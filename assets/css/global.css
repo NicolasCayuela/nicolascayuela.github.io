@@ -1,0 +1,126 @@
+@charset "utf-8";
+body {
+    font-family: "Lato", sans-serif;
+    font-weight: 400;
+    padding-top: 5.0rem;
+    color: #000;
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+    font-weight: 700;
+}
+
+.text-profile-position {
+    font-weight: 400;
+}
+
+.text-profile-bio {
+    /* font-family: "Raleway"; */
+    font-weight: 400;
+}
+
+.navbar {
+    opacity: 0.95;
+}
+
+.inline-badge {
+    height: 16px;
+    vertical-align: -10%;
+    margin-right: 2px;
+    line-break: unset;
+}
+
+.no-break {
+    white-space: nowrap;
+}
+
+.cover-image {
+    width: 180px;
+    max-height: 120px;
+}
+
+.abstract-body {
+    min-height: 100px;
+}
+
+img.lazy {
+    background-image: url('images/loading.gif');
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    background-size: 50px 50px;
+    min-height: 80px;
+}
+
+.badge-custom {
+    font-size: 100%;
+}
+
+.email-text {
+    font-family: Courier, monospace;
+}
+
+.text-black {
+  color: #000 !important;
+}
+
+a.text-black:link,
+a.text-black:visited{
+  color: #000;
+  text-decoration: none;
+}
+a.text-black:hover,
+a.text-black:active{
+  color: #000;
+  text-decoration: none;
+}
+
+/* ===== i18n Language Toggle ===== */
+.lang-zh {
+    display: none !important;
+}
+
+html.lang-active-zh .lang-en {
+    display: none !important;
+}
+
+html.lang-active-zh .lang-zh {
+    display: inline !important;
+}
+
+/* Language toggle switch */
+.lang-toggle {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid #d0dde8;
+    border-radius: 4px;
+    overflow: hidden;
+    font-size: 0.8rem;
+    margin-left: 0.75rem;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.lang-toggle-label {
+    padding: 0.2rem 0.5rem;
+    color: #999;
+    transition: all 0.2s ease;
+    user-select: none;
+    line-height: 1.4;
+}
+
+.lang-toggle-label:hover {
+    color: #4a7298;
+}
+
+.lang-toggle-active {
+    background-color: #4a7298;
+    color: #fff !important;
+    font-weight: 500;
+}
+
+.lang-toggle-divider {
+    width: 1px;
+    background-color: #d0dde8;
+    height: 1rem;
+}

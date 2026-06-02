@@ -1,0 +1,22 @@
+---
+layout: null
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>{{ site.url }}{{ site.baseurl }}/</loc>
+  </url>
+  <url>
+    <loc>{{ site.url }}{{ site.baseurl }}/publications</loc>
+  </url>
+  {% for pub in site.publications %}
+  <url>
+    <loc>{{ site.url }}{{ pub.url }}</loc>
+  </url>
+  {% endfor %}
+  {% for proj in site.projects %}
+  <url>
+    <loc>{{ site.url }}{{ proj.url }}</loc>
+  </url>
+  {% endfor %}
+</urlset>

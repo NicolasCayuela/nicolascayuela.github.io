@@ -1,0 +1,17 @@
+<footer class="footer">
+    <div class="container">
+        <div class="row my-3">
+            <div class="col-6">
+                <div class="text-muted">
+                    <i>{% include i18n.html key="last_updated" %} {{ "now" | date: "%b %Y" }}</i>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="text-right text-muted">
+                    <span class="lang-en">{{ site.data.profile.footer_text }}</span>
+                    <span class="lang-zh">{{ site.data.profile.footer_text_zh }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>

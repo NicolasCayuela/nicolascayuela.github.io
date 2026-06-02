@@ -1,0 +1,7 @@
+pages:
+- name: Home
+  name_zh: Accueil
+  url: ./
+- name: Publications
+  name_zh: Publications
+  url: publications

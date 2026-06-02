@@ -1,0 +1,92 @@
+primary_name: "Nicolas Cayuela"
+secondary_name: "Nicolas Cayuela"
+navbar_name: "Nicolas Cayuela"
+positions:
+  - '<i class="fas fa-user-graduate"></i> &nbsp;PhD Student in Phononics & Metamaterials'
+  - '<i class="fas fa-flask"></i> &nbsp;Institut Jean Lamour'
+  - <i class="fas fa-map-marker-alt"></i> &nbsp; Nancy, France
+
+positions_zh:
+  - '<i class="fas fa-user-graduate"></i> &nbsp;Doctorant en phononique & métamatériaux'
+  - '<i class="fas fa-flask"></i> &nbsp;Institut Jean Lamour'
+  - <i class="fas fa-map-marker-alt"></i> &nbsp; Nancy, France
+
+email: "githubcontact.sublime067@simplelogin.com"
+#gscholar: XXXXXXXXXXXX        # your Google Scholar user id (uncomment to enable)
+#orcid: 0000-0000-0000-0000
+github: NicolasCayuela
+linkedin: nicolas-cayuela
+#x: yourhandle
+#resume: assets/cv/Resume_Nicolas_Cayuela.pdf
+
+short_bio: >-
+  Hi, I am <strong>Nicolas Cayuela</strong>, a PhD student in phononics and metamaterials
+  at <strong>Institut Jean Lamour</strong> in Nancy, France. My research focuses on the design
+  and study of phononic crystals and acoustic/elastic metamaterials.
+  <br> <span style="color: red; font-style: italic;">Feel free to contact me if you are interested in discussing or collaborating.</span>
+
+short_bio_zh: >-
+  Bonjour, je suis <strong>Nicolas Cayuela</strong>, doctorant en phononique et métamatériaux
+  à l'<strong>Institut Jean Lamour</strong> à Nancy. Mes recherches portent sur la conception
+  et l'étude des cristaux phononiques et des métamatériaux acoustiques/élastiques.
+  <br> <span style="color: red; font-style: italic;">N'hésitez pas à me contacter pour échanger ou collaborer.</span>
+
+show_portrait: true
+portrait_url: assets/images/photos/profile.jpg
+portrait_caption: >-
+  I'm Nicolas Cayuela. Welcome to my homepage!
+
+portrait_caption_zh: >-
+  Je suis Nicolas Cayuela. Bienvenue sur ma page !
+
+education:
+  - name: Institut Jean Lamour
+    logo: assets/images/empty_300x200.png
+    url: "https://ijl.univ-lorraine.fr/"
+    position: PhD in Phononics & Metamaterials
+    date: 2024 - present
+
+education_zh:
+  - name: Institut Jean Lamour
+    logo: assets/images/empty_300x200.png
+    url: "https://ijl.univ-lorraine.fr/"
+    position: Doctorat en phononique & métamatériaux
+    date: 2024 - présent
+
+# experience:
+#   - name: Lab / Company
+#     logo: assets/images/empty_300x200.png
+#     position: Role
+#     date: 2023 - 2024
+# experience_zh:
+#   - name: Laboratoire / Entreprise
+#     logo: assets/images/empty_300x200.png
+#     position: Poste
+#     date: 2023 - 2024
+
+# service:
+#   - name: "Reviewer for ..."
+# service_zh:
+#   - name: "Relecteur pour ..."
+
+# awards:
+#   - name: Award name
+#     date: 2025.01
+# awards_zh:
+#   - name: Nom du prix
+#     date: 2025.01
+
+# news:
+#   - name: Something happened
+#     date: 2025.01
+#     url: "https://example.com"
+# news_zh:
+#   - name: Une nouvelle
+#     date: 2025.01
+#     url: "https://example.com"
+
+footer_text: >-
+  Powered by Jekyll & the Academic Homepage template.
+
+footer_text_zh: >-
+  Propulsé par Jekyll & le template Academic Homepage.
