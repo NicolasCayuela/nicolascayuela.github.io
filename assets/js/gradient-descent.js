@@ -181,7 +181,7 @@
   canvas.addEventListener("mousedown", function (e) { dragging = true; lx = e.clientX; ly = e.clientY; });
   window.addEventListener("mousemove", function (e) {
     if (!dragging) return;
-    yaw += (e.clientX - lx) * 0.01;
+    yaw -= (e.clientX - lx) * 0.01;
     pitch += (e.clientY - ly) * 0.01;
     lx = e.clientX; ly = e.clientY;
   });
@@ -189,7 +189,7 @@
   canvas.addEventListener("touchstart", function (e) { dragging = true; lx = e.touches[0].clientX; ly = e.touches[0].clientY; }, { passive: true });
   canvas.addEventListener("touchmove", function (e) {
     if (!dragging) return;
-    yaw += (e.touches[0].clientX - lx) * 0.01;
+    yaw -= (e.touches[0].clientX - lx) * 0.01;
     pitch += (e.touches[0].clientY - ly) * 0.01;
     lx = e.touches[0].clientX; ly = e.touches[0].clientY;
   }, { passive: true });

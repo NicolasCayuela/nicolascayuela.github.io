@@ -15,6 +15,7 @@
   var CELL = 13, DPR = 1, cols = 0, rows = 0;
   var grid, next;
   var mode = "life";           // "life" | "fire"
+  var fireDirty = false;       // grid was overwritten by forest fire -> reset on return to life
   var running = false;
   var acc = 0, last = 0;
 
@@ -273,6 +274,11 @@
     canvas.style.cursor = "pointer";
     if (m === "fire") {
       for (var j = 0; j < grid.length; j++) grid[j] = Math.random() < 0.6 ? 1 : 0; // fresh random forest
+      fireDirty = true;
+    } else if (m === "life" && fireDirty) {        // returning from fire -> clean Life board
+      grid = new Uint8Array(cols * rows);
+      stamp(PATTERNS.glider, 4, 3);
+      fireDirty = false;
     }
     draw();
   }
