@@ -24,7 +24,7 @@
 
   // precompute the nearest-class "latent regions" once (independent of view size)
   function buildRegions() {
-    var R = 1200, off = document.createElement("canvas");
+    var R = 600, off = document.createElement("canvas");
     off.width = R; off.height = R;
     var octx = off.getContext("2d"), img = octx.createImageData(R, R);
     var it = data.items, cols = COLORS.map(hexToRgb), px, py, i;
