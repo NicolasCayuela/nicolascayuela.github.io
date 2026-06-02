@@ -1,7 +1,8 @@
 /*
- * Conway's Game of Life — small interactive widget.
- * Click / drag to draw black cells. Pick a pattern then click to stamp it.
- * Toroidal (wrap-around) grid so gliders keep travelling.
+ * Two cellular automata in one widget:
+ *   - Conway's Game of Life (draw cells, stamp classic patterns)
+ *   - Forest fire (Drossel-Schwabe): trees grow, lightning/neighbours ignite.
+ * Toroidal grid. Bilingual labels live in the HTML include.
  */
 (function () {
   "use strict";
@@ -11,49 +12,57 @@
   var ctx = canvas.getContext("2d");
   var wrap = document.getElementById("gol-wrap");
 
-  var CELL = 13;            // logical px per cell
-  var DPR = 1;
-  var cols = 0, rows = 0;
+  var CELL = 13, DPR = 1, cols = 0, rows = 0;
   var grid, next;
+  var mode = "life";           // "life" | "fire"
   var running = false;
-  var speed = 11;          // generations per second
   var acc = 0, last = 0;
 
-  // ---- patterns (relative cell coords) ----
+  // forest-fire colours / cell states: 0 empty, 1 tree, 2 burning
+  var COL_EMPTY = "#efe7d6", COL_TREE = "#2f9e44", COL_BURN = "#ff5a1f";
+
+  // ---- Game of Life patterns (relative cell coords) ----
   var PATTERNS = {
     glider: [[1,0],[2,1],[0,2],[1,2],[2,2]],
+    lwss: [[1,0],[4,0],[0,1],[0,2],[4,2],[0,3],[1,3],[2,3],[3,3]],
+    mwss: [[1,0],[4,0],[0,1],[0,2],[5,2],[0,3],[1,3],[2,3],[3,3],[4,3],[2,4]],
     blinker: [[0,0],[1,0],[2,0]],
     toad: [[1,0],[2,0],[3,0],[0,1],[1,1],[2,1]],
     beacon: [[0,0],[1,0],[0,1],[1,1],[2,2],[3,2],[2,3],[3,3]],
-    lwss: [[1,0],[4,0],[0,1],[0,2],[4,2],[0,3],[1,3],[2,3],[3,3]],
+    block: [[0,0],[1,0],[0,1],[1,1]],
+    beehive: [[1,0],[2,0],[0,1],[3,1],[1,2],[2,2]],
+    loaf: [[1,0],[2,0],[0,1],[3,1],[1,2],[3,2],[2,3]],
     pulsar: [
       [2,0],[3,0],[4,0],[8,0],[9,0],[10,0],
-      [0,2],[5,2],[7,2],[12,2],
-      [0,3],[5,3],[7,3],[12,3],
-      [0,4],[5,4],[7,4],[12,4],
+      [0,2],[5,2],[7,2],[12,2],[0,3],[5,3],[7,3],[12,3],[0,4],[5,4],[7,4],[12,4],
       [2,5],[3,5],[4,5],[8,5],[9,5],[10,5],
       [2,7],[3,7],[4,7],[8,7],[9,7],[10,7],
-      [0,8],[5,8],[7,8],[12,8],
-      [0,9],[5,9],[7,9],[12,9],
-      [0,10],[5,10],[7,10],[12,10],
+      [0,8],[5,8],[7,8],[12,8],[0,9],[5,9],[7,9],[12,9],[0,10],[5,10],[7,10],[12,10],
       [2,12],[3,12],[4,12],[8,12],[9,12],[10,12]
     ],
+    pentadecathlon: [
+      [2,0],[7,0],
+      [0,1],[1,1],[3,1],[4,1],[5,1],[6,1],[8,1],[9,1],
+      [2,2],[7,2]
+    ],
+    rpentomino: [[1,0],[2,0],[0,1],[1,1],[1,2]],
+    acorn: [[1,0],[3,1],[0,2],[1,2],[4,2],[5,2],[6,2]],
+    diehard: [[6,0],[0,1],[1,1],[1,2],[5,2],[6,2],[7,2]],
     gun: [
-      [24,0],
-      [22,1],[24,1],
+      [24,0],[22,1],[24,1],
       [12,2],[13,2],[20,2],[21,2],[34,2],[35,2],
       [11,3],[15,3],[20,3],[21,3],[34,3],[35,3],
       [0,4],[1,4],[10,4],[16,4],[20,4],[21,4],
       [0,5],[1,5],[10,5],[14,5],[16,5],[17,5],[22,5],[24,5],
-      [10,6],[16,6],[24,6],
-      [11,7],[15,7],
-      [12,8],[13,8]
+      [10,6],[16,6],[24,6],[11,7],[15,7],[12,8],[13,8]
     ]
   };
-
-  var activePattern = null;   // null => pen mode (single cells)
+  var activePattern = null;    // null => pen mode (life)
+  var firePaint = "plant";     // "plant" | "ignite"
 
   function idx(c, r) { return r * cols + c; }
+  function growthP() { var el = document.getElementById("gol-growth"); return el ? (+el.value) / 1000 : 0.02; }
+  function lightP() { var el = document.getElementById("gol-light"); return el ? (+el.value) / 100000 : 0.0005; }
 
   function build() {
     var w = wrap.clientWidth || 600;
@@ -61,61 +70,76 @@
     cols = Math.max(10, Math.floor(w / CELL));
     rows = 26;
     var cssW = cols * CELL, cssH = rows * CELL;
-    canvas.style.width = cssW + "px";
-    canvas.style.height = cssH + "px";
-    canvas.width = cssW * DPR;
-    canvas.height = cssH * DPR;
+    canvas.style.width = cssW + "px"; canvas.style.height = cssH + "px";
+    canvas.width = cssW * DPR; canvas.height = cssH * DPR;
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     var ng = new Uint8Array(cols * rows);
-    if (grid) {              // preserve overlap on resize
+    if (grid) {
       var oc = window.__golCols || cols, or = window.__golRows || rows;
       for (var r = 0; r < Math.min(or, rows); r++)
         for (var c = 0; c < Math.min(oc, cols); c++)
           ng[idx(c, r)] = grid[r * oc + c] || 0;
     }
-    grid = ng;
-    next = new Uint8Array(cols * rows);
+    grid = ng; next = new Uint8Array(cols * rows);
     window.__golCols = cols; window.__golRows = rows;
     draw();
   }
 
   function draw() {
-    var cssW = cols * CELL, cssH = rows * CELL;
+    var cssW = cols * CELL, cssH = rows * CELL, r, c, v;
     ctx.clearRect(0, 0, cssW, cssH);
-    // grid lines
-    ctx.strokeStyle = "rgba(0,0,0,0.07)";
-    ctx.lineWidth = 1;
+    if (mode === "fire") { ctx.fillStyle = COL_EMPTY; ctx.fillRect(0, 0, cssW, cssH); }
+    ctx.strokeStyle = "rgba(0,0,0,0.07)"; ctx.lineWidth = 1;
     ctx.beginPath();
     for (var x = 0; x <= cols; x++) { ctx.moveTo(x * CELL + 0.5, 0); ctx.lineTo(x * CELL + 0.5, cssH); }
     for (var y = 0; y <= rows; y++) { ctx.moveTo(0, y * CELL + 0.5); ctx.lineTo(cssW, y * CELL + 0.5); }
     ctx.stroke();
-    // live cells
-    ctx.fillStyle = "#111";
-    for (var r = 0; r < rows; r++) {
-      for (var c = 0; c < cols; c++) {
-        if (grid[idx(c, r)]) ctx.fillRect(c * CELL + 1, r * CELL + 1, CELL - 1, CELL - 1);
+    for (r = 0; r < rows; r++) {
+      for (c = 0; c < cols; c++) {
+        v = grid[idx(c, r)];
+        if (mode === "life") {
+          if (v) { ctx.fillStyle = "#111"; ctx.fillRect(c * CELL + 1, r * CELL + 1, CELL - 1, CELL - 1); }
+        } else if (v === 1) {
+          ctx.fillStyle = COL_TREE; ctx.fillRect(c * CELL + 1, r * CELL + 1, CELL - 1, CELL - 1);
+        } else if (v === 2) {
+          ctx.fillStyle = COL_BURN; ctx.fillRect(c * CELL + 1, r * CELL + 1, CELL - 1, CELL - 1);
+        }
       }
     }
   }
 
-  function step() {
-    for (var r = 0; r < rows; r++) {
-      for (var c = 0; c < cols; c++) {
-        var n = 0;
-        for (var dr = -1; dr <= 1; dr++) {
-          for (var dc = -1; dc <= 1; dc++) {
-            if (!dr && !dc) continue;
-            var rr = (r + dr + rows) % rows;   // wrap (toroidal)
-            var cc = (c + dc + cols) % cols;
-            n += grid[idx(cc, rr)];
-          }
-        }
-        var alive = grid[idx(c, r)];
-        next[idx(c, r)] = (alive && (n === 2 || n === 3)) || (!alive && n === 3) ? 1 : 0;
+  function stepLife() {
+    for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) {
+      var n = 0;
+      for (var dr = -1; dr <= 1; dr++) for (var dc = -1; dc <= 1; dc++) {
+        if (!dr && !dc) continue;
+        n += grid[idx((c + dc + cols) % cols, (r + dr + rows) % rows)];
       }
+      var a = grid[idx(c, r)];
+      next[idx(c, r)] = (a && (n === 2 || n === 3)) || (!a && n === 3) ? 1 : 0;
     }
-    var t = grid; grid = next; next = t;
-    draw();
+  }
+
+  function stepFire() {
+    var p = growthP(), f = lightP();
+    for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) {
+      var v = grid[idx(c, r)], out;
+      if (v === 2) { out = 0; }                       // burning -> empty
+      else if (v === 1) {                              // tree
+        var burningNb = false;
+        for (var dr = -1; dr <= 1 && !burningNb; dr++) for (var dc = -1; dc <= 1; dc++) {
+          if (!dr && !dc) continue;
+          if (grid[idx((c + dc + cols) % cols, (r + dr + rows) % rows)] === 2) { burningNb = true; break; }
+        }
+        out = (burningNb || Math.random() < f) ? 2 : 1; // neighbour or lightning
+      } else { out = Math.random() < p ? 1 : 0; }       // empty -> maybe grow
+      next[idx(c, r)] = out;
+    }
+  }
+
+  function step() {
+    if (mode === "life") stepLife(); else stepFire();
+    var t = grid; grid = next; next = t; draw();
   }
 
   function loop(now) {
@@ -123,10 +147,11 @@
     requestAnimationFrame(loop);
     if (!last) last = now;
     acc += (now - last) / 1000; last = now;
-    var interval = 1 / speed;
+    var interval = 1 / (mode === "fire" ? 14 : 11);
     if (acc >= interval) { acc = 0; step(); }
   }
 
+  var playBtn = document.getElementById("gol-play");
   function setRunning(on) {
     running = on; last = 0; acc = 0;
     playBtn.innerHTML = on
@@ -135,67 +160,68 @@
     if (on) requestAnimationFrame(loop);
   }
 
-  // ---- pointer interaction ----
+  // ---- pointer ----
   function cellAt(e) {
     var rect = canvas.getBoundingClientRect();
-    var x = (e.clientX - rect.left), y = (e.clientY - rect.top);
-    return { c: Math.floor(x / CELL), r: Math.floor(y / CELL) };
+    return { c: Math.floor((e.clientX - rect.left) / CELL), r: Math.floor((e.clientY - rect.top) / CELL) };
   }
+  function inBounds(p) { return p.c >= 0 && p.c < cols && p.r >= 0 && p.r < rows; }
 
   function stamp(pat, c0, r0) {
-    // centre the pattern on the click
     var maxc = 0, maxr = 0, i;
     for (i = 0; i < pat.length; i++) { if (pat[i][0] > maxc) maxc = pat[i][0]; if (pat[i][1] > maxr) maxr = pat[i][1]; }
     var oc = c0 - (maxc >> 1), or = r0 - (maxr >> 1);
     for (i = 0; i < pat.length; i++) {
-      var c = ((oc + pat[i][0]) % cols + cols) % cols;
-      var r = ((or + pat[i][1]) % rows + rows) % rows;
-      grid[idx(c, r)] = 1;
+      grid[idx(((oc + pat[i][0]) % cols + cols) % cols, ((or + pat[i][1]) % rows + rows) % rows)] = 1;
     }
     draw();
   }
 
   var painting = false, paintVal = 1;
-  canvas.addEventListener("mousedown", function (e) {
-    var p = cellAt(e);
-    if (p.c < 0 || p.c >= cols || p.r < 0 || p.r >= rows) return;
-    if (activePattern) { stamp(PATTERNS[activePattern], p.c, p.r); return; }
-    paintVal = grid[idx(p.c, p.r)] ? 0 : 1;   // toggle based on first cell
-    painting = true;
-    grid[idx(p.c, p.r)] = paintVal;
+  function apply(p) {
+    if (mode === "fire") {
+      grid[idx(p.c, p.r)] = firePaint === "ignite" ? 2 : 1;
+    } else {
+      grid[idx(p.c, p.r)] = paintVal;
+    }
     draw();
+  }
+  canvas.addEventListener("mousedown", function (e) {
+    var p = cellAt(e); if (!inBounds(p)) return;
+    if (mode === "life" && activePattern) { stamp(PATTERNS[activePattern], p.c, p.r); return; }
+    if (mode === "life") paintVal = grid[idx(p.c, p.r)] ? 0 : 1;
+    painting = true; apply(p);
   });
   canvas.addEventListener("mousemove", function (e) {
-    if (!painting || activePattern) return;
-    var p = cellAt(e);
-    if (p.c < 0 || p.c >= cols || p.r < 0 || p.r >= rows) return;
-    grid[idx(p.c, p.r)] = paintVal;
-    draw();
+    if (!painting) return;
+    if (mode === "life" && activePattern) return;
+    var p = cellAt(e); if (inBounds(p)) apply(p);
   });
   window.addEventListener("mouseup", function () { painting = false; });
-
-  // touch support
   canvas.addEventListener("touchstart", function (e) {
     e.preventDefault();
-    var t = e.touches[0], p = cellAt(t);
-    if (p.c < 0 || p.c >= cols || p.r < 0 || p.r >= rows) return;
-    if (activePattern) { stamp(PATTERNS[activePattern], p.c, p.r); return; }
-    grid[idx(p.c, p.r)] = grid[idx(p.c, p.r)] ? 0 : 1; draw();
+    var p = cellAt(e.touches[0]); if (!inBounds(p)) return;
+    if (mode === "life" && activePattern) { stamp(PATTERNS[activePattern], p.c, p.r); return; }
+    if (mode === "life") grid[idx(p.c, p.r)] = grid[idx(p.c, p.r)] ? 0 : 1; else apply(p);
+    draw();
   }, { passive: false });
 
   // ---- controls ----
-  var playBtn = document.getElementById("gol-play");
   function on(id, fn) { var el = document.getElementById(id); if (el) el.addEventListener("click", fn); }
-
   on("gol-play", function () { setRunning(!running); });
   on("gol-step", function () { setRunning(false); step(); });
   on("gol-clear", function () { grid = new Uint8Array(cols * rows); setRunning(false); draw(); });
   on("gol-random", function () {
-    for (var i = 0; i < grid.length; i++) grid[i] = Math.random() < 0.28 ? 1 : 0;
+    if (mode === "fire") {
+      for (var i = 0; i < grid.length; i++) grid[i] = Math.random() < 0.6 ? 1 : 0;
+      grid[(Math.random() * grid.length) | 0] = 2;       // one spark
+    } else {
+      for (var j = 0; j < grid.length; j++) grid[j] = Math.random() < 0.28 ? 1 : 0;
+    }
     draw();
   });
 
-  // pattern buttons set the active stamp; click again (or "Pen") to go back to drawing
+  // Game of Life pattern buttons
   var patBtns = document.querySelectorAll("[data-gol-pattern]");
   function setActive(name, btn) {
     activePattern = name;
@@ -203,25 +229,48 @@
     if (btn) btn.classList.add("active");
     canvas.style.cursor = name ? "crosshair" : "pointer";
   }
-  for (var i = 0; i < patBtns.length; i++) {
-    (function (b) {
-      b.addEventListener("click", function () {
-        var name = b.getAttribute("data-gol-pattern");
-        if (name === "") { setActive(null, null); return; }      // Pen
-        setActive(activePattern === name ? null : name, activePattern === name ? null : b);
-      });
-    })(patBtns[i]);
+  for (var pi = 0; pi < patBtns.length; pi++) (function (b) {
+    b.addEventListener("click", function () {
+      var name = b.getAttribute("data-gol-pattern");
+      if (name === "") { setActive(null, b); return; }
+      setActive(activePattern === name ? null : name, activePattern === name ? null : b);
+    });
+  })(patBtns[pi]);
+
+  // Forest-fire paint buttons
+  var fireBtns = document.querySelectorAll("[data-gol-fire]");
+  for (var fi = 0; fi < fireBtns.length; fi++) (function (b) {
+    b.addEventListener("click", function () {
+      firePaint = b.getAttribute("data-gol-fire");
+      for (var i = 0; i < fireBtns.length; i++) fireBtns[i].classList.remove("active");
+      b.classList.add("active");
+      canvas.style.cursor = "crosshair";
+    });
+  })(fireBtns[fi]);
+
+  // Mode switch
+  function show(id, vis) { var el = document.getElementById(id); if (el) el.classList.toggle("d-none", !vis); }
+  function setMode(m, btn) {
+    mode = m; setRunning(false);
+    document.getElementById("gol-mode-life").classList.toggle("active", m === "life");
+    document.getElementById("gol-mode-fire").classList.toggle("active", m === "fire");
+    show("gol-life-controls", m === "life");
+    show("gol-fire-controls", m === "fire");
+    canvas.style.cursor = "pointer";
+    if (m === "fire") {
+      var empty = true;
+      for (var i = 0; i < grid.length; i++) if (grid[i]) { empty = false; break; }
+      if (empty) { for (var j = 0; j < grid.length; j++) grid[j] = Math.random() < 0.6 ? 1 : 0; }
+    }
+    draw();
   }
+  on("gol-mode-life", function () { setMode("life"); });
+  on("gol-mode-fire", function () { setMode("fire"); });
 
   // ---- init ----
   var rt;
-  window.addEventListener("resize", function () {
-    clearTimeout(rt);
-    rt = setTimeout(build, 200);
-  });
+  window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(build, 200); });
   build();
-
-  // a friendly starting state: one glider
   stamp(PATTERNS.glider, 4, 3);
   setRunning(false);
 })();

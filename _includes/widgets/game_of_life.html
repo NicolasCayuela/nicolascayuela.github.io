@@ -6,11 +6,23 @@
                     <i class="fas fa-gamepad"></i> &nbsp;
                     <span class="lang-en">Bored?</span><span class="lang-zh">Tu t'ennuies ?</span>
                 </h6>
-                <p class="small text-muted mx-2 mb-3">
-                    <span class="lang-en">Conway's <strong>Game of Life</strong>. Click or drag the grid to draw black cells. Pick a pattern below, then click to stamp it. The grid wraps around, so gliders fly forever.</span>
-                    <span class="lang-zh">Le <strong>jeu de la vie</strong> de Conway. Clique ou glisse sur la grille pour dessiner des cellules noires. Choisis une forme ci-dessous puis clique pour la poser. La grille est torique : les planeurs tournent à l'infini.</span>
+
+                <!-- mode switch -->
+                <div class="btn-group btn-group-sm mb-3" role="group">
+                    <button id="gol-mode-life" type="button" class="btn btn-outline-dark active">
+                        <i class="fas fa-border-all"></i> <span class="lang-en">Game of Life</span><span class="lang-zh">Jeu de la vie</span>
+                    </button>
+                    <button id="gol-mode-fire" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-fire"></i> <span class="lang-en">Forest fire</span><span class="lang-zh">Feu de forêt</span>
+                    </button>
+                </div>
+
+                <p class="small text-muted mx-1 mb-3">
+                    <span class="lang-en"><strong>Game of Life:</strong> click or drag to draw cells, pick a pattern then click to stamp it. <strong>Forest fire:</strong> trees grow, lightning &amp; neighbours spread the blaze — plant trees or ignite with a click. The grid wraps around.</span>
+                    <span class="lang-zh"><strong>Jeu de la vie&nbsp;:</strong> clique ou glisse pour dessiner, choisis une forme puis clique pour la poser. <strong>Feu de forêt&nbsp;:</strong> les arbres poussent, la foudre et le voisinage propagent le feu — plante des arbres ou allume d'un clic. La grille est torique.</span>
                 </p>
 
+                <!-- shared transport controls -->
                 <div class="d-flex flex-wrap mb-2" style="gap:.4rem;">
                     <button id="gol-play" class="btn btn-sm btn-dark">
                         <i class="fas fa-play"></i> <span class="lang-en">Play</span><span class="lang-zh">Lancer</span>
@@ -26,7 +38,8 @@
                     </button>
                 </div>
 
-                <div class="d-flex flex-wrap align-items-center mb-3" style="gap:.4rem;">
+                <!-- Game of Life: pattern palette -->
+                <div id="gol-life-controls" class="d-flex flex-wrap align-items-center mb-3" style="gap:.4rem;">
                     <span class="small text-muted mr-1">
                         <span class="lang-en">Patterns:</span><span class="lang-zh">Formes&nbsp;:</span>
                     </span>
@@ -34,14 +47,47 @@
                         <i class="fas fa-pen"></i> <span class="lang-en">Pen</span><span class="lang-zh">Stylo</span>
                     </button>
                     <button data-gol-pattern="glider" class="btn btn-sm btn-outline-secondary">Glider</button>
+                    <button data-gol-pattern="lwss" class="btn btn-sm btn-outline-secondary">LWSS</button>
+                    <button data-gol-pattern="mwss" class="btn btn-sm btn-outline-secondary">MWSS</button>
                     <button data-gol-pattern="blinker" class="btn btn-sm btn-outline-secondary">Blinker</button>
                     <button data-gol-pattern="toad" class="btn btn-sm btn-outline-secondary">Toad</button>
                     <button data-gol-pattern="beacon" class="btn btn-sm btn-outline-secondary">Beacon</button>
-                    <button data-gol-pattern="lwss" class="btn btn-sm btn-outline-secondary">LWSS</button>
+                    <button data-gol-pattern="block" class="btn btn-sm btn-outline-secondary">Block</button>
+                    <button data-gol-pattern="beehive" class="btn btn-sm btn-outline-secondary">Beehive</button>
+                    <button data-gol-pattern="loaf" class="btn btn-sm btn-outline-secondary">Loaf</button>
                     <button data-gol-pattern="pulsar" class="btn btn-sm btn-outline-secondary">Pulsar</button>
+                    <button data-gol-pattern="pentadecathlon" class="btn btn-sm btn-outline-secondary">Pentadecathlon</button>
+                    <button data-gol-pattern="rpentomino" class="btn btn-sm btn-outline-secondary">R-pentomino</button>
+                    <button data-gol-pattern="acorn" class="btn btn-sm btn-outline-secondary">Acorn</button>
+                    <button data-gol-pattern="diehard" class="btn btn-sm btn-outline-secondary">Diehard</button>
                     <button data-gol-pattern="gun" class="btn btn-sm btn-outline-secondary">
                         <span class="lang-en">Glider gun</span><span class="lang-zh">Canon à planeurs</span>
                     </button>
+                </div>
+
+                <!-- Forest fire: paint mode + parameters -->
+                <div id="gol-fire-controls" class="d-none mb-3">
+                    <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.4rem;">
+                        <span class="small text-muted mr-1">
+                            <span class="lang-en">Brush:</span><span class="lang-zh">Pinceau&nbsp;:</span>
+                        </span>
+                        <button data-gol-fire="plant" class="btn btn-sm btn-outline-success active">
+                            <i class="fas fa-tree"></i> <span class="lang-en">Plant trees</span><span class="lang-zh">Planter</span>
+                        </button>
+                        <button data-gol-fire="ignite" class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-fire"></i> <span class="lang-en">Ignite</span><span class="lang-zh">Enflammer</span>
+                        </button>
+                    </div>
+                    <div class="d-flex flex-wrap align-items-center" style="gap:1rem;">
+                        <label class="small text-muted mb-0">
+                            <span class="lang-en">Growth</span><span class="lang-zh">Croissance</span>
+                            <input id="gol-growth" type="range" min="0" max="100" value="20" style="vertical-align:middle; width:110px;">
+                        </label>
+                        <label class="small text-muted mb-0">
+                            <span class="lang-en">Lightning</span><span class="lang-zh">Foudre</span>
+                            <input id="gol-light" type="range" min="0" max="100" value="50" style="vertical-align:middle; width:110px;">
+                        </label>
+                    </div>
                 </div>
 
                 <div id="gol-wrap" style="width:100%; overflow-x:auto;">
@@ -52,4 +98,4 @@
     </div>
 </div>
 
-<script src="{{ '/assets/js/game-of-life.js' | relative_url }}?v=1"></script>
+<script src="{{ '/assets/js/game-of-life.js' | relative_url }}?v=2"></script>
