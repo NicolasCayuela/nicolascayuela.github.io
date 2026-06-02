@@ -85,8 +85,5 @@ education_zh:
 #     date: 2025.01
 #     url: "https://example.com"
 
-footer_text: >-
-  Powered by Jekyll & the Academic Homepage template.
-
-footer_text_zh: >-
-  Propulsé par Jekyll & le template Academic Homepage.
+footer_text: ""
+footer_text_zh: ""
