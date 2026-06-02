@@ -21,7 +21,7 @@
     amp: 13,            // peak node displacement (px)
     wavelength: 190,    // spatial period of a wave (px)
     speed: 130,         // wave phase speed (px/s)
-    waveLife: 8,        // seconds a ripple stays alive
+    waveLife: 15,       // seconds a ripple stays alive
     maxWaves: 40,       // perf backstop only; high so live ripples are never cut
     autoMin: 2,         // min seconds between random excitations
     autoMax: 5,         // max seconds between random excitations
@@ -158,7 +158,7 @@
     }
 
     // displace nodes
-    var i, w, n, dx, dy, d, disp, maxStrain = 1e-4;
+    var i, w, n, dx, dy, d, disp;
     for (i = 0; i < nodes.length; i++) {
       n = nodes[i];
       var ux = 0, uy = 0;
@@ -173,14 +173,16 @@
       n.x = n.ox + ux;
       n.y = n.oy + uy;
       n.strain = Math.sqrt(ux * ux + uy * uy);
-      if (n.strain > maxStrain) maxStrain = n.strain;
     }
 
-    draw(maxStrain);
+    draw();
   }
 
   var LEVELS = 16;              // colormap quantisation; each level = one batched stroke
-  function draw(maxStrain) {
+  // normalise against a single wave's crest (not the dynamic max) so every
+  // wavefront reaches red all the way round; interference just stays clamped at red.
+  var REF = CFG.amp * 0.7;
+  function draw() {
     ctx.clearRect(0, 0, W, H);
 
     // links bucketed by field amplitude -> COMSOL Rainbow (jet) colormap
@@ -189,7 +191,7 @@
 
     for (li = 0; li < links.length; li++) {
       var a = nodes[links[li][0]], c = nodes[links[li][1]];
-      var s = (a.strain + c.strain) * 0.5 / maxStrain; // 0..1 normalised amplitude
+      var s = (a.strain + c.strain) * 0.5 / REF; // 0..1 normalised amplitude
       if (s > 1) s = 1;
       var lv = (s * (LEVELS - 1) + 0.5) | 0;
       paths[lv].push(a.x, a.y, c.x, c.y);

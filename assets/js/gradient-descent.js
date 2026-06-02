@@ -34,7 +34,7 @@
   var surf = "ripples", optimizer = "momentum", lrScale = 1;
 
   // marker state
-  var px = 0, py = 0, vx = 0, vy = 0, trail = [], paused = false, settled = false;
+  var px = 0, py = 0, vx = 0, vy = 0, trail = [], paused = false, settled = false, settleTimer = 0;
   var aMx = 0, aMy = 0, aVx = 0, aVy = 0, aT = 0;   // Adam moments
   var target = null;   // global minimum (goal)
 
@@ -154,12 +154,13 @@
     var s = SURF[surf].start;
     px = (Math.random() * 2 - 1) * s; py = (Math.random() * 2 - 1) * s;
     vx = 0; vy = 0; aMx = 0; aMy = 0; aVx = 0; aVy = 0; aT = 0;
-    trail = [[px, py]]; settled = false;
+    trail = [[px, py]]; settled = false; settleTimer = 0;
   }
 
   function sliderFrac() { var el = document.getElementById("gd-lr"); return (el ? +el.value : 50) / 100; }   // 0.01..1
 
   function step() {
+    var sx = px, sy = py;
     var g = SURF[surf].g(px, py), m = 0.85, f = sliderFrac();
     if (optimizer === "adam") {
       var b1 = 0.9, b2 = 0.999, eps = 1e-8, a = 0.05 * f;   // small Adam step
@@ -179,12 +180,15 @@
         px -= L * g[0]; py -= L * g[1];
       }
     }
+    // keep the marker inside the visible domain (saddle would otherwise fly off)
+    if (px > D) { px = D; vx = 0; } else if (px < -D) { px = -D; vx = 0; }
+    if (py > D) { py = D; vy = 0; } else if (py < -D) { py = -D; vy = 0; }
     trail.push([px, py]);
     if (trail.length > 400) trail.shift();
-    var gm = Math.sqrt(g[0] * g[0] + g[1] * g[1]);
-    var vm = Math.sqrt(vx * vx + vy * vy);
-    if (Math.abs(px) > D * 1.6 || Math.abs(py) > D * 1.6) restart();   // ran off (e.g. saddle)
-    else if (gm < 0.015 && vm < 0.01) settled = true;                  // reached a minimum -> stay
+    // stop once it essentially stops moving (a minimum, or a clamped edge for the saddle)
+    var moved = Math.sqrt((px - sx) * (px - sx) + (py - sy) * (py - sy));
+    if (moved < 0.004) { settleTimer++; if (settleTimer > 30) settled = true; }
+    else settleTimer = 0;
   }
 
   // ---- animation ----
