@@ -16,7 +16,7 @@
                             <a target="_blank" href="{{ site.data.profile.cv_link }}"><i class="fas fa-file-alt"></i> [{% include i18n.html key="cv" %}]</a> <br/>
                             {% endif %}
                         </p>
-                        <!-- 将联系方式放在原short-bio的位置 -->
+                        <img src="{{ '/assets/images/etc/france.svg' | relative_url }}" alt="Nancy, France" class="d-block mb-2" style="height: 130px; width: auto;">
                         <div class="row">
                             <div class="col">
                                 <a class="pr-3 no-break" href="mailto:{{ site.data.profile.email | encode_email }}">
@@ -101,9 +101,6 @@
 
                             </div>
                         </div>
-                    </div>
-                    <div class="col-auto d-none d-sm-flex align-items-start order-md-last">
-                        <img src="{{ '/assets/images/etc/france.svg' | relative_url }}" alt="Nancy, France" style="height: 140px; width: auto;">
                     </div>
                     {% if site.data.profile.show_portrait %}
                     <div class="col-md-auto d-none d-md-block">
