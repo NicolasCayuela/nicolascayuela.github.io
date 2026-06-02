@@ -23,8 +23,8 @@
     speed: 130,         // wave phase speed (px/s)
     waveLife: 15,       // seconds a ripple stays alive
     maxWaves: 40,       // perf backstop only; high so live ripples are never cut
-    autoMin: 2,         // min seconds between random excitations
-    autoMax: 5,         // max seconds between random excitations
+    autoMin: 1.2,       // min seconds between random excitations
+    autoMax: 3,         // max seconds between random excitations
     linkDist: 1.9,      // neighbour link cutoff, in lattice pitches
     baseAlpha: 0.22,    // resting link opacity (idle = faint blue, COMSOL low end)
     peakAlpha: 0.95,    // link opacity at the crest (COMSOL high end)
