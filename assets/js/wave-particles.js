@@ -23,7 +23,8 @@
     speed: 130,         // wave phase speed (px/s)
     waveLife: 4.2,      // seconds a ripple stays alive
     maxWaves: 14,       // hard cap on simultaneous ripples
-    autoEvery: 2.6,     // seconds between ambient auto-ripples
+    autoMin: 1,         // min seconds between random excitations
+    autoMax: 10,        // max seconds between random excitations
     linkDist: 1.9,      // neighbour link cutoff, in lattice pitches
     baseAlpha: 0.16,    // resting link opacity
     nodeAlpha: 0.5,
@@ -118,8 +119,13 @@
     return w.amp * decay * env * Math.sin(w.k * ring);
   }
 
-  var last = 0, acc = 0, autoTimer = 0;
+  var last = 0, acc = 0, autoTimer = 0, nextAuto = 0;
   var frameInterval = 1 / CFG.fps;
+
+  function scheduleAuto() {
+    nextAuto = CFG.autoMin + Math.random() * (CFG.autoMax - CFG.autoMin);
+  }
+  scheduleAuto();
 
   function frame(now) {
     requestAnimationFrame(frame);
@@ -133,9 +139,10 @@
 
     // advance waves
     autoTimer += step;
-    if (autoTimer >= CFG.autoEvery) {
+    if (autoTimer >= nextAuto) {
       autoTimer = 0;
-      spawn(Math.random() * W, Math.random() * H, CFG.amp * (0.5 + Math.random() * 0.5));
+      scheduleAuto();   // new random delay in [autoMin, autoMax] seconds
+      spawn(Math.random() * W, Math.random() * H, CFG.amp * (0.5 + Math.random() * 0.7));
     }
     for (var wI = waves.length - 1; wI >= 0; wI--) {
       waves[wI].t += step;
