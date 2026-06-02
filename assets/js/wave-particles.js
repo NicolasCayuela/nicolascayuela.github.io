@@ -28,8 +28,10 @@
     linkDist: 1.9,      // neighbour link cutoff, in lattice pitches
     baseAlpha: 0.16,    // resting link opacity
     nodeAlpha: 0.5,
-    hueLow: 188,        // calm wavefront hue (cyan)
-    hueHigh: 286,       // high-strain hue (violet) -> AI/elastic field look
+    restHue: 205,       // hue of an undisturbed lattice (faint blue)
+    hueStep: 47,        // hue increment per excitation -> rainbow cycling
+    sat: 90,            // colour saturation %
+    light: 60,          // colour lightness %
     opacity: 0.55,      // whole-canvas opacity
     fps: 60
   };
@@ -74,7 +76,7 @@
         nodes.push({
           ox: (c - 0.5) * s + jx,
           oy: (r - 0.5) * s + jy,
-          x: 0, y: 0, strain: 0
+          x: 0, y: 0, strain: 0, hue: CFG.restHue
         });
       }
     }
@@ -98,11 +100,14 @@
     }
   }
 
+  var hueCounter = 0;
   function spawn(x, y, amp) {
     if (waves.length >= CFG.maxWaves) waves.shift();
+    hueCounter = (hueCounter + CFG.hueStep) % 360;   // walk the rainbow
     waves.push({
       x: x, y: y, t: 0,
       amp: amp,
+      hue: hueCounter,
       k: (2 * Math.PI) / CFG.wavelength,
       life: CFG.waveLife
     });
@@ -153,7 +158,7 @@
     var i, w, n, dx, dy, d, disp, maxStrain = 1e-4;
     for (i = 0; i < nodes.length; i++) {
       n = nodes[i];
-      var ux = 0, uy = 0;
+      var ux = 0, uy = 0, bestAbs = 0, bestHue = n.hue;
       for (var k = 0; k < waves.length; k++) {
         w = waves[k];
         dx = n.ox - w.x; dy = n.oy - w.y;
@@ -161,40 +166,45 @@
         disp = waveField(w, d);
         ux += (dx / d) * disp;          // longitudinal: displace along radius
         uy += (dy / d) * disp;
+        var ad = disp < 0 ? -disp : disp;
+        if (ad > bestAbs) { bestAbs = ad; bestHue = w.hue; } // hue of dominant wave
       }
       n.x = n.ox + ux;
       n.y = n.oy + uy;
       n.strain = Math.sqrt(ux * ux + uy * uy);
+      n.hue = bestHue;
       if (n.strain > maxStrain) maxStrain = n.strain;
     }
 
     draw(maxStrain);
   }
 
+  var HB = 18, SB = 5;          // hue buckets x strain buckets (rainbow + intensity)
   function draw(maxStrain) {
     ctx.clearRect(0, 0, W, H);
 
-    // links, bucketed by strain so we stroke a handful of paths instead of thousands
-    var BUCKETS = 7;
-    var paths = [];
-    for (var b = 0; b < BUCKETS; b++) paths.push([]);
+    // links bucketed by (hue, strain) so each colour/intensity is one batched stroke
+    var paths = [], total = HB * SB, bb;
+    for (bb = 0; bb < total; bb++) paths.push([]);
 
     for (var li = 0; li < links.length; li++) {
       var a = nodes[links[li][0]], c = nodes[links[li][1]];
       var s = (a.strain + c.strain) * 0.5 / maxStrain; // 0..1 normalised strain
       if (s > 1) s = 1;
-      var bi = (s * (BUCKETS - 1)) | 0;
-      var p = paths[bi];
-      p.push(a.x, a.y, c.x, c.y);
+      var hue = a.strain >= c.strain ? a.hue : c.hue;  // the more-excited end drives colour
+      var hb = ((hue / 360 * HB) | 0) % HB; if (hb < 0) hb += HB;
+      var sb = (s * (SB - 1) + 0.5) | 0;
+      paths[hb * SB + sb].push(a.x, a.y, c.x, c.y);
     }
 
-    for (var bk = 0; bk < BUCKETS; bk++) {
-      var arr = paths[bk];
+    for (bb = 0; bb < total; bb++) {
+      var arr = paths[bb];
       if (!arr.length) continue;
-      var t = bk / (BUCKETS - 1);
-      var hue = CFG.hueLow + (CFG.hueHigh - CFG.hueLow) * t;
+      var hbI = (bb / SB) | 0, sbI = bb % SB;
+      var t = SB > 1 ? sbI / (SB - 1) : 1;
+      var h = (hbI + 0.5) / HB * 360;
       var alpha = CFG.baseAlpha + (0.85 - CFG.baseAlpha) * t;
-      ctx.strokeStyle = "hsla(" + hue.toFixed(0) + ",85%,58%," + alpha.toFixed(3) + ")";
+      ctx.strokeStyle = "hsla(" + h.toFixed(0) + "," + CFG.sat + "%," + CFG.light + "%," + alpha.toFixed(3) + ")";
       ctx.lineWidth = 0.6 + t * 1.3;
       ctx.beginPath();
       for (var j = 0; j < arr.length; j += 4) {
@@ -204,12 +214,11 @@
       ctx.stroke();
     }
 
-    // nodes (brighter where strained -> they trace the wavefronts)
+    // nodes coloured by their dominant wave, brighter where strained
     for (var ni = 0; ni < nodes.length; ni++) {
       var nd = nodes[ni];
       var ns = nd.strain / maxStrain; if (ns > 1) ns = 1;
-      var nh = CFG.hueLow + (CFG.hueHigh - CFG.hueLow) * ns;
-      ctx.fillStyle = "hsla(" + nh.toFixed(0) + ",90%,60%," +
+      ctx.fillStyle = "hsla(" + nd.hue.toFixed(0) + "," + CFG.sat + "%," + (CFG.light + 5) + "%," +
         (CFG.nodeAlpha * (0.35 + 0.65 * ns)).toFixed(3) + ")";
       var rad = 0.9 + ns * 1.8;
       ctx.beginPath();
