@@ -1,0 +1,101 @@
+<div class="row mt-3">
+    <div class="col">
+        <div class="card border-0 shadow-sm bg-white">
+            <div class="card-body p-4">
+                <h6>
+                    <i class="fas fa-draw-polygon"></i> &nbsp;
+                    <span class="lang-en">Symmetry pad</span><span class="lang-zh">Dessin à symétrie</span>
+                </h6>
+                <p class="small text-muted mx-1 mb-3">
+                    <span class="lang-en">Draw in the white area: every symmetry of the chosen <strong>wallpaper group</strong> (17 of them) repeats your strokes across the plane.</span>
+                    <span class="lang-zh">Dessine dans la zone blanche : chaque symétrie du <strong>groupe de papier peint</strong> choisi (17 au total) répète tes traits sur tout le plan.</span>
+                </p>
+
+                <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.5rem;">
+                    <label class="small text-muted mb-0">
+                        <span class="lang-en">Translation amount</span><span class="lang-zh">Translation</span>
+                        <input id="sym-trans" type="number" min="20" max="600" value="150" style="width:74px;">
+                    </label>
+                    <button id="sym-apply" class="btn btn-sm btn-outline-dark">
+                        <span class="lang-en">Apply</span><span class="lang-zh">Appliquer</span>
+                    </button>
+                </div>
+
+                <div class="d-flex flex-wrap" style="gap:1rem;">
+                    <!-- left: symmetry group -->
+                    <div style="min-width:120px;">
+                        <div class="small font-weight-bold mb-1">
+                            <span class="lang-en">Symmetry group</span><span class="lang-zh">Groupe</span>
+                        </div>
+                        <div id="sym-groups" class="small" style="line-height:1.7;">
+                            <div><label class="mb-0"><input type="radio" name="sym-group" value="p1"> p1</label></div>
+                            <div><label class="mb-0"><input type="radio" name="sym-group" value="pg"> pg</label></div>
+                            <div><label class="mb-0"><input type="radio" name="sym-group" value="pm"> pm</label></div>
+                            <div><label class="mb-0"><input type="radio" name="sym-group" value="cm"> cm</label></div>
+                            <div class="mt-2"><label class="mb-0"><input type="radio" name="sym-group" value="p2"> p2</label></div>
+                            <div><label class="mb-0"><input type="radio" name="sym-group" value="pgg"> pgg</label></div>
+                            <div><label class="mb-0"><input type="radio" name="sym-group" value="pmm"> pmm</label></div>
+                            <div><label class="mb-0"><input type="radio" name="sym-group" value="cmm"> cmm</label></div>
+                            <div><label class="mb-0"><input type="radio" name="sym-group" value="pmg"> pmg</label></div>
+                            <div class="mt-2"><label class="mb-0"><input type="radio" name="sym-group" value="p4"> p4</label></div>
+                            <div><label class="mb-0"><input type="radio" name="sym-group" value="p4m" checked> p4m</label></div>
+                            <div><label class="mb-0"><input type="radio" name="sym-group" value="p4g"> p4g</label></div>
+                            <div class="mt-2"><label class="mb-0"><input type="radio" name="sym-group" value="p3"> p3</label></div>
+                            <div><label class="mb-0"><input type="radio" name="sym-group" value="p3m1"> p3m1</label></div>
+                            <div><label class="mb-0"><input type="radio" name="sym-group" value="p31m"> p31m</label></div>
+                            <div class="mt-2"><label class="mb-0"><input type="radio" name="sym-group" value="p6"> p6</label></div>
+                            <div><label class="mb-0"><input type="radio" name="sym-group" value="p6m"> p6m</label></div>
+                        </div>
+                    </div>
+
+                    <!-- center: canvas -->
+                    <div id="sym-wrap" style="flex:1 1 320px; min-width:260px;">
+                        <canvas id="sym-canvas" style="background:#fff; border:1px solid #ccc; border-radius:4px; touch-action:none; cursor:crosshair; width:100%;"></canvas>
+                        <div class="d-flex flex-wrap align-items-center mt-2" style="gap:.6rem;">
+                            <button id="sym-undo" class="btn btn-sm btn-outline-dark"><i class="fas fa-undo"></i> <span class="lang-en">Undo</span><span class="lang-zh">Annuler</span></button>
+                            <button id="sym-redo" class="btn btn-sm btn-outline-dark"><i class="fas fa-redo"></i> <span class="lang-en">Redo</span><span class="lang-zh">Refaire</span></button>
+                            <button id="sym-clear" class="btn btn-sm btn-outline-dark"><i class="fas fa-trash"></i> <span class="lang-en">Clear</span><span class="lang-zh">Effacer</span></button>
+                            <label class="small text-muted mb-0 ml-1"><input id="sym-grid" type="checkbox"> <span class="lang-en">Show grid</span><span class="lang-zh">Grille</span></label>
+                        </div>
+                    </div>
+
+                    <!-- right: tool / width / color -->
+                    <div class="small" style="min-width:130px; line-height:1.7;">
+                        <div class="font-weight-bold mb-1"><span class="lang-en">Tool</span><span class="lang-zh">Outil</span></div>
+                        <div><label class="mb-0"><input type="radio" name="sym-tool" value="line"> <span class="lang-en">Line</span><span class="lang-zh">Ligne</span></label></div>
+                        <div><label class="mb-0"><input type="radio" name="sym-tool" value="rect"> <span class="lang-en">Rectangle</span><span class="lang-zh">Rectangle</span></label></div>
+                        <div><label class="mb-0"><input type="radio" name="sym-tool" value="oval"> <span class="lang-en">Oval</span><span class="lang-zh">Ovale</span></label></div>
+                        <div><label class="mb-0"><input type="radio" name="sym-tool" value="frect"> <span class="lang-en">Filled Rect</span><span class="lang-zh">Rect plein</span></label></div>
+                        <div><label class="mb-0"><input type="radio" name="sym-tool" value="foval"> <span class="lang-en">Filled Oval</span><span class="lang-zh">Ovale plein</span></label></div>
+                        <div><label class="mb-0"><input type="radio" name="sym-tool" value="freehand" checked> <span class="lang-en">Freehand</span><span class="lang-zh">Main levée</span></label></div>
+
+                        <div class="font-weight-bold mt-2 mb-1"><span class="lang-en">Line width</span><span class="lang-zh">Épaisseur</span></div>
+                        <div class="d-flex flex-wrap" style="gap:.1rem .8rem;">
+                            <label class="mb-0"><input type="radio" name="sym-width" value="1"> 1</label>
+                            <label class="mb-0"><input type="radio" name="sym-width" value="2"> 2</label>
+                            <label class="mb-0"><input type="radio" name="sym-width" value="3" checked> 3</label>
+                            <label class="mb-0"><input type="radio" name="sym-width" value="4"> 4</label>
+                            <label class="mb-0"><input type="radio" name="sym-width" value="5"> 5</label>
+                            <label class="mb-0"><input type="radio" name="sym-width" value="10"> 10</label>
+                            <label class="mb-0"><input type="radio" name="sym-width" value="20"> 20</label>
+                        </div>
+
+                        <div class="font-weight-bold mt-2 mb-1"><span class="lang-en">Color</span><span class="lang-zh">Couleur</span></div>
+                        <div><label class="mb-0"><input type="radio" name="sym-color" value="Black" checked> <span class="lang-en">Black</span><span class="lang-zh">Noir</span></label></div>
+                        <div><label class="mb-0"><input type="radio" name="sym-color" value="Red"> <span class="lang-en">Red</span><span class="lang-zh">Rouge</span></label></div>
+                        <div><label class="mb-0"><input type="radio" name="sym-color" value="Green"> <span class="lang-en">Green</span><span class="lang-zh">Vert</span></label></div>
+                        <div><label class="mb-0"><input type="radio" name="sym-color" value="Blue"> <span class="lang-en">Blue</span><span class="lang-zh">Bleu</span></label></div>
+                        <div><label class="mb-0"><input type="radio" name="sym-color" value="Cyan"> Cyan</label></div>
+                        <div><label class="mb-0"><input type="radio" name="sym-color" value="Magenta"> Magenta</label></div>
+                        <div><label class="mb-0"><input type="radio" name="sym-color" value="Yellow"> <span class="lang-en">Yellow</span><span class="lang-zh">Jaune</span></label></div>
+                        <div><label class="mb-0"><input type="radio" name="sym-color" value="Light Gray"> <span class="lang-en">Light Gray</span><span class="lang-zh">Gris clair</span></label></div>
+                        <div><label class="mb-0"><input type="radio" name="sym-color" value="Gray"> <span class="lang-en">Gray</span><span class="lang-zh">Gris</span></label></div>
+                        <div><label class="mb-0"><input type="radio" name="sym-color" value="Dark Gray"> <span class="lang-en">Dark Gray</span><span class="lang-zh">Gris foncé</span></label></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ '/assets/js/symmetry.js' | relative_url }}?v=1"></script>
