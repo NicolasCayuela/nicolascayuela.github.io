@@ -18,6 +18,9 @@
                     <button id="gol-mode-sym" type="button" class="btn btn-outline-dark">
                         <i class="fas fa-draw-polygon"></i> <span class="lang-en">Symmetry groups</span><span class="lang-zh">Groupes de symétrie</span>
                     </button>
+                    <button id="gol-mode-gd" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-mountain"></i> <span class="lang-en">Gradient descent</span><span class="lang-zh">Descente de gradient</span>
+                    </button>
                 </div>
 
                 <!-- ============ Game of Life / Forest fire ============ -->
@@ -204,10 +207,43 @@
                         </a>
                     </p>
                 </div>
+
+                <!-- ============ Gradient descent (3D) ============ -->
+                <div id="gd-area" class="d-none">
+                    <p class="small text-muted mx-1 mb-3">
+                        <span class="lang-en">A marker rolls down a 3D loss surface following its gradient. <strong>Drag</strong> to rotate the view. Pick a surface and an optimiser, and tune the learning rate.</span>
+                        <span class="lang-zh">Une bille descend une surface de perte 3D en suivant son gradient. <strong>Glisse</strong> pour tourner la vue. Choisis une surface, un optimiseur et règle le taux d'apprentissage.</span>
+                    </p>
+                    <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.4rem;">
+                        <span class="small text-muted mr-1"><span class="lang-en">Surface:</span><span class="lang-zh">Surface&nbsp;:</span></span>
+                        <button data-gd-surf="bowl" class="btn btn-sm btn-outline-dark">Bowl</button>
+                        <button data-gd-surf="saddle" class="btn btn-sm btn-outline-dark">Saddle</button>
+                        <button data-gd-surf="ripples" class="btn btn-sm btn-outline-dark active">Ripples</button>
+                        <button data-gd-surf="rosenbrock" class="btn btn-sm btn-outline-dark">Rosenbrock</button>
+                    </div>
+                    <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.4rem;">
+                        <span class="small text-muted mr-1"><span class="lang-en">Optimiser:</span><span class="lang-zh">Optimiseur&nbsp;:</span></span>
+                        <button data-gd-opt="sgd" class="btn btn-sm btn-outline-secondary">SGD</button>
+                        <button data-gd-opt="momentum" class="btn btn-sm btn-outline-secondary active">Momentum</button>
+                        <label class="small text-muted mb-0 ml-2">
+                            <span class="lang-en">Learning rate</span><span class="lang-zh">Taux d'apprentissage</span>
+                            <input id="gd-lr" type="range" min="1" max="100" value="50" style="vertical-align:middle; width:110px;">
+                        </label>
+                    </div>
+                    <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.6rem;">
+                        <button id="gd-play" class="btn btn-sm btn-dark"><i class="fas fa-pause"></i> <span class="lang-en">Pause</span><span class="lang-zh">Pause</span></button>
+                        <button id="gd-restart" class="btn btn-sm btn-outline-dark"><i class="fas fa-redo"></i> <span class="lang-en">Restart</span><span class="lang-zh">Relancer</span></button>
+                        <label class="small text-muted mb-0 ml-1"><input id="gd-rotate" type="checkbox" checked> <span class="lang-en">Auto-rotate</span><span class="lang-zh">Rotation auto</span></label>
+                    </div>
+                    <div id="gd-wrap" style="width:100%;">
+                        <canvas id="gd-canvas" style="background:#fff; border-radius:4px; touch-action:none; cursor:grab; width:100%;"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<script src="{{ '/assets/js/game-of-life.js' | relative_url }}?v=5"></script>
-<script src="{{ '/assets/js/symmetry.js' | relative_url }}?v=5"></script>
+<script src="{{ '/assets/js/game-of-life.js' | relative_url }}?v=6"></script>
+<script src="{{ '/assets/js/symmetry.js' | relative_url }}?v=6"></script>
+<script src="{{ '/assets/js/gradient-descent.js' | relative_url }}?v=1"></script>

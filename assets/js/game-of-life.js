@@ -257,15 +257,15 @@
     document.getElementById("gol-mode-fire").classList.toggle("active", m === "fire");
     var symBtn = document.getElementById("gol-mode-sym");
     if (symBtn) symBtn.classList.toggle("active", m === "sym");
+    var gdBtn = document.getElementById("gol-mode-gd");
+    if (gdBtn) gdBtn.classList.toggle("active", m === "gd");
 
-    if (m === "sym") {                         // hand over to the symmetry app
-      show("gol-area", false);
-      show("sym-area", true);
-      if (window.__symResize) window.__symResize();
-      return;
-    }
-    show("gol-area", true);
-    show("sym-area", false);
+    show("gol-area", m === "life" || m === "fire");
+    show("sym-area", m === "sym");
+    show("gd-area", m === "gd");
+
+    if (m === "sym") { if (window.__symResize) window.__symResize(); return; }
+    if (m === "gd") { if (window.__gdResize) window.__gdResize(); return; }
 
     mode = m;
     show("gol-life-controls", m === "life");
@@ -279,6 +279,7 @@
   on("gol-mode-life", function () { setMode("life"); });
   on("gol-mode-fire", function () { setMode("fire"); });
   on("gol-mode-sym", function () { setMode("sym"); });
+  on("gol-mode-gd", function () { setMode("gd"); });
 
   // ---- init ----
   var rt;

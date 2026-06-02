@@ -105,18 +105,34 @@
                     {% if site.data.profile.show_portrait %}
                     <div class="col-md-auto d-none d-md-block">
                         <figure class="figure">
-                            <img 
-                                src="{{ site.data.profile.portrait_url }}" 
-                                class="figure-img img-fluid img-thumbnail" 
+                            <img
+                                id="portrait-img"
+                                src="{{ site.data.profile.portrait_url }}"
+                                class="figure-img img-fluid img-thumbnail"
                                 style="height: 200px;"
-                                data-toggle="tooltip" 
-                                data-placement="top" 
-                                title="{{ site.data.profile.portrait_caption }}"
+                                data-toggle="tooltip"
+                                data-placement="top"
+                                title="Hello!"
                             >
                             <figcaption class="figure-caption text-right"></figcaption>
                         </figure>
                     </div>
                     {% endif %}
+                    <script>
+                    (function () {
+                        var img = document.getElementById('portrait-img');
+                        if (!img) return;
+                        var caps = { en: "Hello!", zh: "Hello !" };   // FR uses a non-breaking space before !
+                        function apply() {
+                            var t = (localStorage.getItem('site-lang') || 'en') === 'zh' ? caps.zh : caps.en;
+                            img.setAttribute('title', t);
+                            img.setAttribute('data-original-title', t);
+                            if (window.jQuery) { try { jQuery(img).tooltip('dispose'); jQuery(img).tooltip(); } catch (e) {} }
+                        }
+                        apply();
+                        new MutationObserver(apply).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+                    })();
+                    </script>
         
                 </div>
             </div>
