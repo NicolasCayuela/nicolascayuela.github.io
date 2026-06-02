@@ -1,9 +1,9 @@
+{% if site.data.profile.education %}
 <div class="row mt-3">
     <div class="col">
         <div class="card border-0 shadow-sm bg-white">
             <div class="card-body p-4">
                 <div class="row">
-                    {% if site.data.profile.education %}
                     <div class="col-md-12">
                         <div class="my-1">
                             <h6><i class="fas fa-school"></i> &nbsp; {% include i18n.html key="education" %}</h6>
@@ -29,18 +29,18 @@
                             </div>
                         </div>
                     </div>
-                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endif %}
+{% if site.data.profile.experience %}
 <div class="row mt-3">
     <div class="col">
         <div class="card border-0 shadow-sm bg-white">
             <div class="card-body p-4">
                 <div class="row">
-                    {% if site.data.profile.experience %}
                     <div class="col-md-12">
                         <div class="my-1">
                             <h6><i class="fas fa-laptop-code"></i> &nbsp; {% include i18n.html key="experience" %}</h6>
@@ -66,18 +66,18 @@
                             </div>
                         </div>
                     </div>
-                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endif %}
+{% if site.data.profile.service %}
 <div class="row mt-3">
     <div class="col">
         <div class="card border-0 shadow-sm bg-white">
             <div class="card-body p-4">
                 <div class="row">
-                    {% if site.data.profile.service %}
                     <div class="col-md-12">
                         <div class="my-1">
                             <h6><i class="fas fa-handshake"></i> &nbsp; {% include i18n.html key="service" %}</h6>
@@ -85,9 +85,8 @@
                                 <ul class="list small pl-3 mb-1">
                                     <div class="row">
                                         {% for item in site.data.profile.service %}
-                                        <div class="col-md-12"> <!-- 每行一个元素 -->
-                                            <li> <!-- 使用flex布局让date和name在一行 -->
-                                                <!-- <strong class="mr-1">{{item.date}}.</strong> 加粗日期 -->
+                                        <div class="col-md-12">
+                                            <li>
                                                 <em class="lang-en">{{ item.name }}</em><span class="lang-fr">{{ site.data.profile.service_fr[forloop.index0].name }}</span>
                                             </li>
                                         </div>
@@ -97,18 +96,18 @@
                             </div>
                         </div>
                     </div>
-                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endif %}
+{% if site.data.profile.awards %}
 <div class="row mt-3">
     <div class="col">
         <div class="card border-0 shadow-sm bg-white">
             <div class="card-body p-4">
                 <div class="row">
-                    {% if site.data.profile.awards %}
                     <div class="col-md-12">
                         <div class="my-1">
                             <h6><i class="fas fa-trophy"></i> &nbsp; {% include i18n.html key="honors_awards" %}</h6>
@@ -134,18 +133,18 @@
                             </div>
                         </div>
                     </div>
-                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endif %}
+{% if site.data.profile.news %}
 <div class="row mt-3">
     <div class="col">
         <div class="card border-0 shadow-sm bg-white">
             <div class="card-body p-4">
                 <div class="row">
-                    {% if site.data.profile.news %}
                     <div class="col-md-12">
                         <div class="my-1">
                             <h6><i class="fas fa-rss"></i> &nbsp; {% include i18n.html key="news" %}</h6>
@@ -171,9 +170,9 @@
                             </div>
                         </div>
                     </div>
-                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endif %}

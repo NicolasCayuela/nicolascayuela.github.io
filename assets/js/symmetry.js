@@ -1,5 +1,5 @@
 /*
- * Wallpaper-symmetry drawing pad — built from scratch.
+ * Wallpaper-symmetry drawing pad - built from scratch.
  * Whatever you draw is replicated by every symmetry of the chosen plane
  * group (one of the 17 wallpaper groups), tiled across the canvas.
  *

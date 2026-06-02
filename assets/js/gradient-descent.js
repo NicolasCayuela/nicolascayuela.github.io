@@ -1,5 +1,5 @@
 /*
- * 3D gradient descent visualiser — from scratch (no three.js).
+ * 3D gradient descent visualiser - from scratch (no three.js).
  * A loss surface z = f(x,y) is meshed, colour-mapped (jet) and projected to 2D
  * with a rotatable orthographic camera (drag to rotate). A marker rolls down
  * the surface following the gradient (SGD or momentum), leaving a trail.
