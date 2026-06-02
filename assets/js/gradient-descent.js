@@ -162,7 +162,7 @@
     if (!dragging) return;
     yaw += (e.clientX - lx) * 0.01;
     pitch += (e.clientY - ly) * 0.01;
-    pitch = Math.max(0.15, Math.min(1.45, pitch));
+    pitch = Math.max(-1.45, Math.min(1.55, pitch));
     lx = e.clientX; ly = e.clientY;
   });
   window.addEventListener("mouseup", function () { dragging = false; });
@@ -171,7 +171,7 @@
     if (!dragging) return;
     yaw += (e.touches[0].clientX - lx) * 0.01;
     pitch += (e.touches[0].clientY - ly) * 0.01;
-    pitch = Math.max(0.15, Math.min(1.45, pitch));
+    pitch = Math.max(-1.45, Math.min(1.55, pitch));
     lx = e.touches[0].clientX; ly = e.touches[0].clientY;
   }, { passive: true });
   canvas.addEventListener("touchend", function () { dragging = false; });
