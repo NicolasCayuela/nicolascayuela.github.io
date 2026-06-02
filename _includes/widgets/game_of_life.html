@@ -12,9 +12,6 @@
                     <button id="gol-mode-cifar" type="button" class="btn btn-outline-dark active">
                         <i class="fas fa-image"></i> <span class="lang-en">CIFAR-10 Latent space</span><span class="lang-fr">Espace latent CIFAR-10</span>
                     </button>
-                    <button id="gol-mode-gnn" type="button" class="btn btn-outline-dark">
-                        <i class="fas fa-project-diagram"></i> <span class="lang-en">GNN message passing</span><span class="lang-fr">GNN passage de messages</span>
-                    </button>
                     <button id="gol-mode-life" type="button" class="btn btn-outline-dark">
                         <i class="fas fa-border-all"></i> <span class="lang-en">Game of Life</span><span class="lang-fr">Jeu de la vie</span>
                     </button>
@@ -282,28 +279,6 @@
                     </div>
                 </div>
 
-                <!-- ============ GNN message passing ============ -->
-                <div id="gnn-area" class="d-none">
-                    <p class="small text-muted mx-1 mb-3">
-                        <span class="lang-en">Mark a few <strong>seed</strong> nodes with a class colour, then watch the labels <strong>propagate along the edges</strong>: each node averages its neighbours' labels (seeds stay fixed) until the whole graph is classified - the message-passing idea behind <strong>Graph Neural Networks</strong>. Click a node to seed it; drag to move it.</span>
-                        <span class="lang-fr">Marque quelques nœuds <strong>graines</strong> avec une couleur de classe, puis regarde les labels <strong>se propager le long des arêtes</strong> : chaque nœud moyenne les labels de ses voisins (les graines restent fixes) jusqu'à classer tout le graphe - le principe du passage de messages des <strong>réseaux de neurones sur graphes</strong>. Clique un nœud pour le graine ; glisse pour le déplacer.</span>
-                    </p>
-                    <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.4rem;">
-                        <span class="small text-muted mr-1"><span class="lang-en">Seed class:</span><span class="lang-fr">Classe :</span></span>
-                        <button data-gnn-class="0" class="btn btn-sm active" style="background:#e6194b;color:#fff;">A</button>
-                        <button data-gnn-class="1" class="btn btn-sm" style="background:#3cb44b;color:#fff;">B</button>
-                        <button data-gnn-class="2" class="btn btn-sm" style="background:#1c54e5;color:#fff;">C</button>
-                        <span class="mx-2"></span>
-                        <button id="gnn-play" class="btn btn-sm btn-dark"><i class="fas fa-pause"></i> <span class="lang-en">Pause</span><span class="lang-fr">Pause</span></button>
-                        <button id="gnn-step" class="btn btn-sm btn-outline-dark"><i class="fas fa-step-forward"></i> <span class="lang-en">Step</span><span class="lang-fr">Pas</span></button>
-                        <button id="gnn-clear" class="btn btn-sm btn-outline-dark"><i class="fas fa-eraser"></i> <span class="lang-en">Clear seeds</span><span class="lang-fr">Effacer graines</span></button>
-                        <button id="gnn-reset" class="btn btn-sm btn-outline-dark"><i class="fas fa-dice"></i> <span class="lang-en">New graph</span><span class="lang-fr">Nouveau graphe</span></button>
-                        <span class="small text-muted ml-2"><span class="lang-en">Iteration:</span><span class="lang-fr">Itération :</span> <strong id="gnn-iter">0</strong></span>
-                    </div>
-                    <div id="gnn-wrap" style="width:100%;">
-                        <canvas id="gnn-canvas" style="background:#fff; border:1px solid #ccc; border-radius:4px; touch-action:none; cursor:pointer; width:100%;"></canvas>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -313,4 +288,3 @@
 <script src="{{ '/assets/js/symmetry.js' | relative_url }}?v=6"></script>
 <script src="{{ '/assets/js/gradient-descent.js' | relative_url }}?v=13"></script>
 <script src="{{ '/assets/js/cifar.js' | relative_url }}?v=3"></script>
-<script src="{{ '/assets/js/gnn.js' | relative_url }}?v=2"></script>

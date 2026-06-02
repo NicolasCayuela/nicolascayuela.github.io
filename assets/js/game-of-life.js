@@ -262,19 +262,15 @@
     if (gdBtn) gdBtn.classList.toggle("active", m === "gd");
     var cfBtn = document.getElementById("gol-mode-cifar");
     if (cfBtn) cfBtn.classList.toggle("active", m === "cifar");
-    var gnnBtn = document.getElementById("gol-mode-gnn");
-    if (gnnBtn) gnnBtn.classList.toggle("active", m === "gnn");
 
     show("gol-area", m === "life" || m === "fire");
     show("sym-area", m === "sym");
     show("gd-area", m === "gd");
     show("cifar-area", m === "cifar");
-    show("gnn-area", m === "gnn");
 
     if (m === "sym") { if (window.__symResize) window.__symResize(); return; }
     if (m === "gd") { if (window.__gdResize) window.__gdResize(); return; }
     if (m === "cifar") { if (window.__cifarResize) window.__cifarResize(); return; }
-    if (m === "gnn") { if (window.__gnnResize) window.__gnnResize(); return; }
 
     mode = m;
     show("gol-life-controls", m === "life");
@@ -296,7 +292,6 @@
   on("gol-mode-sym", function () { setMode("sym"); });
   on("gol-mode-gd", function () { setMode("gd"); });
   on("gol-mode-cifar", function () { setMode("cifar"); });
-  on("gol-mode-gnn", function () { setMode("gnn"); });
 
   // ---- init ----
   var rt;
