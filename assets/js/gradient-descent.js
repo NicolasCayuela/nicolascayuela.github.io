@@ -29,7 +29,13 @@
                                             -2 * Math.sin(2 * x) * Math.sin(2 * y) + 0.36 * y]; }, lr: 0.06, start: 1.8 },
     rosenbrock: { f: function (x, y) { var a = 1 - x, b = y - x * x; return 0.02 * (a * a + 20 * b * b); },
                   g: function (x, y) { var b = y - x * x;
-                                       return [0.02 * (-2 * (1 - x) - 80 * x * b), 0.02 * (40 * b)]; }, lr: 0.04, start: 1.7 }
+                                       return [0.02 * (-2 * (1 - x) - 80 * x * b), 0.02 * (40 * b)]; }, lr: 0.04, start: 1.7 },
+    volcano: { f: function (x, y) { var r = x * x + y * y - 1; return r * r; },               // ring of minima
+               g: function (x, y) { var r = x * x + y * y - 1; return [4 * r * x, 4 * r * y]; }, lr: 0.08, start: 1.7 },
+    fourwells: { f: function (x, y) { var a = x * x - 1, b = y * y - 1; return a * a + b * b; }, // 4 minima
+                 g: function (x, y) { return [4 * x * (x * x - 1), 4 * y * (y * y - 1)]; }, lr: 0.06, start: 1.7 },
+    monkey: { f: function (x, y) { return 0.3 * (x * x * x - 3 * x * y * y); },                 // monkey saddle (no min)
+              g: function (x, y) { return [0.3 * (3 * x * x - 3 * y * y), 0.3 * (-6 * x * y)]; }, lr: 0.05, start: 1.4, noMin: true }
   };
   var surf = "ripples", optimizer = "momentum", lrScale = 1;
 
@@ -154,7 +160,7 @@
     var s = SURF[surf].start;
     px = (Math.random() * 2 - 1) * s; py = (Math.random() * 2 - 1) * s;
     vx = 0; vy = 0; aMx = 0; aMy = 0; aVx = 0; aVy = 0; aT = 0;
-    trail = [[px, py]]; settled = false; settleTimer = 0;
+    trail = [[px, py]]; settled = false; settleTimer = 0; settleHold = 0;
   }
 
   function sliderFrac() { var el = document.getElementById("gd-lr"); return (el ? +el.value : 50) / 100; }   // 0.01..1
@@ -192,11 +198,14 @@
   }
 
   // ---- animation ----
-  var frame = 0;
+  var frame = 0, settleHold = 0;
   function loop() {
     requestAnimationFrame(loop);
     if (canvas.offsetParent === null) return;     // hidden tab -> idle
-    if (!paused && !settled) { frame++; if (frame % 3 === 0) step(); }
+    if (!paused) {
+      if (!settled) { frame++; if (frame % 3 === 0) step(); }
+      else { settleHold++; if (settleHold > 180) restart(); }   // ~3s after converging -> relaunch
+    }
     render();
   }
 

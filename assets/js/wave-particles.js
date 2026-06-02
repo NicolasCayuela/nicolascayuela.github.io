@@ -120,8 +120,9 @@
   function waveField(w, d) {
     var front = CFG.speed * w.t;          // current radius of the wavefront
     var ring = d - front;                 // signed distance to the front
-    // gaussian envelope around the travelling front + global time decay
-    var env = Math.exp(-(ring * ring) / (2 * 9000));
+    // narrow gaussian envelope -> thin, sharp wavefronts (background stays calm
+    // even with many overlapping ripples), plus global time decay
+    var env = Math.exp(-(ring * ring) / (2 * 1600));
     var decay = 1 - w.t / w.life;
     if (decay < 0) decay = 0;
     return w.amp * decay * env * Math.sin(w.k * ring);
@@ -181,7 +182,7 @@
   var LEVELS = 16;              // colormap quantisation; each level = one batched stroke
   // normalise against a single wave's crest (not the dynamic max) so every
   // wavefront reaches red all the way round; interference just stays clamped at red.
-  var REF = CFG.amp * 0.7;
+  var REF = CFG.amp * 0.95;
   function draw() {
     ctx.clearRect(0, 0, W, H);
 
