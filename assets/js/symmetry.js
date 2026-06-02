@@ -59,15 +59,45 @@
             [0,-1,-1,0,0,0], [-1,1,0,1,0,0], [1,0,1,-1,0,0]] }
   };
 
+  // ---- frieze groups: 1D horizontal translation + a horizontal centre line ----
+  var FRIEZE = {
+    f_p111: ["E"],
+    f_p112: ["E", "R2c"],
+    f_p1m1: ["E", "mY"],
+    f_pm11: ["E", "mXc"],
+    f_pmm2: ["E", "R2c", "mXc", "mY"],
+    f_p1a1: ["E", "glide"],
+    f_pma2: ["E", "mY", "glide", "rot4"]
+  };
+  function isFrieze() { return group.indexOf("f_") === 0; }
+
   var ax, ay, bx, by;          // lattice basis vectors (px)
   var pixelOps = [];           // affine {a,b,c,d,e,f}
+  var frieze = false;
 
   function basis() {
     if (GROUPS[group].lat === "hex") { ax = T; ay = 0; bx = T / 2; by = T * Math.sqrt(3) / 2; }
     else { ax = T; ay = 0; bx = 0; by = T; }
   }
 
+  function buildFrieze() {
+    frieze = true;
+    var yc = H / 2, t2 = 2 * yc, h = T / 2;
+    var defs = {
+      E:    { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 },
+      mY:   { a: -1, b: 0, c: 0, d: 1, e: 0, f: 0 },            // vertical mirror x=0
+      mXc:  { a: 1, b: 0, c: 0, d: -1, e: 0, f: t2 },           // horizontal mirror y=yc
+      R2c:  { a: -1, b: 0, c: 0, d: -1, e: 0, f: t2 },          // 180 about (0,yc)
+      glide:{ a: 1, b: 0, c: 0, d: -1, e: h, f: t2 },           // glide: x+T/2, mirror y=yc
+      rot4: { a: -1, b: 0, c: 0, d: -1, e: h, f: t2 }           // 180 about (T/4,yc)
+    };
+    pixelOps = FRIEZE[group].map(function (k) { return defs[k]; });
+    ax = T; ay = 0; bx = 0; by = 0;
+  }
+
   function buildOps() {
+    if (isFrieze()) { buildFrieze(); return; }
+    frieze = false;
     basis();
     var det = ax * by - bx * ay;
     var iB11 = by / det, iB12 = -bx / det, iB21 = -ay / det, iB22 = ax / det; // B^-1
@@ -99,6 +129,7 @@
     W = w; H = 460;
     canvas.style.width = W + "px"; canvas.style.height = H + "px";
     canvas.width = W * DPR; canvas.height = H * DPR;
+    buildOps();                 // frieze ops depend on canvas height
     render();
   }
 
@@ -130,6 +161,14 @@
     setT({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
     ctx.strokeStyle = "rgba(0,0,0,0.18)"; ctx.lineWidth = 0.6;
     var rng = latticeRange(), i, j;
+    if (frieze) {
+      var yc = H / 2;
+      ctx.beginPath();
+      for (i = rng.i0; i <= rng.i1; i++) { ctx.moveTo(i * T, 0); ctx.lineTo(i * T, H); }
+      ctx.moveTo(0, yc); ctx.lineTo(W, yc);
+      ctx.stroke();
+      return;
+    }
     ctx.beginPath();
     for (i = rng.i0; i <= rng.i1; i++) {           // lines along b
       ctx.moveTo(i * ax + rng.j0 * bx, i * ay + rng.j0 * by);
@@ -150,6 +189,7 @@
   }
 
   function latticeRange() {
+    if (frieze) return { i0: Math.floor(0 / T) - 2, i1: Math.ceil(W / T) + 2, j0: 0, j1: 0 };
     var det = ax * by - bx * ay;
     var iB11 = by / det, iB12 = -bx / det, iB21 = -ay / det, iB22 = ax / det;
     var minI = 1e9, maxI = -1e9, minJ = 1e9, maxJ = -1e9;
