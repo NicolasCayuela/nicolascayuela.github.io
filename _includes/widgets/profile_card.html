@@ -122,7 +122,7 @@
                     (function () {
                         var img = document.getElementById('portrait-img');
                         if (!img) return;
-                        var caps = { en: "Hello!", zh: "Hello !" };   // FR uses a non-breaking space before !
+                        var caps = { en: "Hello!", fr: "Hello !" };   // FR uses a non-breaking space before !
                         function apply() {
                             var t = (localStorage.getItem('site-lang') || 'en') === 'fr' ? caps.fr : caps.en;
                             img.setAttribute('title', t);
