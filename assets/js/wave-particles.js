@@ -26,15 +26,21 @@
     autoMin: 2,         // min seconds between random excitations
     autoMax: 5,         // max seconds between random excitations
     linkDist: 1.9,      // neighbour link cutoff, in lattice pitches
-    baseAlpha: 0.16,    // resting link opacity
-    nodeAlpha: 0.5,
-    restHue: 205,       // hue of an undisturbed lattice (faint blue)
-    hueStep: 47,        // hue increment per excitation -> rainbow cycling
-    sat: 90,            // colour saturation %
-    light: 60,          // colour lightness %
-    opacity: 0.55,      // whole-canvas opacity
+    baseAlpha: 0.22,    // resting link opacity (idle = faint blue, COMSOL low end)
+    peakAlpha: 0.95,    // link opacity at the crest (COMSOL high end)
+    nodeAlpha: 0.6,
+    opacity: 0.6,       // whole-canvas opacity
     fps: 60
   };
+
+  // COMSOL "Rainbow" (jet) colormap: t in [0,1] -> [r,g,b] 0..255
+  function jet(t) {
+    if (t < 0) t = 0; else if (t > 1) t = 1;
+    var r = Math.max(0, Math.min(1, Math.min(4 * t - 1.5, -4 * t + 4.5)));
+    var g = Math.max(0, Math.min(1, Math.min(4 * t - 0.5, -4 * t + 3.5)));
+    var b = Math.max(0, Math.min(1, Math.min(4 * t + 0.5, -4 * t + 2.5)));
+    return [(r * 255) | 0, (g * 255) | 0, (b * 255) | 0];
+  }
 
   var canvas = document.createElement("canvas");
   canvas.setAttribute("aria-hidden", "true");
@@ -76,7 +82,7 @@
         nodes.push({
           ox: (c - 0.5) * s + jx,
           oy: (r - 0.5) * s + jy,
-          x: 0, y: 0, strain: 0, hue: CFG.restHue
+          x: 0, y: 0, strain: 0
         });
       }
     }
@@ -100,14 +106,11 @@
     }
   }
 
-  var hueCounter = 0;
   function spawn(x, y, amp) {
     if (waves.length >= CFG.maxWaves) waves.shift();
-    hueCounter = (hueCounter + CFG.hueStep) % 360;   // walk the rainbow
     waves.push({
       x: x, y: y, t: 0,
       amp: amp,
-      hue: hueCounter,
       k: (2 * Math.PI) / CFG.wavelength,
       life: CFG.waveLife
     });
@@ -158,7 +161,7 @@
     var i, w, n, dx, dy, d, disp, maxStrain = 1e-4;
     for (i = 0; i < nodes.length; i++) {
       n = nodes[i];
-      var ux = 0, uy = 0, bestAbs = 0, bestHue = n.hue;
+      var ux = 0, uy = 0;
       for (var k = 0; k < waves.length; k++) {
         w = waves[k];
         dx = n.ox - w.x; dy = n.oy - w.y;
@@ -166,46 +169,40 @@
         disp = waveField(w, d);
         ux += (dx / d) * disp;          // longitudinal: displace along radius
         uy += (dy / d) * disp;
-        var ad = disp < 0 ? -disp : disp;
-        if (ad > bestAbs) { bestAbs = ad; bestHue = w.hue; } // hue of dominant wave
       }
       n.x = n.ox + ux;
       n.y = n.oy + uy;
       n.strain = Math.sqrt(ux * ux + uy * uy);
-      n.hue = bestHue;
       if (n.strain > maxStrain) maxStrain = n.strain;
     }
 
     draw(maxStrain);
   }
 
-  var HB = 18, SB = 5;          // hue buckets x strain buckets (rainbow + intensity)
+  var LEVELS = 16;              // colormap quantisation; each level = one batched stroke
   function draw(maxStrain) {
     ctx.clearRect(0, 0, W, H);
 
-    // links bucketed by (hue, strain) so each colour/intensity is one batched stroke
-    var paths = [], total = HB * SB, bb;
-    for (bb = 0; bb < total; bb++) paths.push([]);
+    // links bucketed by field amplitude -> COMSOL Rainbow (jet) colormap
+    var paths = [], li, bb;
+    for (bb = 0; bb < LEVELS; bb++) paths.push([]);
 
-    for (var li = 0; li < links.length; li++) {
+    for (li = 0; li < links.length; li++) {
       var a = nodes[links[li][0]], c = nodes[links[li][1]];
-      var s = (a.strain + c.strain) * 0.5 / maxStrain; // 0..1 normalised strain
+      var s = (a.strain + c.strain) * 0.5 / maxStrain; // 0..1 normalised amplitude
       if (s > 1) s = 1;
-      var hue = a.strain >= c.strain ? a.hue : c.hue;  // the more-excited end drives colour
-      var hb = ((hue / 360 * HB) | 0) % HB; if (hb < 0) hb += HB;
-      var sb = (s * (SB - 1) + 0.5) | 0;
-      paths[hb * SB + sb].push(a.x, a.y, c.x, c.y);
+      var lv = (s * (LEVELS - 1) + 0.5) | 0;
+      paths[lv].push(a.x, a.y, c.x, c.y);
     }
 
-    for (bb = 0; bb < total; bb++) {
+    for (bb = 0; bb < LEVELS; bb++) {
       var arr = paths[bb];
       if (!arr.length) continue;
-      var hbI = (bb / SB) | 0, sbI = bb % SB;
-      var t = SB > 1 ? sbI / (SB - 1) : 1;
-      var h = (hbI + 0.5) / HB * 360;
-      var alpha = CFG.baseAlpha + (0.85 - CFG.baseAlpha) * t;
-      ctx.strokeStyle = "hsla(" + h.toFixed(0) + "," + CFG.sat + "%," + CFG.light + "%," + alpha.toFixed(3) + ")";
-      ctx.lineWidth = 0.6 + t * 1.3;
+      var t = bb / (LEVELS - 1);
+      var col = jet(t);
+      var alpha = CFG.baseAlpha + (CFG.peakAlpha - CFG.baseAlpha) * t;
+      ctx.strokeStyle = "rgba(" + col[0] + "," + col[1] + "," + col[2] + "," + alpha.toFixed(3) + ")";
+      ctx.lineWidth = 0.6 + t * 1.6;
       ctx.beginPath();
       for (var j = 0; j < arr.length; j += 4) {
         ctx.moveTo(arr[j], arr[j + 1]);
@@ -214,13 +211,14 @@
       ctx.stroke();
     }
 
-    // nodes coloured by their dominant wave, brighter where strained
+    // nodes coloured by the same colormap, brighter/larger where the field is strong
     for (var ni = 0; ni < nodes.length; ni++) {
       var nd = nodes[ni];
       var ns = nd.strain / maxStrain; if (ns > 1) ns = 1;
-      ctx.fillStyle = "hsla(" + nd.hue.toFixed(0) + "," + CFG.sat + "%," + (CFG.light + 5) + "%," +
-        (CFG.nodeAlpha * (0.35 + 0.65 * ns)).toFixed(3) + ")";
-      var rad = 0.9 + ns * 1.8;
+      var nc = jet(ns);
+      ctx.fillStyle = "rgba(" + nc[0] + "," + nc[1] + "," + nc[2] + "," +
+        (CFG.nodeAlpha * (0.4 + 0.6 * ns)).toFixed(3) + ")";
+      var rad = 0.9 + ns * 1.9;
       ctx.beginPath();
       ctx.arc(nd.x, nd.y, rad, 0, 6.2832);
       ctx.fill();
