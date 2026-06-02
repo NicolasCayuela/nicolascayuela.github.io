@@ -4,20 +4,24 @@
             <div class="card-body p-4">
                 <div class="row">
                     <div class="col">
-                        <p class="h1 font-weight-normal lang-en mb-0">{{ site.data.profile.primary_name }}</p>
-                        <p class="h1 font-weight-normal lang-fr mb-0">{{ site.data.profile.secondary_name }}</p>
-                        <p class="text-profile-position">
-                            {% for position in site.data.profile.positions %}
-                            <span class="lang-en">{{ position }}</span>
-                            <span class="lang-fr">{{ site.data.profile.positions_fr[forloop.index0] }}</span>
-                            <br/>
-                            {% endfor %}
-                            {% if site.data.profile.cv_link %}
-                            <a target="_blank" href="{{ site.data.profile.cv_link }}"><i class="fas fa-file-alt"></i> [{% include i18n.html key="cv" %}]</a> <br/>
-                            {% endif %}
-                        </p>
-                        <img src="{{ '/assets/images/etc/france.svg' | relative_url }}" alt="Nancy, France" class="d-block mb-2" style="height: 130px; width: auto;">
-                        <div class="row">
+                        <div class="d-flex align-items-center flex-wrap">
+                          <div>
+                            <p class="h1 font-weight-normal lang-en mb-0">{{ site.data.profile.primary_name }}</p>
+                            <p class="h1 font-weight-normal lang-fr mb-0">{{ site.data.profile.secondary_name }}</p>
+                            <p class="text-profile-position mb-0">
+                                {% for position in site.data.profile.positions %}
+                                <span class="lang-en">{{ position }}</span>
+                                <span class="lang-fr">{{ site.data.profile.positions_fr[forloop.index0] }}</span>
+                                <br/>
+                                {% endfor %}
+                                {% if site.data.profile.cv_link %}
+                                <a target="_blank" href="{{ site.data.profile.cv_link }}"><i class="fas fa-file-alt"></i> [{% include i18n.html key="cv" %}]</a> <br/>
+                                {% endif %}
+                            </p>
+                          </div>
+                          <img src="{{ '/assets/images/etc/france.svg' | relative_url }}" alt="Nancy, France" class="ml-4 d-none d-sm-block" style="height: 130px; width: auto;">
+                        </div>
+                        <div class="row mt-2">
                             <div class="col">
                                 <a class="pr-3 no-break" href="mailto:{{ site.data.profile.email | encode_email }}">
                                     <i class="fas fa-envelope"></i> <span class="email-text">{{ site.data.profile.email }}</span>
