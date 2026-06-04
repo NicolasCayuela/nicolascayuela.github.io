@@ -262,15 +262,27 @@
     if (gdBtn) gdBtn.classList.toggle("active", m === "gd");
     var cfBtn = document.getElementById("gol-mode-cifar");
     if (cfBtn) cfBtn.classList.toggle("active", m === "cifar");
+    var dgBtn = document.getElementById("gol-mode-dog");
+    if (dgBtn) dgBtn.classList.toggle("active", m === "dog");
+    var dfBtn = document.getElementById("gol-mode-ddpm");
+    if (dfBtn) dfBtn.classList.toggle("active", m === "ddpm");
+    var stBtn = document.getElementById("gol-mode-style");
+    if (stBtn) stBtn.classList.toggle("active", m === "style");
 
     show("gol-area", m === "life" || m === "fire");
     show("sym-area", m === "sym");
     show("gd-area", m === "gd");
     show("cifar-area", m === "cifar");
+    show("dog-area", m === "dog");
+    show("ddpm-area", m === "ddpm");
+    show("style-area", m === "style");
 
     if (m === "sym") { if (window.__symResize) window.__symResize(); return; }
     if (m === "gd") { if (window.__gdResize) window.__gdResize(); return; }
     if (m === "cifar") { if (window.__cifarResize) window.__cifarResize(); return; }
+    if (m === "dog") { if (window.__dogShow) window.__dogShow(); return; }
+    if (m === "ddpm") { if (window.__ddpmShow) window.__ddpmShow(); return; }
+    if (m === "style") { if (window.__styleShow) window.__styleShow(); return; }
 
     mode = m;
     show("gol-life-controls", m === "life");
@@ -292,6 +304,9 @@
   on("gol-mode-sym", function () { setMode("sym"); });
   on("gol-mode-gd", function () { setMode("gd"); });
   on("gol-mode-cifar", function () { setMode("cifar"); });
+  on("gol-mode-dog", function () { setMode("dog"); });
+  on("gol-mode-ddpm", function () { setMode("ddpm"); });
+  on("gol-mode-style", function () { setMode("style"); });
 
   // ---- init ----
   var rt;

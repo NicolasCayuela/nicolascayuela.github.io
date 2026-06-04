@@ -21,3 +21,10 @@ package-lock.json
 
 # Ignore files created by MacOS
 .DS_Store
+
+# Dog Creator / Dog Diffusion training artifacts (not needed on the site)
+scripts/afhq_cache/
+scripts/dog_ae.pt
+scripts/dog_preview.png
+scripts/dog_ddpm.pt
+scripts/dog_ddpm_preview.png

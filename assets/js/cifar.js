@@ -1,7 +1,8 @@
 /*
- * CIFAR-10 dataset explorer (inspired by the MNIST latent-space demo).
- * Right: a 2D map where each real CIFAR-10 thumbnail is a dot coloured by its
- * class. Drag the cursor around the map; the left panel shows the nearest image.
+ * CIFAR-100 dataset explorer (inspired by the MNIST latent-space demo).
+ * Right: a 3D point cloud where each real CIFAR-100 thumbnail is a dot
+ * coloured by its class. Drag to rotate the cloud; move the cursor and the
+ * left panel shows the image at the nearest point.
  */
 (function () {
   "use strict";
@@ -12,49 +13,70 @@
   var mctx = mapC.getContext("2d");
   var ictx = imgC.getContext("2d");
 
-  var COLORS = ["#e6194b", "#3cb44b", "#ff1aff", "#4363d8", "#42d4f4",
-                "#0000ff", "#f58231", "#3cf0a0", "#911eb4", "#bfef45"];
-
-  var data = null, sprite = null, ready = false, regionCanvas = null;
-
-  function hexToRgb(h) {
-    var n = parseInt(h.slice(1), 16);
-    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-  }
-
-  // precompute the nearest-class "latent regions" once (independent of view size)
-  function buildRegions() {
-    var R = 600, off = document.createElement("canvas");
-    off.width = R; off.height = R;
-    var octx = off.getContext("2d"), img = octx.createImageData(R, R);
-    var it = data.items, cols = COLORS.map(hexToRgb), px, py, i;
-    for (py = 0; py < R; py++) {
-      for (px = 0; px < R; px++) {
-        var x = (px + 0.5) / R, y = (py + 0.5) / R, best = 1e9, bc = 0;
-        for (i = 0; i < it.length; i++) {
-          var dx = it[i].x - x, dy = it[i].y - y, d = dx * dx + dy * dy;
-          if (d < best) { best = d; bc = it[i].c; }
-        }
-        var o = (py * R + px) * 4, c = cols[bc];
-        img.data[o] = c[0]; img.data[o + 1] = c[1]; img.data[o + 2] = c[2]; img.data[o + 3] = 255;
-      }
+  // one distinct colour per class, generated with golden-angle hue steps
+  var COLORS = [];
+  function makeColors(n) {
+    COLORS = [];
+    for (var k = 0; k < n; k++) {
+      var h = (k * 137.508) % 360;
+      var l = 38 + 18 * (k % 3);           // 38 / 56 / 74 % lightness bands
+      COLORS.push("hsl(" + h.toFixed(1) + ",85%," + l + "%)");
     }
-    octx.putImageData(img, 0, 0);
-    regionCanvas = off;
   }
+
+  var data = null, sprite = null, ready = false;
+
+  // deterministic PRNG so the 3D layout is stable across reloads
+  function mulberry32(seed) {
+    var a = seed >>> 0;
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  // 3D positions: class centers on a fibonacci sphere, points jittered around them
+  var pts = [];                    // [{x,y,z,c,i}]
+  function build3D() {
+    var n = data.classes.length, centers = [], golden = Math.PI * (3 - Math.sqrt(5));
+    var rnd = mulberry32(7);
+    for (var k = 0; k < n; k++) {
+      var yy = 1 - 2 * (k + 0.5) / n, rr = Math.sqrt(1 - yy * yy), th = golden * k;
+      // vary the shell radius a bit so 100 clusters fill the volume, not one shell
+      var R = 0.42 + 0.32 * rnd();
+      centers.push([R * rr * Math.cos(th), R * yy, R * rr * Math.sin(th)]);
+    }
+    var it = data.items, J = 0.07;   // tight jitter: many small clusters
+    pts = [];
+    for (var i = 0; i < it.length; i++) {
+      var c = centers[it[i].c];
+      // uniform jitter in a small ball
+      var jx, jy, jz;
+      do {
+        jx = 2 * rnd() - 1; jy = 2 * rnd() - 1; jz = 2 * rnd() - 1;
+      } while (jx * jx + jy * jy + jz * jz > 1);
+      pts.push({ x: c[0] + J * jx, y: c[1] + J * jy, z: c[2] + J * jz, c: it[i].c, i: i });
+    }
+  }
+
   var DPR = Math.min(window.devicePixelRatio || 1, 2);
   var SIZE = 360;                  // map logical size (square)
-  var cursor = { x: 0.5, y: 0.5 };
   var nearest = 0;
+  var yaw = 0.6, pitch = 0.35;     // view angles
+  var pointer = { x: 0.5, y: 0.5, active: false };
+  var autoSpin = true;
 
   var base = mapC.getAttribute("data-json");
   var spriteUrl = mapC.getAttribute("data-sprite");
 
   fetch(base).then(function (r) { return r.json(); }).then(function (j) {
     data = j;
-    buildRegions();
+    makeColors(data.classes.length);
+    build3D();
     sprite = new Image();
-    sprite.onload = function () { ready = true; pickNearest(); render(); drawImg(); };
+    sprite.onload = function () { ready = true; drawImg(); requestAnimationFrame(tick); };
     sprite.src = spriteUrl;
   });
 
@@ -64,8 +86,8 @@
   }
 
   function resize() {
-    if (!ready) { layoutSize(); sizeCanvas(); return; }
-    layoutSize(); sizeCanvas(); render(); drawImg();
+    layoutSize(); sizeCanvas();
+    if (ready) drawImg();
   }
   function sizeCanvas() {
     DPR = Math.min(window.devicePixelRatio || 1, 2);
@@ -74,30 +96,68 @@
     mctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   }
 
-  function pickNearest() {
-    if (!data) return;
-    var best = 1e9, bi = 0, it = data.items;
-    for (var i = 0; i < it.length; i++) {
-      var dx = it[i].x - cursor.x, dy = it[i].y - cursor.y;
-      var d = dx * dx + dy * dy;
-      if (d < best) { best = d; bi = i; }
-    }
-    nearest = bi;
+  // rotate + perspective-project a 3D point to screen space
+  var CAM = 2.6, FOV = 1.9;
+  function project(p) {
+    var cy = Math.cos(yaw), sy = Math.sin(yaw);
+    var cp = Math.cos(pitch), sp = Math.sin(pitch);
+    var x = p.x * cy + p.z * sy;
+    var z1 = -p.x * sy + p.z * cy;
+    var y = p.y * cp - z1 * sp;
+    var z = p.y * sp + z1 * cp;
+    var s = FOV / (CAM - z);
+    return { sx: SIZE * (0.5 + x * s), sy: SIZE * (0.5 - y * s), z: z, s: s };
   }
 
+  var projected = [];              // last projected positions (for picking)
   function render() {
     if (!ready) return;
     mctx.clearRect(0, 0, SIZE, SIZE);
-    // smooth colour regions (nearest class) -> "latent space" continuity
-    if (regionCanvas) {
-      mctx.imageSmoothingEnabled = true;
-      mctx.drawImage(regionCanvas, 0, 0, SIZE, SIZE);
+    mctx.fillStyle = "#fff";
+    mctx.fillRect(0, 0, SIZE, SIZE);
+
+    projected = [];
+    var i, pr;
+    for (i = 0; i < pts.length; i++) {
+      pr = project(pts[i]);
+      pr.c = pts[i].c; pr.i = pts[i].i;
+      projected.push(pr);
     }
-    // cursor ring
-    mctx.beginPath();
-    mctx.arc(cursor.x * SIZE, cursor.y * SIZE, 11, 0, 6.2832);
-    mctx.strokeStyle = "rgba(40,40,40,0.9)"; mctx.lineWidth = 3; mctx.stroke();
-    mctx.fillStyle = "rgba(255,255,255,0.35)"; mctx.fill();
+    // painter's algorithm: far points first
+    var order = projected.slice().sort(function (a, b) { return a.z - b.z; });
+    for (i = 0; i < order.length; i++) {
+      pr = order[i];
+      var rad = Math.max(1.6, 3.4 * pr.s);
+      mctx.beginPath();
+      mctx.arc(pr.sx, pr.sy, rad, 0, 6.2832);
+      mctx.fillStyle = COLORS[pr.c];
+      mctx.globalAlpha = 0.55 + 0.45 * Math.max(0, Math.min(1, (pr.z + 1) / 2));
+      mctx.fill();
+      mctx.globalAlpha = 1;
+    }
+    // highlight nearest point
+    for (i = 0; i < projected.length; i++) {
+      if (projected[i].i === nearest) {
+        pr = projected[i];
+        mctx.beginPath();
+        mctx.arc(pr.sx, pr.sy, Math.max(5, 4.2 * pr.s) + 3, 0, 6.2832);
+        mctx.strokeStyle = "rgba(40,40,40,0.9)"; mctx.lineWidth = 2.5; mctx.stroke();
+        break;
+      }
+    }
+  }
+
+  function pickNearest() {
+    if (!projected.length || !pointer.active) return;
+    var mx = pointer.x * SIZE, my = pointer.y * SIZE;
+    var best = 1e18, bi = nearest;
+    for (var i = 0; i < projected.length; i++) {
+      var dx = projected[i].sx - mx, dy = projected[i].sy - my;
+      // bias toward closer (front) points when screen distances tie
+      var d = dx * dx + dy * dy - projected[i].z * 4;
+      if (d < best) { best = d; bi = projected[i].i; }
+    }
+    if (bi !== nearest) { nearest = bi; drawImg(); }
   }
 
   function drawImg() {
@@ -108,23 +168,58 @@
     ictx.clearRect(0, 0, L, L);
     ictx.drawImage(sprite, it.g * T, it.r * T, T, T, 0, 0, L, L);
     var label = document.getElementById("cifar-label");
-    if (label) label.textContent = data.classes[it.c];
+    if (label) label.textContent = data.classes[it.c].replace(/_/g, " ");
   }
 
-  // ---- pointer drag on the map ----
-  var dragging = false;
-  function setCursor(e) {
+  function tick() {
+    if (autoSpin && !dragging) yaw += 0.004;
+    render();
+    pickNearest();
+    requestAnimationFrame(tick);
+  }
+
+  // ---- pointer: drag rotates, move picks nearest ----
+  var dragging = false, lastX = 0, lastY = 0;
+  function localPos(e) {
     var rect = mapC.getBoundingClientRect();
     var src = e.touches ? e.touches[0] : e;
-    cursor.x = Math.max(0, Math.min(1, (src.clientX - rect.left) / rect.width));
-    cursor.y = Math.max(0, Math.min(1, (src.clientY - rect.top) / rect.height));
-    pickNearest(); render(); drawImg();
+    return {
+      x: Math.max(0, Math.min(1, (src.clientX - rect.left) / rect.width)),
+      y: Math.max(0, Math.min(1, (src.clientY - rect.top) / rect.height)),
+      cx: src.clientX, cy: src.clientY
+    };
   }
-  mapC.addEventListener("mousedown", function (e) { dragging = true; setCursor(e); });
-  window.addEventListener("mousemove", function (e) { if (dragging) setCursor(e); });
+  mapC.addEventListener("mousedown", function (e) {
+    dragging = true; autoSpin = false;
+    var p = localPos(e); lastX = p.cx; lastY = p.cy;
+  });
+  window.addEventListener("mousemove", function (e) {
+    var p = localPos(e);
+    if (dragging) {
+      yaw += (p.cx - lastX) * 0.01;
+      pitch = Math.max(-1.4, Math.min(1.4, pitch + (p.cy - lastY) * 0.01));
+      lastX = p.cx; lastY = p.cy;
+    }
+    if (e.target === mapC || dragging) {
+      pointer.x = p.x; pointer.y = p.y; pointer.active = true;
+    }
+  });
   window.addEventListener("mouseup", function () { dragging = false; });
-  mapC.addEventListener("touchstart", function (e) { e.preventDefault(); dragging = true; setCursor(e); }, { passive: false });
-  mapC.addEventListener("touchmove", function (e) { e.preventDefault(); if (dragging) setCursor(e); }, { passive: false });
+  mapC.addEventListener("mouseleave", function () { if (!dragging) pointer.active = false; });
+  mapC.addEventListener("touchstart", function (e) {
+    e.preventDefault(); dragging = true; autoSpin = false;
+    var p = localPos(e); lastX = p.cx; lastY = p.cy;
+    pointer.x = p.x; pointer.y = p.y; pointer.active = true;
+  }, { passive: false });
+  mapC.addEventListener("touchmove", function (e) {
+    e.preventDefault();
+    if (!dragging) return;
+    var p = localPos(e);
+    yaw += (p.cx - lastX) * 0.01;
+    pitch = Math.max(-1.4, Math.min(1.4, pitch + (p.cy - lastY) * 0.01));
+    lastX = p.cx; lastY = p.cy;
+    pointer.x = p.x; pointer.y = p.y; pointer.active = true;
+  }, { passive: false });
   mapC.addEventListener("touchend", function () { dragging = false; });
 
   var rt;
