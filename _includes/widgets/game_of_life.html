@@ -33,6 +33,9 @@
                     <button id="gol-mode-style" type="button" class="btn btn-outline-dark">
                         <i class="fas fa-palette"></i> <span class="lang-en">Style transfer</span><span class="lang-fr">Transfert de style</span>
                     </button>
+                    <button id="gol-mode-w2v" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-font"></i> <span class="lang-en">Word embeddings</span><span class="lang-fr">Plongements de mots</span>
+                    </button>
                 </div>
 
                 <!-- ============ Game of Life / Forest fire ============ -->
@@ -391,33 +394,29 @@
                         <span class="lang-fr"><strong>Transfert de style neuronal</strong> : un réseau feed-forward (<a href="https://arxiv.org/abs/1603.08155" target="_blank" rel="noopener">Johnson et al.</a>, entraîné avec PyTorch) repeint ta photo dans le style d'un tableau - tourbillons à la Van Gogh, mosaïques, aquarelles. Les vignettes de tableaux utilisent <strong>AdaIN</strong> (<a href="https://arxiv.org/abs/1703.06868" target="_blank" rel="noopener">Huang &amp; Belongie</a>), un seul réseau capable d'appliquer le style de <em>n'importe quel</em> tableau. Choisis un style, charge une image (elle reste dans ton navigateur) et le réseau tourne en direct avec ONNX.</span>
                     </p>
                     <style>
-                        #style-area [data-adain].active { outline:3px solid #1c54e5; outline-offset:1px; }
-                        #style-area [data-adain]:hover { transform:scale(1.08); transition:transform .12s; }
+                        #style-area .st-thumb.active { outline:3px solid #1c54e5; outline-offset:1px; }
+                        #style-area .st-thumb:hover { transform:scale(1.08); transition:transform .12s; }
                     </style>
-                    <div class="d-flex flex-wrap align-items-center mb-3" style="gap:.4rem;">
-                        <span class="small text-muted mr-1"><span class="lang-en">Style:</span><span class="lang-fr">Style&nbsp;:</span></span>
-                        <button data-style="starry-night" class="btn btn-sm btn-outline-dark">Starry Night</button>
-                        <button data-style="rain-princess-9" class="btn btn-sm btn-outline-dark active">Rain Princess</button>
-                        <button data-style="candy-9" class="btn btn-sm btn-outline-dark">Candy</button>
-                        <button data-style="mosaic-9" class="btn btn-sm btn-outline-dark">Mosaic</button>
-                        <button data-style="udnie-9" class="btn btn-sm btn-outline-dark">Udnie</button>
-                        <button data-style="pointilism-9" class="btn btn-sm btn-outline-dark">Pointilism</button>
-                        <label class="btn btn-sm btn-outline-secondary mb-0 ml-2">
-                            <i class="fas fa-upload"></i> <span class="lang-en">Upload image</span><span class="lang-fr">Charger une image</span>
-                            <input id="style-file" type="file" accept="image/*" style="display:none;">
-                        </label>
-                    </div>
                     <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.45rem;">
-                        <span class="small text-muted mr-1"><span class="lang-en">Paintings (AdaIN):</span><span class="lang-fr">Tableaux (AdaIN)&nbsp;:</span></span>
-                        {% assign adain_styles = "wave|The Great Wave - Hokusai,scream|The Scream - Munch,kandinsky|Composition VII - Kandinsky,monet|Water Lilies - Monet,seurat|La Grande Jatte - Seurat,klimt|The Kiss - Klimt,mucha|Salon des Cent - Mucha,matisse|Woman with a Hat - Matisse,turner|The Fighting Temeraire - Turner,vitrail|Stained glass - Sainte-Chapelle,mosaic-byz|Byzantine mosaic - Ravenna" | split: "," %}
+                        <span class="small text-muted mr-1"><span class="lang-en">Paintings:</span><span class="lang-fr">Tableaux&nbsp;:</span></span>
+                        <button data-style="starry-night" title="The Starry Night - Van Gogh" class="btn p-0 border st-thumb active"
+                                style="width:46px; height:46px; overflow:hidden; border-radius:8px;">
+                            <img src="{{ '/assets/images/styles/starry-night.jpg' | relative_url }}"
+                                 alt="The Starry Night - Van Gogh" style="width:100%; height:100%; object-fit:cover;">
+                        </button>
+                        {% assign adain_styles = "wave|The Great Wave - Hokusai,scream|The Scream - Munch,kandinsky|Composition VII - Kandinsky,monet|Water Lilies - Monet,seurat|La Grande Jatte - Seurat,klimt|The Kiss - Klimt,mucha|Salon des Cent - Mucha,matisse|Woman with a Hat - Matisse,turner|The Fighting Temeraire - Turner,vitrail|Stained glass - Sainte-Chapelle,mosaic-byz|Byzantine mosaic - Ravenna,mondrian|Composition II - Mondrian,klee|Senecio - Klee,vermeer|Girl with a Pearl Earring - Vermeer,friedrich|Wanderer above the Sea of Fog - Friedrich,sunflowers|Sunflowers - Van Gogh" | split: "," %}
                         {% for s in adain_styles %}
                         {% assign parts = s | split: "|" %}
-                        <button data-adain="{{ parts[0] }}" title="{{ parts[1] }}" class="btn p-0 border"
+                        <button data-adain="{{ parts[0] }}" title="{{ parts[1] }}" class="btn p-0 border st-thumb"
                                 style="width:46px; height:46px; overflow:hidden; border-radius:8px;">
                             <img src="{{ '/assets/images/styles/' | append: parts[0] | append: '.jpg' | relative_url }}"
                                  alt="{{ parts[1] }}" style="width:100%; height:100%; object-fit:cover;">
                         </button>
                         {% endfor %}
+                        <label class="btn btn-sm btn-outline-secondary mb-0 ml-2">
+                            <i class="fas fa-upload"></i> <span class="lang-en">Upload image</span><span class="lang-fr">Charger une image</span>
+                            <input id="style-file" type="file" accept="image/*" style="display:none;">
+                        </label>
                     </div>
                     <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.5rem;">
                         <label class="small text-muted mb-0">
@@ -439,15 +438,49 @@
                     <div id="style-status" class="small text-muted mt-2">&nbsp;</div>
                 </div>
 
+                <!-- ============ Word embeddings (word2vec / GloVe) ============ -->
+                <div id="w2v-area" class="d-none" data-json="{{ '/assets/models/word_embeddings.json' | relative_url }}">
+                    <p class="small text-muted mx-1 mb-3">
+                        <span class="lang-en"><strong>Word embeddings</strong> (<a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">word2vec</a>-style, here <a href="https://nlp.stanford.edu/projects/glove/" target="_blank" rel="noopener">GloVe</a> 50d) map every word to a vector so that similar words are close and directions carry meaning: <em>king - man + woman ≈ queen</em>. The 5000 most frequent words are shown in 3D (PCA). <strong>Drag to rotate</strong>, search a word for its neighbours, or try vector arithmetic.</span>
+                        <span class="lang-fr">Les <strong>plongements de mots</strong> (type <a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">word2vec</a>, ici <a href="https://nlp.stanford.edu/projects/glove/" target="_blank" rel="noopener">GloVe</a> 50d) associent à chaque mot un vecteur : les mots similaires sont proches et les directions portent du sens : <em>king - man + woman ≈ queen</em>. Les 5000 mots les plus fréquents sont affichés en 3D (ACP). <strong>Glisse pour tourner</strong>, cherche un mot pour voir ses voisins, ou essaie l'arithmétique vectorielle.</span>
+                    </p>
+                    <div class="d-flex flex-wrap" style="gap:1.2rem;">
+                        <div style="flex:1 1 300px; min-width:260px;">
+                            <canvas id="w2v-canvas" style="border:1px solid #ccc; border-radius:4px; touch-action:none; cursor:grab;"></canvas>
+                            <div id="w2v-status" class="small text-muted mt-1">&nbsp;</div>
+                        </div>
+                        <div style="min-width:230px; max-width:300px;">
+                            <div class="small font-weight-bold mb-1"><span class="lang-en">Nearest neighbours</span><span class="lang-fr">Plus proches voisins</span></div>
+                            <div class="d-flex mb-1" style="gap:.3rem;">
+                                <input id="w2v-search" type="text" class="form-control form-control-sm" placeholder="dog, music, paris…" style="max-width:150px;">
+                                <button id="w2v-search-btn" class="btn btn-sm btn-dark"><i class="fas fa-search"></i></button>
+                            </div>
+                            <ul id="w2v-neighbors" class="small pl-3 mb-3" style="line-height:1.5;"></ul>
+
+                            <div class="small font-weight-bold mb-1"><span class="lang-en">Vector arithmetic</span><span class="lang-fr">Arithmétique vectorielle</span></div>
+                            <div class="d-flex align-items-center mb-1 flex-wrap" style="gap:.25rem;">
+                                <input id="w2v-a" type="text" class="form-control form-control-sm" style="width:72px;">
+                                <span class="small">-</span>
+                                <input id="w2v-b" type="text" class="form-control form-control-sm" style="width:72px;">
+                                <span class="small">+</span>
+                                <input id="w2v-c" type="text" class="form-control form-control-sm" style="width:72px;">
+                                <button id="w2v-math-btn" class="btn btn-sm btn-dark">=</button>
+                            </div>
+                            <ul id="w2v-result" class="small pl-3 mb-0" style="line-height:1.5;"></ul>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 </div>
 
-<script src="{{ '/assets/js/game-of-life.js' | relative_url }}?v=13"></script>
+<script src="{{ '/assets/js/game-of-life.js' | relative_url }}?v=14"></script>
 <script src="{{ '/assets/js/symmetry.js' | relative_url }}?v=8"></script>
 <script src="{{ '/assets/js/gradient-descent.js' | relative_url }}?v=13"></script>
 <script src="{{ '/assets/js/cifar.js' | relative_url }}?v=8"></script>
-<script src="{{ '/assets/js/dog-creator.js' | relative_url }}?v=3"></script>
-<script src="{{ '/assets/js/dog-diffusion.js' | relative_url }}?v=2"></script>
-<script src="{{ '/assets/js/style-transfer.js' | relative_url }}?v=3"></script>
+<script src="{{ '/assets/js/dog-creator.js' | relative_url }}?v=4"></script>
+<script src="{{ '/assets/js/dog-diffusion.js' | relative_url }}?v=3"></script>
+<script src="{{ '/assets/js/style-transfer.js' | relative_url }}?v=4"></script>
+<script src="{{ '/assets/js/word2vec.js' | relative_url }}?v=1"></script>

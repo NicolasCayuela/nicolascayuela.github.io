@@ -14,12 +14,17 @@
   var srcCtx = srcC.getContext("2d");
   var outCtx = outC.getContext("2d");
 
-  var ORT_URL = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.min.js";
+  var ORT_URL = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.webgpu.min.js";
+  // try the GPU execution provider first, fall back to plain wasm
+  function createSession(url) {
+    return window.ort.InferenceSession.create(url, { executionProviders: ["webgpu", "wasm"] })
+      .catch(function () { return window.ort.InferenceSession.create(url); });
+  }
   var SIZE = 224;                       // model input resolution
   var sessions = {};                    // fast style -> InferenceSession
   var adainSession = null;              // AdaIN arbitrary-style session
   var adainStyles = {};                 // painting key -> Float32Array (CHW 0-255)
-  var cur = { type: "fast", style: "rain-princess-9" };
+  var cur = { type: "fast", style: "starry-night" };
   var srcImage = null;                  // current content image (Image element)
   var busy = false, queued = false;
   var lastStyled = null, lastSrcPx = null;   // cached last result for re-blending
@@ -45,7 +50,7 @@
     if (sessions[style]) return Promise.resolve(sessions[style]);
     var base = area.getAttribute("data-base");
     setStatus("Loading style model…", "Chargement du modèle de style…");
-    return window.ort.InferenceSession.create(base + style + ".onnx").then(function (s) {
+    return createSession(base + style + ".onnx").then(function (s) {
       sessions[style] = s;
       return s;
     });
@@ -55,7 +60,7 @@
     if (adainSession) return Promise.resolve(adainSession);
     var base = area.getAttribute("data-base");
     setStatus("Loading AdaIN model (~28 MB)…", "Chargement du modèle AdaIN (~28 Mo)…");
-    return window.ort.InferenceSession.create(base + "adain.onnx").then(function (s) {
+    return createSession(base + "adain.onnx").then(function (s) {
       adainSession = s;
       return s;
     });

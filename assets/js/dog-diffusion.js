@@ -11,7 +11,12 @@
   if (!area || !canvas) return;
   var ctx = canvas.getContext("2d");
 
-  var ORT_URL = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.min.js";
+  var ORT_URL = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.webgpu.min.js";
+  // try the GPU execution provider first, fall back to plain wasm
+  function createSession(url) {
+    return window.ort.InferenceSession.create(url, { executionProviders: ["webgpu", "wasm"] })
+      .catch(function () { return window.ort.InferenceSession.create(url); });
+  }
   var session = null, meta = null, loading = false, ready = false;
   var running = false, runId = 0;
   var IMG = 32;
@@ -119,13 +124,13 @@
     var base = area.getAttribute("data-base");
     Promise.all([
       loadScript(ORT_URL),
-      fetch(base + "dog_diffusion.json").then(function (r) { return r.json(); })
+      fetch(base + "dog_diffusion.json?v=2").then(function (r) { return r.json(); })
     ]).then(function (rs) {
       meta = rs[1];
       IMG = meta.img;
       off.width = IMG; off.height = IMG;
       offCtx = off.getContext("2d");
-      return window.ort.InferenceSession.create(base + "dog_diffusion.onnx");
+      return createSession(base + "dog_diffusion.onnx?v=2");
     }).then(function (s) {
       session = s; ready = true; loading = false;
       setStatus("Ready - press Generate.", "Prêt - clique sur Générer.");
