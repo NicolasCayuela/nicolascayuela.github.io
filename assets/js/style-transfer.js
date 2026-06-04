@@ -16,10 +16,12 @@
 
   var ORT_URL = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.min.js";
   var SIZE = 224;                       // model input resolution
-  var sessions = {};                    // style -> InferenceSession
-  var curStyle = "rain-princess-9";
+  var sessions = {};                    // fast style -> InferenceSession
+  var adainSession = null;              // AdaIN arbitrary-style session
+  var adainStyles = {};                 // painting key -> Float32Array (CHW 0-255)
+  var cur = { type: "fast", style: "rain-princess-9" };
   var srcImage = null;                  // current content image (Image element)
-  var busy = false, ortLoaded = false;
+  var busy = false, queued = false;
   var lastStyled = null, lastSrcPx = null;   // cached last result for re-blending
   var statusEl = document.getElementById("style-status");
 
@@ -49,6 +51,44 @@
     });
   }
 
+  function getAdainSession() {
+    if (adainSession) return Promise.resolve(adainSession);
+    var base = area.getAttribute("data-base");
+    setStatus("Loading AdaIN model (~28 MB)…", "Chargement du modèle AdaIN (~28 Mo)…");
+    return window.ort.InferenceSession.create(base + "adain.onnx").then(function (s) {
+      adainSession = s;
+      return s;
+    });
+  }
+
+  function getStyleTensor(key) {
+    if (adainStyles[key]) return Promise.resolve(adainStyles[key]);
+    var stylesBase = area.getAttribute("data-styles");
+    return new Promise(function (res, rej) {
+      var im = new Image();
+      im.onload = function () {
+        var tmp = document.createElement("canvas");
+        tmp.width = SIZE; tmp.height = SIZE;
+        var tctx = tmp.getContext("2d");
+        // cover-crop the painting to a square
+        var w = im.naturalWidth, h = im.naturalHeight, m = Math.min(w, h);
+        tctx.drawImage(im, (w - m) / 2, (h - m) / 2, m, m, 0, 0, SIZE, SIZE);
+        var px = tctx.getImageData(0, 0, SIZE, SIZE).data;
+        var plane = SIZE * SIZE;
+        var arr = new Float32Array(3 * plane);
+        for (var k = 0; k < plane; k++) {
+          arr[k] = px[4 * k];
+          arr[plane + k] = px[4 * k + 1];
+          arr[2 * plane + k] = px[4 * k + 2];
+        }
+        adainStyles[key] = arr;
+        res(arr);
+      };
+      im.onerror = rej;
+      im.src = stylesBase + key + ".jpg";
+    });
+  }
+
   function drawSource() {
     if (!srcImage) return;
     // cover-crop to square
@@ -57,34 +97,54 @@
     srcCtx.drawImage(srcImage, (w - m) / 2, (h - m) / 2, m, m, 0, 0, srcC.width, srcC.height);
   }
 
+  function contentTensor() {
+    // sample the source canvas down to 224x224
+    var tmp = document.createElement("canvas");
+    tmp.width = SIZE; tmp.height = SIZE;
+    var tctx = tmp.getContext("2d");
+    tctx.drawImage(srcC, 0, 0, SIZE, SIZE);
+    var px = tctx.getImageData(0, 0, SIZE, SIZE).data;
+    lastSrcPx = px;
+    var plane = SIZE * SIZE;
+    var input = new Float32Array(3 * plane);    // CHW, RGB in [0,255]
+    for (var k = 0; k < plane; k++) {
+      input[k] = px[4 * k];
+      input[plane + k] = px[4 * k + 1];
+      input[2 * plane + k] = px[4 * k + 2];
+    }
+    return new window.ort.Tensor("float32", input, [1, 3, SIZE, SIZE]);
+  }
+
   function stylize() {
-    if (!srcImage || busy) return;
+    if (!srcImage) return;
+    if (busy) { queued = true; return; }
     busy = true;
-    loadScript(ORT_URL).then(function () {
-      return getSession(curStyle);
-    }).then(function (session) {
-      setStatus("Painting…", "Peinture en cours…");
-      // sample the source canvas down to 224x224
-      var tmp = document.createElement("canvas");
-      tmp.width = SIZE; tmp.height = SIZE;
-      var tctx = tmp.getContext("2d");
-      tctx.drawImage(srcC, 0, 0, SIZE, SIZE);
-      var px = tctx.getImageData(0, 0, SIZE, SIZE).data;
-      lastSrcPx = px;
-      var plane = SIZE * SIZE;
-      var input = new Float32Array(3 * plane);    // CHW, RGB in [0,255]
-      for (var k = 0; k < plane; k++) {
-        input[k] = px[4 * k];
-        input[plane + k] = px[4 * k + 1];
-        input[2 * plane + k] = px[4 * k + 2];
-      }
-      var tensor = new window.ort.Tensor("float32", input, [1, 3, SIZE, SIZE]);
-      return session.run({ input1: tensor });
-    }).then(function (out) {
+    var run;
+    if (cur.type === "adain") {
+      run = loadScript(ORT_URL).then(function () {
+        return Promise.all([getAdainSession(), getStyleTensor(cur.style)]);
+      }).then(function (rs) {
+        setStatus("Painting…", "Peinture en cours…");
+        return rs[0].run({
+          content: contentTensor(),
+          style: new window.ort.Tensor("float32", rs[1].slice(), [1, 3, SIZE, SIZE]),
+          alpha: new window.ort.Tensor("float32", new Float32Array([1]), [1])
+        });
+      });
+    } else {
+      run = loadScript(ORT_URL).then(function () {
+        return getSession(cur.style);
+      }).then(function (session) {
+        setStatus("Painting…", "Peinture en cours…");
+        return session.run({ input1: contentTensor() });
+      });
+    }
+    run.then(function (out) {
       lastStyled = out.output1.data;
       drawBlend();
       setStatus("", "");
       busy = false;
+      if (queued) { queued = false; stylize(); }
     }).catch(function (e) {
       busy = false;
       setStatus("Failed: " + e, "Échec : " + e);
@@ -127,15 +187,31 @@
 
   // ---- controls ----
   var styleBtns = document.querySelectorAll("[data-style]");
+  var adainBtns = document.querySelectorAll("[data-adain]");
+  function clearActive() {
+    var j;
+    for (j = 0; j < styleBtns.length; j++) styleBtns[j].classList.remove("active");
+    for (j = 0; j < adainBtns.length; j++) adainBtns[j].classList.remove("active");
+  }
   for (var i = 0; i < styleBtns.length; i++) {
     (function (btn) {
       btn.addEventListener("click", function () {
-        for (var j = 0; j < styleBtns.length; j++) styleBtns[j].classList.remove("active");
+        clearActive();
         btn.classList.add("active");
-        curStyle = btn.getAttribute("data-style");
+        cur = { type: "fast", style: btn.getAttribute("data-style") };
         stylize();
       });
     })(styleBtns[i]);
+  }
+  for (var a = 0; a < adainBtns.length; a++) {
+    (function (btn) {
+      btn.addEventListener("click", function () {
+        clearActive();
+        btn.classList.add("active");
+        cur = { type: "adain", style: btn.getAttribute("data-adain") };
+        stylize();
+      });
+    })(adainBtns[a]);
   }
 
   var strengthIn = document.getElementById("style-strength");

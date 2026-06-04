@@ -375,21 +375,25 @@
                             <div class="small" style="line-height:1.8;">
                                 <label class="mb-0 d-block"><input type="radio" name="ddpm-steps" value="25"> 25 <span class="text-muted">(<span class="lang-en">fast, rough</span><span class="lang-fr">rapide, grossier</span>)</span></label>
                                 <label class="mb-0 d-block"><input type="radio" name="ddpm-steps" value="50"> 50</label>
-                                <label class="mb-0 d-block"><input type="radio" name="ddpm-steps" value="100" checked> 100</label>
-                                <label class="mb-0 d-block"><input type="radio" name="ddpm-steps" value="250"> 250 <span class="text-muted">(<span class="lang-en">slow, best</span><span class="lang-fr">lent, meilleur</span>)</span></label>
+                                <label class="mb-0 d-block"><input type="radio" name="ddpm-steps" value="100" checked> 100 <span class="text-muted">(<span class="lang-en">slow, best</span><span class="lang-fr">lent, meilleur</span>)</span></label>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- ============ Style transfer (fast neural style) ============ -->
+                <!-- ============ Style transfer (fast neural style + AdaIN) ============ -->
                 <div id="style-area" class="d-none"
                      data-base="{{ '/assets/models/style/' | relative_url }}"
+                     data-styles="{{ '/assets/images/styles/' | relative_url }}"
                      data-sample="{{ '/assets/images/style_sample.jpg' | relative_url }}?v=2">
                     <p class="small text-muted mx-1 mb-3">
-                        <span class="lang-en"><strong>Neural style transfer</strong>: a feed-forward network (<a href="https://arxiv.org/abs/1603.08155" target="_blank" rel="noopener">Johnson et al.</a>, trained with PyTorch) repaints your photo in the style of a painting - Van Gogh-like swirls, mosaics, watercolours. Pick a style, upload an image (it stays in your browser) and the network runs live with ONNX.</span>
-                        <span class="lang-fr"><strong>Transfert de style neuronal</strong> : un réseau feed-forward (<a href="https://arxiv.org/abs/1603.08155" target="_blank" rel="noopener">Johnson et al.</a>, entraîné avec PyTorch) repeint ta photo dans le style d'un tableau - tourbillons à la Van Gogh, mosaïques, aquarelles. Choisis un style, charge une image (elle reste dans ton navigateur) et le réseau tourne en direct avec ONNX.</span>
+                        <span class="lang-en"><strong>Neural style transfer</strong>: a feed-forward network (<a href="https://arxiv.org/abs/1603.08155" target="_blank" rel="noopener">Johnson et al.</a>, trained with PyTorch) repaints your photo in the style of a painting - Van Gogh-like swirls, mosaics, watercolours. The painting thumbnails use <strong>AdaIN</strong> (<a href="https://arxiv.org/abs/1703.06868" target="_blank" rel="noopener">Huang &amp; Belongie</a>), a single network that can apply <em>any</em> painting's style. Pick a style, upload an image (it stays in your browser) and the network runs live with ONNX.</span>
+                        <span class="lang-fr"><strong>Transfert de style neuronal</strong> : un réseau feed-forward (<a href="https://arxiv.org/abs/1603.08155" target="_blank" rel="noopener">Johnson et al.</a>, entraîné avec PyTorch) repeint ta photo dans le style d'un tableau - tourbillons à la Van Gogh, mosaïques, aquarelles. Les vignettes de tableaux utilisent <strong>AdaIN</strong> (<a href="https://arxiv.org/abs/1703.06868" target="_blank" rel="noopener">Huang &amp; Belongie</a>), un seul réseau capable d'appliquer le style de <em>n'importe quel</em> tableau. Choisis un style, charge une image (elle reste dans ton navigateur) et le réseau tourne en direct avec ONNX.</span>
                     </p>
+                    <style>
+                        #style-area [data-adain].active { outline:3px solid #1c54e5; outline-offset:1px; }
+                        #style-area [data-adain]:hover { transform:scale(1.08); transition:transform .12s; }
+                    </style>
                     <div class="d-flex flex-wrap align-items-center mb-3" style="gap:.4rem;">
                         <span class="small text-muted mr-1"><span class="lang-en">Style:</span><span class="lang-fr">Style&nbsp;:</span></span>
                         <button data-style="starry-night" class="btn btn-sm btn-outline-dark">Starry Night</button>
@@ -402,6 +406,18 @@
                             <i class="fas fa-upload"></i> <span class="lang-en">Upload image</span><span class="lang-fr">Charger une image</span>
                             <input id="style-file" type="file" accept="image/*" style="display:none;">
                         </label>
+                    </div>
+                    <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.45rem;">
+                        <span class="small text-muted mr-1"><span class="lang-en">Paintings (AdaIN):</span><span class="lang-fr">Tableaux (AdaIN)&nbsp;:</span></span>
+                        {% assign adain_styles = "wave|The Great Wave - Hokusai,scream|The Scream - Munch,kandinsky|Composition VII - Kandinsky,monet|Water Lilies - Monet,seurat|La Grande Jatte - Seurat,klimt|The Kiss - Klimt,mucha|Salon des Cent - Mucha,matisse|Woman with a Hat - Matisse,turner|The Fighting Temeraire - Turner,vitrail|Stained glass - Sainte-Chapelle,mosaic-byz|Byzantine mosaic - Ravenna" | split: "," %}
+                        {% for s in adain_styles %}
+                        {% assign parts = s | split: "|" %}
+                        <button data-adain="{{ parts[0] }}" title="{{ parts[1] }}" class="btn p-0 border"
+                                style="width:46px; height:46px; overflow:hidden; border-radius:8px;">
+                            <img src="{{ '/assets/images/styles/' | append: parts[0] | append: '.jpg' | relative_url }}"
+                                 alt="{{ parts[1] }}" style="width:100%; height:100%; object-fit:cover;">
+                        </button>
+                        {% endfor %}
                     </div>
                     <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.5rem;">
                         <label class="small text-muted mb-0">
@@ -432,6 +448,6 @@
 <script src="{{ '/assets/js/symmetry.js' | relative_url }}?v=8"></script>
 <script src="{{ '/assets/js/gradient-descent.js' | relative_url }}?v=13"></script>
 <script src="{{ '/assets/js/cifar.js' | relative_url }}?v=8"></script>
-<script src="{{ '/assets/js/dog-creator.js' | relative_url }}?v=2"></script>
+<script src="{{ '/assets/js/dog-creator.js' | relative_url }}?v=3"></script>
 <script src="{{ '/assets/js/dog-diffusion.js' | relative_url }}?v=2"></script>
-<script src="{{ '/assets/js/style-transfer.js' | relative_url }}?v=2"></script>
+<script src="{{ '/assets/js/style-transfer.js' | relative_url }}?v=3"></script>

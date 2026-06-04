@@ -150,12 +150,12 @@
     var base = area.getAttribute("data-base");
     Promise.all([
       loadScript(ORT_URL),
-      fetch(base + "dog_data.json").then(function (r) { return r.json(); })
+      fetch(base + "dog_data.json?v=2").then(function (r) { return r.json(); })
     ]).then(function (rs) {
       meta = rs[1];
       N = meta.latent || meta.stds.length;
       coords = new Float32Array(N);
-      return window.ort.InferenceSession.create(base + "dog_decoder.onnx");
+      return window.ort.InferenceSession.create(base + "dog_decoder.onnx?v=2");
     }).then(function (s) {
       session = s; ready = true; loading = false;
       setStatus("", "");
