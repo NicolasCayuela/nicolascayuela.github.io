@@ -60,7 +60,7 @@
 
   function steps() {
     var el = document.querySelector('input[name="ddpm-steps"]:checked');
-    return el ? parseInt(el.value, 10) : 25;
+    return el ? parseInt(el.value, 10) : 100;
   }
 
   function generate() {

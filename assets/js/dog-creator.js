@@ -12,9 +12,9 @@
   var ctx = canvas.getContext("2d");
 
   var ORT_URL = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.min.js";
-  var N = 256;
+  var N = 0;                                 // number of PCs (from the JSON)
   var session = null, meta = null, loading = false, ready = false;
-  var coords = new Float32Array(N);          // current PCA coordinates
+  var coords = null;                         // current PCA coordinates
   var sliders = [];
   var off = document.createElement("canvas"); off.width = 64; off.height = 64;
   var offCtx = off.getContext("2d");
@@ -153,6 +153,8 @@
       fetch(base + "dog_data.json").then(function (r) { return r.json(); })
     ]).then(function (rs) {
       meta = rs[1];
+      N = meta.latent || meta.stds.length;
+      coords = new Float32Array(N);
       return window.ort.InferenceSession.create(base + "dog_decoder.onnx");
     }).then(function (s) {
       session = s; ready = true; loading = false;

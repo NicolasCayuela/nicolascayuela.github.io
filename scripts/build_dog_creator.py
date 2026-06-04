@@ -26,7 +26,8 @@ CACHE = os.path.join(HERE, "afhq_cache")
 OUT_MODELS = os.path.join(HERE, "..", "assets", "models")
 IMG = 64
 LATENT = 256
-EPOCHS = 25
+PCS = 64                      # principal components exposed as sliders
+EPOCHS = 90
 BATCH = 64
 DOG_LABEL = 1                 # huggan/AFHQ: cat=0, dog=1, wild=2
 SAMPLES_IN_JSON = 300
@@ -124,6 +125,8 @@ def main():
         for b in range(0, n, BATCH):
             idx = perm[b:b + BATCH]
             x = data[idx].float() / 255.0
+            flip = torch.rand(x.shape[0]) < 0.5      # horizontal-flip augmentation
+            x[flip] = x[flip].flip(-1)
             opt.zero_grad()
             out = dec(enc(x))
             loss = loss_fn(out, x)
@@ -149,10 +152,11 @@ def main():
     stds = (S / math.sqrt(n - 1))                        # per-component std
     proj = Zc @ Vh.T                                     # N x LATENT, PCA coords
 
-    # ---- ONNX export: p (1x256) -> image (1x3x64x64) ----
+    # ---- ONNX export: p (1xPCS) -> image (1x3x64x64); only the top PCS
+    # components are exposed, the rest stay at the mean ----
     os.makedirs(OUT_MODELS, exist_ok=True)
-    wrapper = PCADecoder(dec, mean, Vh).eval()
-    dummy = torch.zeros(1, LATENT)
+    wrapper = PCADecoder(dec, mean, Vh[:PCS]).eval()
+    dummy = torch.zeros(1, PCS)
     onnx_path = os.path.join(OUT_MODELS, "dog_decoder.onnx")
     try:
         torch.onnx.export(wrapper, dummy, onnx_path, input_names=["p"],
@@ -164,10 +168,10 @@ def main():
 
     # ---- JSON: stds + sample dataset projections ----
     pick = torch.randperm(n)[:SAMPLES_IN_JSON]
-    samples = proj[pick]
+    samples = proj[pick, :PCS]
     js = {
-        "latent": LATENT,
-        "stds": [round(float(v), 4) for v in stds],
+        "latent": PCS,
+        "stds": [round(float(v), 4) for v in stds[:PCS]],
         "samples": [[round(float(v), 2) for v in row] for row in samples],
     }
     with open(os.path.join(OUT_MODELS, "dog_data.json"), "w") as f:
@@ -178,7 +182,7 @@ def main():
     with torch.no_grad():
         x = data[:8].float() / 255.0
         rec = dec(enc(x))
-        avg = wrapper(torch.zeros(1, LATENT))
+        avg = wrapper(torch.zeros(1, PCS))
     grid = Image.new("RGB", (8 * IMG, 3 * IMG))
     for i in range(8):
         grid.paste(Image.fromarray((x[i].permute(1, 2, 0).numpy() * 255).astype(np.uint8)), (i * IMG, 0))

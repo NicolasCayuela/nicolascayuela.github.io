@@ -315,8 +315,8 @@
                             font-weight:700; padding:.3rem .4rem .35rem; }
                     </style>
                     <p class="small text-muted mx-1 mb-3">
-                        <span class="lang-en">A convolutional <strong>autoencoder</strong> (PyTorch) was trained on AFHQ dog faces, then <strong>PCA</strong> was run on the latent codes, giving a 256-dimensional latent space. Each slider moves along one principal component (the first ones matter most); the decoder runs live in your browser and redraws the dog. <em>Double-click a slider to reset it.</em></span>
-                        <span class="lang-fr">Un <strong>auto-encodeur</strong> convolutif (PyTorch) a été entraîné sur des visages de chiens (AFHQ), puis une <strong>ACP</strong> a été appliquée aux codes latents, donnant un espace latent à 256 dimensions. Chaque curseur se déplace le long d'une composante principale (les premières comptent le plus) ; le décodeur tourne en direct dans ton navigateur et redessine le chien. <em>Double-clique sur un curseur pour le remettre à zéro.</em></span>
+                        <span class="lang-en">A convolutional <strong>autoencoder</strong> (PyTorch) was trained on AFHQ dog faces, then <strong>PCA</strong> was run on the latent codes; the sliders control the top 64 principal components. Each slider moves along one component (the first ones matter most); the decoder runs live in your browser and redraws the dog. <em>Double-click a slider to reset it.</em></span>
+                        <span class="lang-fr">Un <strong>auto-encodeur</strong> convolutif (PyTorch) a été entraîné sur des visages de chiens (AFHQ), puis une <strong>ACP</strong> a été appliquée aux codes latents ; les curseurs contrôlent les 64 premières composantes principales. Chaque curseur se déplace le long d'une composante (les premières comptent le plus) ; le décodeur tourne en direct dans ton navigateur et redessine le chien. <em>Double-clique sur un curseur pour le remettre à zéro.</em></span>
                     </p>
                     <div class="d-flex flex-wrap justify-content-center" style="gap:1.2rem;">
                         <!-- left: sliders -->
@@ -373,9 +373,10 @@
                                 <span class="lang-en">Denoising steps (DDIM)</span><span class="lang-fr">Étapes de débruitage (DDIM)</span>
                             </div>
                             <div class="small" style="line-height:1.8;">
-                                <label class="mb-0 d-block"><input type="radio" name="ddpm-steps" value="10"> 10 <span class="text-muted">(<span class="lang-en">fast, rough</span><span class="lang-fr">rapide, grossier</span>)</span></label>
-                                <label class="mb-0 d-block"><input type="radio" name="ddpm-steps" value="25" checked> 25</label>
-                                <label class="mb-0 d-block"><input type="radio" name="ddpm-steps" value="50"> 50 <span class="text-muted">(<span class="lang-en">slow, best</span><span class="lang-fr">lent, meilleur</span>)</span></label>
+                                <label class="mb-0 d-block"><input type="radio" name="ddpm-steps" value="25"> 25 <span class="text-muted">(<span class="lang-en">fast, rough</span><span class="lang-fr">rapide, grossier</span>)</span></label>
+                                <label class="mb-0 d-block"><input type="radio" name="ddpm-steps" value="50"> 50</label>
+                                <label class="mb-0 d-block"><input type="radio" name="ddpm-steps" value="100" checked> 100</label>
+                                <label class="mb-0 d-block"><input type="radio" name="ddpm-steps" value="250"> 250 <span class="text-muted">(<span class="lang-en">slow, best</span><span class="lang-fr">lent, meilleur</span>)</span></label>
                             </div>
                         </div>
                     </div>
@@ -432,5 +433,5 @@
 <script src="{{ '/assets/js/gradient-descent.js' | relative_url }}?v=13"></script>
 <script src="{{ '/assets/js/cifar.js' | relative_url }}?v=8"></script>
 <script src="{{ '/assets/js/dog-creator.js' | relative_url }}?v=2"></script>
-<script src="{{ '/assets/js/dog-diffusion.js' | relative_url }}?v=1"></script>
+<script src="{{ '/assets/js/dog-diffusion.js' | relative_url }}?v=2"></script>
 <script src="{{ '/assets/js/style-transfer.js' | relative_url }}?v=2"></script>
