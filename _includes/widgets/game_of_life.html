@@ -404,10 +404,18 @@
                         <button data-style="candy-9" class="btn btn-sm btn-outline-dark">Candy</button>
                         <button data-style="mosaic-9" class="btn btn-sm btn-outline-dark">Mosaic</button>
                         <button data-style="udnie-9" class="btn btn-sm btn-outline-dark">Udnie</button>
+                        <button data-style="pointilism-9" class="btn btn-sm btn-outline-dark">Pointilism</button>
                         <label class="btn btn-sm btn-outline-secondary mb-0 ml-2">
                             <i class="fas fa-upload"></i> <span class="lang-en">Upload image</span><span class="lang-fr">Charger une image</span>
                             <input id="style-file" type="file" accept="image/*" style="display:none;">
                         </label>
+                    </div>
+                    <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.5rem;">
+                        <label class="small text-muted mb-0">
+                            <span class="lang-en">Intensity</span><span class="lang-fr">Intensité</span>
+                            <input id="style-strength" type="range" min="10" max="100" value="100" style="vertical-align:middle; width:140px;">
+                        </label>
+                        <span id="style-strength-val" class="small text-muted">100%</span>
                     </div>
                     <div class="d-flex flex-wrap align-items-start" style="gap:1.2rem;">
                         <div class="text-center">
@@ -433,4 +441,4 @@
 <script src="{{ '/assets/js/cifar.js' | relative_url }}?v=8"></script>
 <script src="{{ '/assets/js/dog-creator.js' | relative_url }}?v=2"></script>
 <script src="{{ '/assets/js/dog-diffusion.js' | relative_url }}?v=1"></script>
-<script src="{{ '/assets/js/style-transfer.js' | relative_url }}?v=1"></script>
+<script src="{{ '/assets/js/style-transfer.js' | relative_url }}?v=2"></script>

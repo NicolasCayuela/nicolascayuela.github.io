@@ -20,6 +20,7 @@
   var curStyle = "rain-princess-9";
   var srcImage = null;                  // current content image (Image element)
   var busy = false, ortLoaded = false;
+  var lastStyled = null, lastSrcPx = null;   // cached last result for re-blending
   var statusEl = document.getElementById("style-status");
 
   function setStatus(en, fr) {
@@ -69,6 +70,7 @@
       var tctx = tmp.getContext("2d");
       tctx.drawImage(srcC, 0, 0, SIZE, SIZE);
       var px = tctx.getImageData(0, 0, SIZE, SIZE).data;
+      lastSrcPx = px;
       var plane = SIZE * SIZE;
       var input = new Float32Array(3 * plane);    // CHW, RGB in [0,255]
       for (var k = 0; k < plane; k++) {
@@ -79,27 +81,42 @@
       var tensor = new window.ort.Tensor("float32", input, [1, 3, SIZE, SIZE]);
       return session.run({ input1: tensor });
     }).then(function (out) {
-      var d = out.output1.data, plane = SIZE * SIZE;
-      var tmp = document.createElement("canvas");
-      tmp.width = SIZE; tmp.height = SIZE;
-      var tctx = tmp.getContext("2d");
-      var img = tctx.createImageData(SIZE, SIZE);
-      for (var k = 0; k < plane; k++) {
-        img.data[4 * k] = Math.max(0, Math.min(255, Math.round(d[k])));
-        img.data[4 * k + 1] = Math.max(0, Math.min(255, Math.round(d[plane + k])));
-        img.data[4 * k + 2] = Math.max(0, Math.min(255, Math.round(d[2 * plane + k])));
-        img.data[4 * k + 3] = 255;
-      }
-      tctx.putImageData(img, 0, 0);
-      outCtx.imageSmoothingEnabled = true;
-      outCtx.clearRect(0, 0, outC.width, outC.height);
-      outCtx.drawImage(tmp, 0, 0, outC.width, outC.height);
+      lastStyled = out.output1.data;
+      drawBlend();
       setStatus("", "");
       busy = false;
     }).catch(function (e) {
       busy = false;
       setStatus("Failed: " + e, "Échec : " + e);
     });
+  }
+
+  function strength() {
+    var el = document.getElementById("style-strength");
+    return el ? parseInt(el.value, 10) / 100 : 1;
+  }
+
+  // blend the cached stylized output with the original at the chosen intensity
+  function drawBlend() {
+    if (!lastStyled || !lastSrcPx) return;
+    var a = strength(), plane = SIZE * SIZE;
+    var tmp = document.createElement("canvas");
+    tmp.width = SIZE; tmp.height = SIZE;
+    var tctx = tmp.getContext("2d");
+    var img = tctx.createImageData(SIZE, SIZE);
+    for (var k = 0; k < plane; k++) {
+      var r = a * lastStyled[k] + (1 - a) * lastSrcPx[4 * k];
+      var g = a * lastStyled[plane + k] + (1 - a) * lastSrcPx[4 * k + 1];
+      var b = a * lastStyled[2 * plane + k] + (1 - a) * lastSrcPx[4 * k + 2];
+      img.data[4 * k] = Math.max(0, Math.min(255, Math.round(r)));
+      img.data[4 * k + 1] = Math.max(0, Math.min(255, Math.round(g)));
+      img.data[4 * k + 2] = Math.max(0, Math.min(255, Math.round(b)));
+      img.data[4 * k + 3] = 255;
+    }
+    tctx.putImageData(img, 0, 0);
+    outCtx.imageSmoothingEnabled = true;
+    outCtx.clearRect(0, 0, outC.width, outC.height);
+    outCtx.drawImage(tmp, 0, 0, outC.width, outC.height);
   }
 
   function setImageFromURL(url) {
@@ -120,6 +137,13 @@
       });
     })(styleBtns[i]);
   }
+
+  var strengthIn = document.getElementById("style-strength");
+  if (strengthIn) strengthIn.addEventListener("input", function () {
+    var lab = document.getElementById("style-strength-val");
+    if (lab) lab.textContent = strengthIn.value + "%";
+    drawBlend();                                 // re-blend cached result, no re-run
+  });
 
   var fileIn = document.getElementById("style-file");
   if (fileIn) fileIn.addEventListener("change", function () {
