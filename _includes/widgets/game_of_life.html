@@ -115,8 +115,8 @@
                 <!-- ============ Symmetry groups (1D, 2D) ============ -->
                 <div id="sym-area" class="d-none">
                     <p class="small text-muted mx-1 mb-3">
-                        <span class="lang-en">Draw in the white area and watch your strokes mirrored, rotated and tiled in real time. Choose one of the <strong>17 wallpaper groups</strong> or <strong>7 frieze groups</strong>, then design your own kaleidoscopic tiling. Or pick the <strong>aperiodic hat monotile</strong> (the 2023 "einstein" tile): draw inside the highlighted tile and your strokes are copied into every hat of a tiling that never repeats.</span>
-                        <span class="lang-fr">Dessine dans la zone blanche et regarde tes traits réfléchis, tournés et pavés en temps réel. Choisis l'un des <strong>17 groupes de papier peint</strong> ou des <strong>7 groupes de frise</strong>, puis compose ton propre pavage kaléidoscopique. Ou choisis la <strong>monotuile apériodique hat</strong> (la tuile « einstein » de 2023) : dessine dans la tuile surlignée et tes traits sont copiés dans chaque hat d'un pavage qui ne se répète jamais.</span>
+                        <span class="lang-en">Draw in the white area and watch your strokes mirrored, rotated and tiled in real time. Choose one of the <strong>17 wallpaper groups</strong> or <strong>7 frieze groups</strong>, then design your own kaleidoscopic tiling.</span>
+                        <span class="lang-fr">Dessine dans la zone blanche et regarde tes traits réfléchis, tournés et pavés en temps réel. Choisis l'un des <strong>17 groupes de papier peint</strong> ou des <strong>7 groupes de frise</strong>, puis compose ton propre pavage kaléidoscopique.</span>
                     </p>
 
                     <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.5rem;">
@@ -153,11 +153,6 @@
                                 <div><label class="mb-0"><input type="radio" name="sym-group" value="p31m"> p31m</label></div>
                                 <div class="mt-2"><label class="mb-0"><input type="radio" name="sym-group" value="p6"> p6</label></div>
                                 <div><label class="mb-0"><input type="radio" name="sym-group" value="p6m"> p6m</label></div>
-
-                                <div class="font-weight-bold mt-3 mb-1">
-                                    <span class="lang-en">Aperiodic monotile</span><span class="lang-fr">Monotuile apériodique</span>
-                                </div>
-                                <div><label class="mb-0"><input type="radio" name="sym-group" value="hat"> <span class="lang-en">hat (einstein)</span><span class="lang-fr">hat (einstein)</span></label></div>
 
                                 <div class="font-weight-bold mt-3 mb-1">
                                     <span class="lang-en">Frieze Symmetry</span><span class="lang-fr">Symétrie de frise</span>
@@ -391,8 +386,8 @@
                      data-base="{{ '/assets/models/style/' | relative_url }}"
                      data-sample="{{ '/assets/images/style_sample.jpg' | relative_url }}?v=2">
                     <p class="small text-muted mx-1 mb-3">
-                        <span class="lang-en"><strong>Neural style transfer</strong>: a feed-forward network (Johnson et al., trained with PyTorch) repaints your photo in the style of a painting - Van Gogh-like swirls, mosaics, watercolours. Pick a style, upload an image (it stays in your browser) and the network runs live with ONNX.</span>
-                        <span class="lang-fr"><strong>Transfert de style neuronal</strong> : un réseau feed-forward (Johnson et al., entraîné avec PyTorch) repeint ta photo dans le style d'un tableau - tourbillons à la Van Gogh, mosaïques, aquarelles. Choisis un style, charge une image (elle reste dans ton navigateur) et le réseau tourne en direct avec ONNX.</span>
+                        <span class="lang-en"><strong>Neural style transfer</strong>: a feed-forward network (<a href="https://arxiv.org/abs/1603.08155" target="_blank" rel="noopener">Johnson et al.</a>, trained with PyTorch) repaints your photo in the style of a painting - Van Gogh-like swirls, mosaics, watercolours. Pick a style, upload an image (it stays in your browser) and the network runs live with ONNX.</span>
+                        <span class="lang-fr"><strong>Transfert de style neuronal</strong> : un réseau feed-forward (<a href="https://arxiv.org/abs/1603.08155" target="_blank" rel="noopener">Johnson et al.</a>, entraîné avec PyTorch) repeint ta photo dans le style d'un tableau - tourbillons à la Van Gogh, mosaïques, aquarelles. Choisis un style, charge une image (elle reste dans ton navigateur) et le réseau tourne en direct avec ONNX.</span>
                     </p>
                     <div class="d-flex flex-wrap align-items-center mb-3" style="gap:.4rem;">
                         <span class="small text-muted mr-1"><span class="lang-en">Style:</span><span class="lang-fr">Style&nbsp;:</span></span>
@@ -433,7 +428,7 @@
 </div>
 
 <script src="{{ '/assets/js/game-of-life.js' | relative_url }}?v=13"></script>
-<script src="{{ '/assets/js/symmetry.js' | relative_url }}?v=7"></script>
+<script src="{{ '/assets/js/symmetry.js' | relative_url }}?v=8"></script>
 <script src="{{ '/assets/js/gradient-descent.js' | relative_url }}?v=13"></script>
 <script src="{{ '/assets/js/cifar.js' | relative_url }}?v=8"></script>
 <script src="{{ '/assets/js/dog-creator.js' | relative_url }}?v=2"></script>
