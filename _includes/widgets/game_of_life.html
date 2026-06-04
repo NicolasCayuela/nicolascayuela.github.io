@@ -287,35 +287,71 @@
 
                 <!-- ============ Dog Creator (autoencoder + PCA latent space) ============ -->
                 <div id="dog-area" class="d-none" data-base="{{ '/assets/models/' | relative_url }}">
+                    <style>
+                        #dog-area .dg-panel { background:#f8f9fb; border:1px solid #e9ecf2; border-radius:12px; }
+                        #dog-area .dg-sliders { flex:0 0 300px; max-height:480px; overflow-y:auto; padding:.6rem .7rem; }
+                        #dog-area .dg-sliders::-webkit-scrollbar { width:7px; }
+                        #dog-area .dg-sliders::-webkit-scrollbar-thumb { background:#cfd6e0; border-radius:4px; }
+                        #dog-area .dg-row { display:flex; align-items:center; gap:.5rem; padding:.14rem .4rem; border-radius:7px; }
+                        #dog-area .dg-row:hover { background:#eef2f8; }
+                        #dog-area .dg-lab { width:3.1rem; font-size:.68rem; color:#7a8497; font-weight:600; flex-shrink:0; }
+                        #dog-area .dg-val { width:2.9rem; font-size:.66rem; text-align:right; color:#aab2bf; font-variant-numeric:tabular-nums; flex-shrink:0; }
+                        #dog-area .dg-val.on { color:#1c54e5; font-weight:700; }
+                        #dog-area .dg-row input[type=range] { -webkit-appearance:none; appearance:none; width:100%; height:4px;
+                            background:#e1e6ee; border-radius:2px; outline:none; margin:0; }
+                        #dog-area .dg-row input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; appearance:none;
+                            width:13px; height:13px; border-radius:50%; background:#1c54e5; border:2px solid #fff;
+                            box-shadow:0 1px 4px rgba(20,40,90,.35); cursor:pointer; }
+                        #dog-area .dg-row input[type=range]::-moz-range-thumb { width:13px; height:13px; border-radius:50%;
+                            background:#1c54e5; border:2px solid #fff; box-shadow:0 1px 4px rgba(20,40,90,.35); cursor:pointer; }
+                        #dog-area .dg-canvas { border-radius:14px; box-shadow:0 6px 22px rgba(25,40,80,.18); width:288px; height:288px;
+                            image-rendering:auto; background:#fff; }
+                        #dog-area .dg-hist { display:flex; gap:.4rem; margin-top:.7rem; flex-wrap:wrap; justify-content:center; min-height:48px; }
+                        #dog-area .dg-hist img { width:46px; height:46px; border-radius:8px; cursor:pointer;
+                            border:2px solid transparent; transition:transform .12s, border-color .12s; }
+                        #dog-area .dg-hist img:hover { transform:scale(1.12); border-color:#1c54e5; }
+                        #dog-area .dg-controls { min-width:205px; }
+                        #dog-area .dg-controls .btn { border-radius:20px; }
+                        #dog-area .dg-switch { display:flex; align-items:center; gap:.45rem; font-size:.78rem; color:#566075;
+                            margin-bottom:.8rem; cursor:pointer; user-select:none; }
+                        #dog-area .dg-head { font-size:.7rem; letter-spacing:.08em; text-transform:uppercase; color:#9aa3b2;
+                            font-weight:700; padding:.3rem .4rem .35rem; }
+                    </style>
                     <p class="small text-muted mx-1 mb-3">
-                        <span class="lang-en">A convolutional <strong>autoencoder</strong> (PyTorch) was trained on AFHQ dog faces, then <strong>PCA</strong> was run on the latent codes, giving a 256-dimensional latent space. Each slider moves along one principal component (the first ones matter most); the decoder runs live in your browser and redraws the dog. Try random dogs or come back to the average dog.</span>
-                        <span class="lang-fr">Un <strong>auto-encodeur</strong> convolutif (PyTorch) a été entraîné sur des visages de chiens (AFHQ), puis une <strong>ACP</strong> a été appliquée aux codes latents, donnant un espace latent à 256 dimensions. Chaque curseur se déplace le long d'une composante principale (les premières comptent le plus) ; le décodeur tourne en direct dans ton navigateur et redessine le chien. Essaie des chiens aléatoires ou reviens au chien moyen.</span>
+                        <span class="lang-en">A convolutional <strong>autoencoder</strong> (PyTorch) was trained on AFHQ dog faces, then <strong>PCA</strong> was run on the latent codes, giving a 256-dimensional latent space. Each slider moves along one principal component (the first ones matter most); the decoder runs live in your browser and redraws the dog. <em>Double-click a slider to reset it.</em></span>
+                        <span class="lang-fr">Un <strong>auto-encodeur</strong> convolutif (PyTorch) a été entraîné sur des visages de chiens (AFHQ), puis une <strong>ACP</strong> a été appliquée aux codes latents, donnant un espace latent à 256 dimensions. Chaque curseur se déplace le long d'une composante principale (les premières comptent le plus) ; le décodeur tourne en direct dans ton navigateur et redessine le chien. <em>Double-clique sur un curseur pour le remettre à zéro.</em></span>
                     </p>
-                    <div class="d-flex flex-wrap" style="gap:1rem;">
+                    <div class="d-flex flex-wrap justify-content-center" style="gap:1.2rem;">
                         <!-- left: sliders -->
-                        <div id="dog-sliders" style="flex:0 0 280px; max-height:420px; overflow-y:auto; display:grid; grid-template-columns:1fr 1fr; gap:.35rem .7rem; border:1px solid #eee; border-radius:4px; padding:.5rem;"></div>
-                        <!-- center: dog -->
+                        <div class="dg-panel dg-sliders" id="dog-sliders-wrap">
+                            <div class="dg-head">
+                                <span class="lang-en">Principal components</span><span class="lang-fr">Composantes principales</span>
+                            </div>
+                            <div id="dog-sliders"></div>
+                        </div>
+                        <!-- center: dog + history -->
                         <div class="text-center">
-                            <canvas id="dog-canvas" width="256" height="256" style="border:1px solid #ccc; border-radius:4px; width:256px; height:256px;"></canvas>
-                            <div id="dog-status" class="small text-muted mt-1">&nbsp;</div>
+                            <canvas id="dog-canvas" class="dg-canvas" width="288" height="288"></canvas>
+                            <div id="dog-status" class="small text-muted mt-2">&nbsp;</div>
+                            <div id="dog-history" class="dg-hist"></div>
                         </div>
                         <!-- right: controls -->
-                        <div style="min-width:190px;">
-                            <label class="small mb-2 d-block">
+                        <div class="dg-controls">
+                            <label class="dg-switch mb-3">
                                 <input id="dog-live" type="checkbox" checked>
                                 <span class="lang-en">Render on change</span><span class="lang-fr">Rendu en continu</span>
                             </label>
-                            <button id="dog-render" class="btn btn-sm btn-outline-dark d-block mb-2">
-                                <span class="lang-en">Render</span><span class="lang-fr">Rendu</span>
-                            </button>
-                            <button id="dog-random" class="btn btn-sm btn-outline-dark d-block mb-2">
+                            <button id="dog-random" class="btn btn-sm btn-dark btn-block mb-2">
                                 <i class="fas fa-dice"></i> <span class="lang-en">Random Dog</span><span class="lang-fr">Chien aléatoire</span>
                             </button>
-                            <button id="dog-random-ds" class="btn btn-sm btn-outline-dark d-block mb-2">
+                            <button id="dog-random-ds" class="btn btn-sm btn-outline-dark btn-block mb-2">
                                 <i class="fas fa-database"></i> <span class="lang-en">Random Dog (From Dataset)</span><span class="lang-fr">Chien aléatoire (du dataset)</span>
                             </button>
-                            <button id="dog-avg" class="btn btn-sm btn-outline-dark d-block mb-2">
+                            <button id="dog-avg" class="btn btn-sm btn-outline-dark btn-block mb-2">
                                 <i class="fas fa-undo"></i> <span class="lang-en">Return to Average Dog</span><span class="lang-fr">Retour au chien moyen</span>
+                            </button>
+                            <button id="dog-render" class="btn btn-sm btn-outline-secondary btn-block mb-2">
+                                <i class="fas fa-sync"></i> <span class="lang-en">Render</span><span class="lang-fr">Rendu</span>
                             </button>
                         </div>
                     </div>
@@ -389,6 +425,6 @@
 <script src="{{ '/assets/js/symmetry.js' | relative_url }}?v=7"></script>
 <script src="{{ '/assets/js/gradient-descent.js' | relative_url }}?v=13"></script>
 <script src="{{ '/assets/js/cifar.js' | relative_url }}?v=7"></script>
-<script src="{{ '/assets/js/dog-creator.js' | relative_url }}?v=1"></script>
+<script src="{{ '/assets/js/dog-creator.js' | relative_url }}?v=2"></script>
 <script src="{{ '/assets/js/dog-diffusion.js' | relative_url }}?v=1"></script>
 <script src="{{ '/assets/js/style-transfer.js' | relative_url }}?v=1"></script>

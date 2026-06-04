@@ -43,29 +43,42 @@
     });
   }
 
+  var valChips = [];
+  function chipText(i) {
+    var sig = meta.stds[i] > 1e-8 ? coords[i] / meta.stds[i] : 0;
+    valChips[i].textContent = (sig >= 0 ? "+" : "") + sig.toFixed(1) + "σ";
+    valChips[i].className = Math.abs(sig) > 0.05 ? "dg-val on" : "dg-val";
+  }
+
   function buildSliders() {
     var wrap = document.getElementById("dog-sliders");
     if (!wrap) return;
     wrap.innerHTML = "";
     for (var i = 0; i < N; i++) {
       (function (i) {
-        var div = document.createElement("div");
-        div.className = "dog-slider";
-        var lab = document.createElement("div");
-        lab.className = "small text-center";
-        lab.style.lineHeight = "1.1";
-        lab.textContent = "PC #" + (i + 1);
+        var row = document.createElement("div");
+        row.className = "dg-row";
+        var lab = document.createElement("span");
+        lab.className = "dg-lab";
+        lab.textContent = "PC " + (i + 1);
         var inp = document.createElement("input");
         inp.type = "range"; inp.min = "-300"; inp.max = "300"; inp.value = "0";
-        inp.style.width = "100%";
+        var val = document.createElement("span");
+        val.className = "dg-val";
+        val.textContent = "+0.0σ";
         inp.addEventListener("input", function () {
           coords[i] = (parseFloat(inp.value) / 100) * meta.stds[i];
+          chipText(i);
           var live = document.getElementById("dog-live");
           if (live && live.checked) requestRender();
         });
-        div.appendChild(lab); div.appendChild(inp);
-        wrap.appendChild(div);
+        inp.addEventListener("dblclick", function () {     // reset one component
+          inp.value = "0"; coords[i] = 0; chipText(i); requestRender();
+        });
+        row.appendChild(lab); row.appendChild(inp); row.appendChild(val);
+        wrap.appendChild(row);
         sliders.push(inp);
+        valChips.push(val);
       })(i);
     }
   }
@@ -74,8 +87,29 @@
     for (var i = 0; i < N; i++) {
       var v = meta.stds[i] > 1e-8 ? (coords[i] / meta.stds[i]) * 100 : 0;
       sliders[i].value = Math.max(-300, Math.min(300, Math.round(v)));
+      chipText(i);
     }
   }
+
+  // ---- history of generated dogs ----
+  var history = [];
+  function addHistory() {
+    var snap = { coords: coords.slice(), url: off.toDataURL() };
+    history.unshift(snap);
+    if (history.length > 8) history.pop();
+    var box = document.getElementById("dog-history");
+    if (!box) return;
+    box.innerHTML = "";
+    history.forEach(function (h) {
+      var im = document.createElement("img");
+      im.src = h.url;
+      im.addEventListener("click", function () {
+        coords.set(h.coords); syncSliders(); requestRender();
+      });
+      box.appendChild(im);
+    });
+  }
+  var histPending = false;
 
   var rendering = false, pending = false;
   function requestRender() {
@@ -101,6 +135,7 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(off, 0, 0, canvas.width, canvas.height);
       rendering = false;
+      if (histPending && !pending) { histPending = false; addHistory(); }
       if (pending) { pending = false; render(); }
     }).catch(function (e) {
       rendering = false;
@@ -132,7 +167,7 @@
 
   // ---- buttons ----
   function on(id, fn) { var el = document.getElementById(id); if (el) el.addEventListener("click", fn); }
-  on("dog-render", function () { requestRender(); });
+  on("dog-render", function () { histPending = true; requestRender(); });
   on("dog-avg", function () {
     if (!ready) return;
     coords.fill(0); syncSliders(); requestRender();
@@ -140,13 +175,13 @@
   on("dog-random", function () {
     if (!ready) return;
     for (var i = 0; i < N; i++) coords[i] = randn() * meta.stds[i] * 0.85;
-    syncSliders(); requestRender();
+    syncSliders(); histPending = true; requestRender();
   });
   on("dog-random-ds", function () {
     if (!ready || !meta.samples || !meta.samples.length) return;
     var row = meta.samples[Math.floor(Math.random() * meta.samples.length)];
     for (var i = 0; i < N; i++) coords[i] = row[i];
-    syncSliders(); requestRender();
+    syncSliders(); histPending = true; requestRender();
   });
 
   // lazy init when the tab becomes visible (called from game-of-life.js)
