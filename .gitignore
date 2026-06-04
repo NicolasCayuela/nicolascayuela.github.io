@@ -28,3 +28,5 @@ scripts/dog_ae.pt
 scripts/dog_preview.png
 scripts/dog_ddpm.pt
 scripts/dog_ddpm_preview.png
+scripts/starry_night_pretrained.pth
+scripts/starry_night_test.png
