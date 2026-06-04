@@ -23,7 +23,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 CACHE = os.path.join(HERE, "afhq_cache")
 OUT_MODELS = os.path.join(HERE, "..", "assets", "models")
 IMG = 32
-EPOCHS = 60
+EPOCHS = 600
 BATCH = 128
 TSTEPS = 1000
 DOG_LABEL = 1                 # huggan/AFHQ: cat=0, dog=1, wild=2
@@ -143,6 +143,8 @@ def main():
         for b in range(0, n, BATCH):
             idx = perm[b:b + BATCH]
             x0 = data[idx].float() / 127.5 - 1.0     # [-1, 1]
+            flip = torch.rand(x0.shape[0]) < 0.5     # horizontal-flip augmentation
+            x0[flip] = x0[flip].flip(-1)
             t = torch.randint(0, TSTEPS, (x0.shape[0],))
             eps = torch.randn_like(x0)
             xt = sqrt_acp[t, None, None, None] * x0 + sqrt_1macp[t, None, None, None] * eps

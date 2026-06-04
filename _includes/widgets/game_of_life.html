@@ -278,6 +278,14 @@
                                     data-json="{{ '/assets/images/cifar/cifar_data.json' | relative_url }}?v=2"
                                     style="border:1px solid #ccc; border-radius:4px; touch-action:none; cursor:grab;"></canvas>
                         </div>
+                        <div style="min-width:150px;">
+                            <div class="small font-weight-bold mb-1" style="font-variant-numeric:tabular-nums;">z&nbsp;∈&nbsp;ℝ⁸</div>
+                            <div id="cifar-vec"></div>
+                            <div class="small text-muted mt-2" style="max-width:170px;">
+                                <span class="lang-en">latent vector of the selected point</span>
+                                <span class="lang-fr">vecteur latent du point sélectionné</span>
+                            </div>
+                        </div>
                     </div>
                     <p class="small text-muted mt-3 mb-0">
                         <span class="lang-en">100 classes, 10 images each - each colour is one class; the class name appears under the image.</span>
@@ -424,7 +432,7 @@
 <script src="{{ '/assets/js/game-of-life.js' | relative_url }}?v=13"></script>
 <script src="{{ '/assets/js/symmetry.js' | relative_url }}?v=7"></script>
 <script src="{{ '/assets/js/gradient-descent.js' | relative_url }}?v=13"></script>
-<script src="{{ '/assets/js/cifar.js' | relative_url }}?v=7"></script>
+<script src="{{ '/assets/js/cifar.js' | relative_url }}?v=8"></script>
 <script src="{{ '/assets/js/dog-creator.js' | relative_url }}?v=2"></script>
 <script src="{{ '/assets/js/dog-diffusion.js' | relative_url }}?v=1"></script>
 <script src="{{ '/assets/js/style-transfer.js' | relative_url }}?v=1"></script>

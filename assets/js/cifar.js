@@ -160,6 +160,57 @@
     if (bi !== nearest) { nearest = bi; drawImg(); }
   }
 
+  // ---- latent vector display: fixed random projection R^3 -> R^8 of the
+  // point's 3D position, so nearby points show similar vectors ----
+  var VDIM = 8, VW = [], vecRows = null;
+  (function () {
+    var rnd = mulberry32(11);
+    for (var k = 0; k < VDIM; k++) {
+      VW.push([2 * rnd() - 1, 2 * rnd() - 1, 2 * rnd() - 1, 0.6 * rnd() - 0.3]); // wx,wy,wz,b
+    }
+  })();
+  function buildVecRows() {
+    var box = document.getElementById("cifar-vec");
+    if (!box) return;
+    box.innerHTML = "";
+    vecRows = [];
+    for (var k = 0; k < VDIM; k++) {
+      var row = document.createElement("div");
+      row.style.cssText = "display:flex;align-items:center;gap:.4rem;margin-bottom:3px;";
+      var barBox = document.createElement("div");
+      barBox.style.cssText = "position:relative;width:84px;height:9px;background:#eef1f6;border-radius:4px;overflow:hidden;flex-shrink:0;";
+      var bar = document.createElement("div");
+      bar.style.cssText = "position:absolute;top:0;height:100%;border-radius:4px;";
+      barBox.appendChild(bar);
+      var num = document.createElement("span");
+      num.style.cssText = "font-size:.68rem;color:#566075;font-variant-numeric:tabular-nums;min-width:3rem;";
+      row.appendChild(barBox); row.appendChild(num);
+      box.appendChild(row);
+      vecRows.push({ bar: bar, num: num });
+    }
+  }
+  function updateVec() {
+    if (!vecRows) buildVecRows();
+    if (!vecRows) return;
+    var p = pts[nearest];
+    for (var k = 0; k < VDIM; k++) {
+      var w = VW[k];
+      var v = w[0] * p.x + w[1] * p.y + w[2] * p.z + w[3];
+      var frac = Math.max(-1, Math.min(1, v / 1.2));     // bar scale
+      var half = 42;                                      // px, half of bar box
+      if (frac >= 0) {
+        vecRows[k].bar.style.left = half + "px";
+        vecRows[k].bar.style.width = (frac * half) + "px";
+        vecRows[k].bar.style.background = "#1c54e5";
+      } else {
+        vecRows[k].bar.style.left = (half + frac * half) + "px";
+        vecRows[k].bar.style.width = (-frac * half) + "px";
+        vecRows[k].bar.style.background = "#f57c00";
+      }
+      vecRows[k].num.textContent = (v >= 0 ? "+" : "") + v.toFixed(2);
+    }
+  }
+
   function drawImg() {
     if (!ready) return;
     var it = data.items[nearest], T = data.thumb;
@@ -169,6 +220,7 @@
     ictx.drawImage(sprite, it.g * T, it.r * T, T, T, 0, 0, L, L);
     var label = document.getElementById("cifar-label");
     if (label) label.textContent = data.classes[it.c].replace(/_/g, " ");
+    updateVec();
   }
 
   function tick() {
