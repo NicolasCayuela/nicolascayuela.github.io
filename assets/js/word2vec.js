@@ -54,7 +54,7 @@
     canvas.width = SIZE * DPR; canvas.height = SIZE * DPR;
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   }
-  var CAM = 2.8, FOV = 1.6;
+  var CAM = 2.8, FOV = 1.6, zoom = 1;
   function project(p) {
     var cy = Math.cos(yaw), sy = Math.sin(yaw);
     var cp = Math.cos(pitch), sp = Math.sin(pitch);
@@ -62,7 +62,7 @@
     var z1 = -p[0] * sy + p[2] * cy;
     var y = p[1] * cp - z1 * sp;
     var z = p[1] * sp + z1 * cp;
-    var s = FOV / (CAM - z);
+    var s = zoom * FOV / (CAM - z);
     return { sx: SIZE * (0.5 + x * s), sy: SIZE * (0.5 - y * s), z: z };
   }
   function render() {
@@ -115,7 +115,30 @@
     lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
     render();
   }, { passive: false });
-  canvas.addEventListener("touchend", function () { dragging = false; });
+  canvas.addEventListener("touchend", function () { dragging = false; pinchDist = 0; });
+
+  // ---- zoom: mouse wheel + two-finger pinch ----
+  function setZoom(z) { zoom = Math.max(0.5, Math.min(6, z)); render(); }
+  canvas.addEventListener("wheel", function (e) {
+    e.preventDefault();
+    setZoom(zoom * (e.deltaY < 0 ? 1.12 : 1 / 1.12));
+  }, { passive: false });
+  var pinchDist = 0;
+  function dist2(t) {
+    var dx = t[0].clientX - t[1].clientX, dy = t[0].clientY - t[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+  canvas.addEventListener("touchstart", function (e) {
+    if (e.touches.length === 2) { e.preventDefault(); dragging = false; pinchDist = dist2(e.touches); }
+  }, { passive: false });
+  canvas.addEventListener("touchmove", function (e) {
+    if (e.touches.length === 2 && pinchDist > 0) {
+      e.preventDefault();
+      var d = dist2(e.touches);
+      setZoom(zoom * d / pinchDist);
+      pinchDist = d;
+    }
+  }, { passive: false });
 
   function lookup(w) {
     if (!w) return -1;

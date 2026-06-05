@@ -97,7 +97,7 @@
   }
 
   // rotate + perspective-project a 3D point to screen space
-  var CAM = 2.6, FOV = 1.9;
+  var CAM = 2.6, FOV = 1.9, zoom = 1;
   function project(p) {
     var cy = Math.cos(yaw), sy = Math.sin(yaw);
     var cp = Math.cos(pitch), sp = Math.sin(pitch);
@@ -105,7 +105,7 @@
     var z1 = -p.x * sy + p.z * cy;
     var y = p.y * cp - z1 * sp;
     var z = p.y * sp + z1 * cp;
-    var s = FOV / (CAM - z);
+    var s = zoom * FOV / (CAM - z);
     return { sx: SIZE * (0.5 + x * s), sy: SIZE * (0.5 - y * s), z: z, s: s };
   }
 
@@ -272,7 +272,30 @@
     lastX = p.cx; lastY = p.cy;
     pointer.x = p.x; pointer.y = p.y; pointer.active = true;
   }, { passive: false });
-  mapC.addEventListener("touchend", function () { dragging = false; });
+  mapC.addEventListener("touchend", function () { dragging = false; pinchDist = 0; });
+
+  // ---- zoom: mouse wheel + two-finger pinch ----
+  function setZoom(z) { zoom = Math.max(0.5, Math.min(5, z)); }
+  mapC.addEventListener("wheel", function (e) {
+    e.preventDefault();
+    setZoom(zoom * (e.deltaY < 0 ? 1.12 : 1 / 1.12));
+  }, { passive: false });
+  var pinchDist = 0;
+  function dist2(t) {
+    var dx = t[0].clientX - t[1].clientX, dy = t[0].clientY - t[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+  mapC.addEventListener("touchstart", function (e) {
+    if (e.touches.length === 2) { e.preventDefault(); dragging = false; pinchDist = dist2(e.touches); }
+  }, { passive: false });
+  mapC.addEventListener("touchmove", function (e) {
+    if (e.touches.length === 2 && pinchDist > 0) {
+      e.preventDefault();
+      var d = dist2(e.touches);
+      setZoom(zoom * d / pinchDist);
+      pinchDist = d;
+    }
+  }, { passive: false });
 
   var rt;
   window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(resize, 200); });
