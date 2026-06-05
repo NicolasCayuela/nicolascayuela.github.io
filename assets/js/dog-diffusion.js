@@ -64,7 +64,7 @@
   }
 
   function steps() {
-    return 25;                                 // fixed DDIM step count
+    return 60;                                 // fixed DDIM step count
   }
 
   function generate() {
