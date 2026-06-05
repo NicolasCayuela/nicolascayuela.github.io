@@ -241,14 +241,14 @@
     // ---- imaginary panel: gap loop + evanescent branch above the top band ----
     dctx.strokeStyle = "#c0392b"; dctx.lineWidth = 1.8;
     for (var sgn = -1; sgn <= 1; sgn += 2) {
-      // gap branches
+      // gap branches; break the path when ki diverges past the plot range
       dctx.beginPath();
       var st = false;
-      dctx.moveTo(kiToX(0), wToY(g[0]));
-      for (i = 0; i <= 120; i++) {
-        w = g[0] + (g[1] - g[0]) * i / 120;
+      for (i = 0; i <= 240; i++) {
+        w = g[0] + (g[1] - g[0]) * i / 240;
         var ki = (mech === "bragg" ? braggKi(w) : resKi(w)[1]) / (2 * Math.PI);
-        x = kiToX(sgn * Math.min(KIMAX, ki)); y = wToY(w);
+        if (ki > KIMAX) { st = false; continue; }   // off-scale: cut, no flat bridge
+        x = kiToX(sgn * ki); y = wToY(w);
         if (!st) { dctx.moveTo(x, y); st = true; } else dctx.lineTo(x, y);
       }
       dctx.stroke();
