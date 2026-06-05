@@ -41,6 +41,12 @@
       : "&nbsp;";
   }
 
+  function setProgress(on) {
+    var bar = document.getElementById("style-progress");
+    if (bar) bar.style.display = on ? "block" : "none";
+    outC.style.opacity = on ? "0.45" : "1";
+  }
+
   function loadScript(src) {
     return new Promise(function (res, rej) {
       if (window.ort) { res(); return; }
@@ -128,6 +134,7 @@
     if (!srcImage) return;
     if (busy) { queued = true; return; }
     busy = true;
+    setProgress(true);
     var run;
     if (cur.type === "adain") {
       run = loadScript(ORT_URL).then(function () {
@@ -152,9 +159,11 @@
       lastStyled = out.output1.data;
       drawBlend();
       setStatus("", "");
+      setProgress(false);
       busy = false;
       if (queued) { queued = false; stylize(); }
     }).catch(function (e) {
+      setProgress(false);
       busy = false;
       if (!wasmOnly) {
         // a kernel unsupported on WebGPU: drop cached sessions, retry on wasm

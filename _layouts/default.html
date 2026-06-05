@@ -3,14 +3,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    {% if page.url == "/" or page.url == "/index.html" %}
-    <title>Nicolas Cayuela - PhD Phononics &amp; Metamaterials | Machine Learning, GNN</title>
-    {% else %}
-    <title>{{ page.title }} - {{ site.data.profile.navbar_name }}</title>
-    {% endif %}
+    <meta name="google-site-verification" content="m5sSh23hfBna8Z26FSpuF8CZbxXyIUevnB4gykymYvo">
+    <title>{{ page.navbar_name | default: page.title }} - {{ site.data.profile.navbar_name }}</title>
     <meta name="description" content="{% if page.description %}{{ page.description }}{% else %}Nicolas Cayuela, PhD student at Institut Jean Lamour (Nancy, UMR CNRS 7198). Research on elastic metamaterials, phononic crystals and graph deep learning (GNN) for inverse design.{% endif %}">
     <link rel="canonical" href="https://nicolascayuela.github.io{{ page.url | replace: 'index.html', '' }}">
-    <meta property="og:title" content="{% if page.url == '/' %}Nicolas Cayuela - PhD Phononics & Metamaterials{% else %}{{ page.title }} - Nicolas Cayuela{% endif %}">
+    <meta property="og:title" content="{{ page.navbar_name | default: page.title }} - Nicolas Cayuela">
     <meta property="og:description" content="{% if page.description %}{{ page.description }}{% else %}PhD student in phononics and metamaterials at Institut Jean Lamour - elastic metamaterials, phononic crystals, GNN inverse design.{% endif %}">
     <meta property="og:url" content="https://nicolascayuela.github.io{{ page.url | replace: 'index.html', '' }}">
     <meta property="og:type" content="website">

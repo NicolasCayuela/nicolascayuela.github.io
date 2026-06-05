@@ -390,6 +390,14 @@
                     <style>
                         #style-area .st-thumb.active { outline:3px solid #1c54e5; outline-offset:1px; }
                         #style-area .st-thumb:hover { transform:scale(1.08); transition:transform .12s; }
+                        #style-area .st-progress { height:6px; background:#e8ecf3; border-radius:3px; overflow:hidden;
+                            max-width:280px; margin:.4rem auto 0; display:none; }
+                        #style-area .st-progress > span { display:block; height:100%; width:35%; border-radius:3px;
+                            background:linear-gradient(90deg,#1c54e5,#7aa0ff); animation:st-slide 1.1s ease-in-out infinite; }
+                        @keyframes st-slide {
+                            0% { margin-left:-35%; }
+                            100% { margin-left:100%; }
+                        }
                     </style>
                     <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.45rem;">
                         <span class="small text-muted mr-1"><span class="lang-en">Paintings:</span><span class="lang-fr">Tableaux&nbsp;:</span></span>
@@ -426,6 +434,7 @@
                         </div>
                         <div class="text-center">
                             <canvas id="style-out" width="280" height="280" style="border:1px solid #ccc; border-radius:4px; width:280px; height:280px; background:#eee;"></canvas>
+                            <div id="style-progress" class="st-progress"><span></span></div>
                             <div class="small text-muted mt-1"><span class="lang-en">stylized</span><span class="lang-fr">stylisée</span></div>
                         </div>
                     </div>
@@ -508,5 +517,5 @@
 <script src="{{ '/assets/js/cifar.js' | relative_url }}?v=9"></script>
 <script src="{{ '/assets/js/dog-creator.js' | relative_url }}?v=6"></script>
 <script src="{{ '/assets/js/dog-diffusion.js' | relative_url }}?v=6"></script>
-<script src="{{ '/assets/js/style-transfer.js' | relative_url }}?v=6"></script>
+<script src="{{ '/assets/js/style-transfer.js' | relative_url }}?v=7"></script>
 <script src="{{ '/assets/js/word2vec.js' | relative_url }}?v=5"></script>
