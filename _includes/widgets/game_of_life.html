@@ -417,15 +417,19 @@
                     </style>
                     <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.45rem;">
                         <span class="small text-muted mr-1"><span class="lang-en">Paintings:</span><span class="lang-fr">Tableaux&nbsp;:</span></span>
-                        <button data-style="starry-night" title="The Starry Night - Van Gogh" class="btn p-0 border st-thumb active"
+                        <button data-style="starry-night" title="The Starry Night - Van Gogh"
+                                data-name-en="The Starry Night - Van Gogh" data-name-fr="La Nuit étoilée - Van Gogh"
+                                class="btn p-0 border st-thumb active"
                                 style="width:46px; height:46px; overflow:hidden; border-radius:8px;">
                             <img src="{{ '/assets/images/styles/starry-night.jpg' | relative_url }}"
                                  alt="The Starry Night - Van Gogh" style="width:100%; height:100%; object-fit:cover;">
                         </button>
-                        {% assign adain_styles = "wave|The Great Wave - Hokusai,red-fuji|Red Fuji - Hokusai,hiroshige|Sudden Shower - Hiroshige,scream|The Scream - Munch,kandinsky|Composition VII - Kandinsky,monet|Water Lilies - Monet,cafe-terrace|Cafe Terrace at Night - Van Gogh,sunflowers|Sunflowers - Van Gogh,cezanne|Mont Sainte-Victoire - Cezanne,seurat|La Grande Jatte - Seurat,klimt|The Kiss - Klimt,mucha|Salon des Cent - Mucha,matisse|Woman with a Hat - Matisse,turner|The Fighting Temeraire - Turner,rousseau|The Dream - Rousseau,friedrich|Wanderer above the Sea of Fog - Friedrich,vermeer|Girl with a Pearl Earring - Vermeer,botticelli|The Birth of Venus - Botticelli,bosch|The Garden of Earthly Delights - Bosch,bruegel|The Tower of Babel - Bruegel,mondrian|Composition II - Mondrian,klee|Senecio - Klee,vitrail|Stained glass - Sainte-Chapelle,mosaic-byz|Byzantine mosaic - Ravenna" | split: "," %}
+                        {% assign adain_styles = "wave|The Great Wave - Hokusai|La Grande Vague de Kanagawa - Hokusai,red-fuji|Red Fuji - Hokusai|Fuji rouge - Hokusai,hiroshige|Sudden Shower - Hiroshige|Averse soudaine - Hiroshige,scream|The Scream - Munch|Le Cri - Munch,kandinsky|Composition VII - Kandinsky|Composition VII - Kandinsky,monet|Water Lilies - Monet|Nymphéas - Monet,cafe-terrace|Cafe Terrace at Night - Van Gogh|Terrasse du café le soir - Van Gogh,sunflowers|Sunflowers - Van Gogh|Les Tournesols - Van Gogh,cezanne|Mont Sainte-Victoire - Cezanne|Mont Sainte-Victoire - Cézanne,seurat|La Grande Jatte - Seurat|Un dimanche à la Grande Jatte - Seurat,klimt|The Kiss - Klimt|Le Baiser - Klimt,mucha|Salon des Cent - Mucha|Salon des Cent - Mucha,matisse|Woman with a Hat - Matisse|Femme au chapeau - Matisse,turner|The Fighting Temeraire - Turner|Le Téméraire - Turner,rousseau|The Dream - Rousseau|Le Rêve - Rousseau,friedrich|Wanderer above the Sea of Fog - Friedrich|Le Voyageur contemplant une mer de nuages - Friedrich,vermeer|Girl with a Pearl Earring - Vermeer|La Jeune Fille à la perle - Vermeer,botticelli|The Birth of Venus - Botticelli|La Naissance de Vénus - Botticelli,bosch|The Garden of Earthly Delights - Bosch|Le Jardin des délices - Bosch,bruegel|The Tower of Babel - Bruegel|La Tour de Babel - Bruegel,mondrian|Composition II - Mondrian|Composition II - Mondrian,klee|Senecio - Klee|Senecio - Klee,vitrail|Stained glass - Sainte-Chapelle|Vitrail - Sainte-Chapelle,mosaic-byz|Byzantine mosaic - Ravenna|Mosaïque byzantine - Ravenne" | split: "," %}
                         {% for s in adain_styles %}
                         {% assign parts = s | split: "|" %}
-                        <button data-adain="{{ parts[0] }}" title="{{ parts[1] }}" class="btn p-0 border st-thumb"
+                        <button data-adain="{{ parts[0] }}" title="{{ parts[1] }}"
+                                data-name-en="{{ parts[1] }}" data-name-fr="{{ parts[2] }}"
+                                class="btn p-0 border st-thumb"
                                 style="width:46px; height:46px; overflow:hidden; border-radius:8px;">
                             <img src="{{ '/assets/images/styles/' | append: parts[0] | append: '.jpg' | relative_url }}"
                                  alt="{{ parts[1] }}" style="width:100%; height:100%; object-fit:cover;">
@@ -451,7 +455,7 @@
                         <div class="text-center">
                             <img id="style-painting" src="{{ '/assets/images/styles/starry-night.jpg' | relative_url }}" alt="The Starry Night - Van Gogh"
                                  style="border:1px solid #ccc; border-radius:4px; width:280px; height:280px; object-fit:cover;">
-                            <div id="style-painting-name" class="small text-muted mt-1">The Starry Night - Van Gogh</div>
+                            <div id="style-painting-name" class="small text-muted mt-1"><span class="lang-en">The Starry Night - Van Gogh</span><span class="lang-fr">La Nuit étoilée - Van Gogh</span></div>
                         </div>
                         <div class="text-center">
                             <canvas id="style-out" width="280" height="280" style="border:1px solid #ccc; border-radius:4px; width:280px; height:280px; background:#eee;"></canvas>
@@ -538,5 +542,5 @@
 <script src="{{ '/assets/js/cifar.js' | relative_url }}?v=9"></script>
 <script src="{{ '/assets/js/dog-creator.js' | relative_url }}?v=7"></script>
 <script src="{{ '/assets/js/dog-diffusion.js' | relative_url }}?v=6"></script>
-<script src="{{ '/assets/js/style-transfer.js' | relative_url }}?v=8"></script>
+<script src="{{ '/assets/js/style-transfer.js' | relative_url }}?v=9"></script>
 <script src="{{ '/assets/js/word2vec.js' | relative_url }}?v=5"></script>

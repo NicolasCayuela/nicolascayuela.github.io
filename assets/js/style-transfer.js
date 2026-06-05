@@ -218,13 +218,19 @@
     for (j = 0; j < styleBtns.length; j++) styleBtns[j].classList.remove("active");
     for (j = 0; j < adainBtns.length; j++) adainBtns[j].classList.remove("active");
   }
-  // show the selected painting next to the result
+  // show the selected painting next to the result (bilingual caption)
   function setPaintingPreview(btn) {
     var img = btn.querySelector("img");
     var prev = document.getElementById("style-painting");
     var name = document.getElementById("style-painting-name");
     if (img && prev) prev.src = img.src;
-    if (img && name) name.textContent = img.alt || btn.title || "";
+    if (name) {
+      var en = btn.getAttribute("data-name-en") || btn.title || "";
+      var fr = btn.getAttribute("data-name-fr") || en;
+      name.innerHTML = '<span class="lang-en"></span><span class="lang-fr"></span>';
+      name.firstChild.textContent = en;
+      name.lastChild.textContent = fr;
+    }
   }
   for (var i = 0; i < styleBtns.length; i++) {
     (function (btn) {
