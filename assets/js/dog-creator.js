@@ -161,12 +161,12 @@
     var base = area.getAttribute("data-base");
     Promise.all([
       loadScript(ORT_URL),
-      fetch(base + "dog_data.json?v=3").then(function (r) { return r.json(); })
+      fetch(base + "dog_data.json?v=4").then(function (r) { return r.json(); })
     ]).then(function (rs) {
       meta = rs[1];
       N = meta.latent || meta.stds.length;
       coords = new Float32Array(N);
-      return createSession(base + "dog_decoder.onnx?v=3");
+      return createSession(base + "dog_decoder.onnx?v=4");
     }).then(function (s) {
       session = s; ready = true; loading = false;
       setProgress(false);
