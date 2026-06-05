@@ -26,7 +26,7 @@
 
   var DPR = Math.min(window.devicePixelRatio || 1, 2);
   var DW = 460, DH = 300;
-  var CW = 760, CH = 130;
+  var CW = 760, CH = 150;
   var mech = "bragg";              // "bragg" | "res"
   var ratio = 2;                   // Bragg: m1/m2
   var wr = 0.8;                    // resonance: internal resonator frequency
@@ -285,58 +285,121 @@
 
   // ---- chain animation ----
   var NCELLS = 12;
+
+  // zigzag spring between (x1, y) and (x2, y)
+  function drawSpring(x1, x2, y, h) {
+    var coils = 7, lead = Math.min(8, Math.abs(x2 - x1) * 0.12);
+    cctx.beginPath();
+    cctx.moveTo(x1, y);
+    cctx.lineTo(x1 + lead, y);
+    var span = (x2 - x1) - 2 * lead;
+    for (var c = 0; c < coils; c++) {
+      var xx = x1 + lead + span * (c + 0.5) / coils;
+      cctx.lineTo(xx, y + (c % 2 === 0 ? -h : h));
+    }
+    cctx.lineTo(x2 - lead, y);
+    cctx.lineTo(x2, y);
+    cctx.stroke();
+  }
+  function dots(x, y, dir) {
+    cctx.fillStyle = "#9aa3b2";
+    for (var d = 0; d < 3; d++) {
+      cctx.beginPath(); cctx.arc(x + dir * d * 7, y, 1.8, 0, 6.2832); cctx.fill();
+    }
+  }
+
   function drawChain() {
     cctx.clearRect(0, 0, CW, CH);
     cctx.fillStyle = "#fff"; cctx.fillRect(0, 0, CW, CH);
     var w = omega(q, branch);
     var cell = CW / (NCELLS + 1);
-    var y = CH / 2, n;
+    var y = CH / 2 - 6, n;
+    cctx.font = "italic 12px Georgia, serif";
 
     if (mech === "bragg") {
       var BA = braggAmpRatio(q, branch);
-      var amp = cell * 0.22;
-      var r1 = 11 * Math.cbrt(m1() / 2), r2 = 11 * Math.cbrt(M2 / 2);
-      var xs = [], rs = [];
+      var amp = cell * 0.18;
+      var r1 = 10 * Math.cbrt(m1() / 2), r2 = 10 * Math.cbrt(M2 / 2);
+      var xs = [], rs = [], eq = [];
       for (n = 0; n < NCELLS; n++) {
         var ph = q * n - w * t;
+        eq.push(cell * (0.8 + n));
         xs.push(cell * (0.8 + n) + amp * Math.cos(ph)); rs.push(r1);
         var ph2 = q * (n + 0.5) - w * t;
+        eq.push(cell * (1.3 + n));
         xs.push(cell * (1.3 + n) + amp * (BA.re * Math.cos(ph2) - BA.im * Math.sin(ph2))); rs.push(r2);
       }
-      cctx.strokeStyle = "#b9c2d0"; cctx.lineWidth = 2;
-      cctx.beginPath();
-      for (n = 0; n < xs.length - 1; n++) { cctx.moveTo(xs[n], y); cctx.lineTo(xs[n + 1], y); }
-      cctx.stroke();
+      // springs
+      cctx.strokeStyle = "#9aa3b2"; cctx.lineWidth = 1.6;
+      for (n = 0; n < xs.length - 1; n++) {
+        drawSpring(xs[n] + rs[n], xs[n + 1] - rs[n + 1], y, 6);
+      }
+      // masses
       for (n = 0; n < xs.length; n++) {
         cctx.beginPath(); cctx.arc(xs[n], y, rs[n], 0, 6.2832);
         cctx.fillStyle = n % 2 === 0 ? "#1c54e5" : "#f57c00";
         cctx.fill(); cctx.strokeStyle = "#fff"; cctx.lineWidth = 1.5; cctx.stroke();
       }
+      // labels on the first two cells (schematic style)
+      cctx.fillStyle = "#566075";
+      for (n = 0; n < 4 && n < xs.length; n++) {
+        cctx.fillText(n % 2 === 0 ? "m₁" : "m₂", xs[n] - 8, y - rs[n] - 8);
+        if (n < 3) cctx.fillText("C", (xs[n] + xs[n + 1]) / 2 - 4, y - 16);
+      }
+      // lattice-constant arrow under the first full cell (m1 -> m1)
+      var ya = y + Math.max(r1, r2) + 16;
+      cctx.strokeStyle = "#566075"; cctx.lineWidth = 1;
+      cctx.beginPath();
+      cctx.moveTo(eq[0], ya); cctx.lineTo(eq[2], ya);
+      cctx.moveTo(eq[0] + 5, ya - 3); cctx.lineTo(eq[0], ya); cctx.lineTo(eq[0] + 5, ya + 3);
+      cctx.moveTo(eq[2] - 5, ya - 3); cctx.lineTo(eq[2], ya); cctx.lineTo(eq[2] - 5, ya + 3);
+      cctx.stroke();
+      cctx.fillText("a", (eq[0] + eq[2]) / 2 - 3, ya + 14);
+      // edge dots
+      dots(eq[0] - cell * 0.55, y, -1);
+      dots(eq[eq.length - 1] + cell * 0.35, y, 1);
     } else {
       // mass-in-mass: outer ring + internal resonator
-      var ampO = cell * 0.16;
+      var ampO = cell * 0.14;
       var rOut = 15, rIn = 7;
       var ratioIn = resAmpRatio(w);
       var xsO = [];
       for (n = 0; n < NCELLS; n++) {
         var phn = q * n - w * t;
-        xsO.push(cell * (1 + n) + ampO * Math.cos(phn));
+        xsO.push(cell * (0.9 + n) + ampO * Math.cos(phn));
       }
-      cctx.strokeStyle = "#b9c2d0"; cctx.lineWidth = 2;
-      cctx.beginPath();
-      for (n = 0; n < xsO.length - 1; n++) { cctx.moveTo(xsO[n], y); cctx.lineTo(xsO[n + 1], y); }
-      cctx.stroke();
+      // springs between outer masses
+      cctx.strokeStyle = "#9aa3b2"; cctx.lineWidth = 1.6;
+      for (n = 0; n < xsO.length - 1; n++) {
+        drawSpring(xsO[n] + rOut, xsO[n + 1] - rOut, y, 6);
+      }
       for (n = 0; n < NCELLS; n++) {
         var phn2 = q * n - w * t;
         var xi = xsO[n] + ampO * (ratioIn - 1) * Math.cos(phn2) * 0.5;
         cctx.beginPath(); cctx.arc(xsO[n], y, rOut, 0, 6.2832);
         cctx.fillStyle = "rgba(28,84,229,0.18)"; cctx.fill();
         cctx.strokeStyle = "#1c54e5"; cctx.lineWidth = 2; cctx.stroke();
-        cctx.beginPath(); cctx.moveTo(xsO[n] - rOut + 3, y); cctx.lineTo(xi, y); cctx.stroke();
+        cctx.strokeStyle = "#9aa3b2"; cctx.lineWidth = 1.2;
+        drawSpring(xsO[n] - rOut + 3, xi - rIn, y, 4);
         cctx.beginPath(); cctx.arc(xi, y, rIn, 0, 6.2832);
         cctx.fillStyle = "#f57c00"; cctx.fill();
         cctx.strokeStyle = "#fff"; cctx.lineWidth = 1.5; cctx.stroke();
       }
+      // labels on the first cell + lattice arrow
+      cctx.fillStyle = "#566075";
+      cctx.fillText("M", xsO[0] - 5, y - rOut - 8);
+      cctx.fillText("m᷊", xsO[0] + 2, y + rOut + 14);
+      cctx.fillText("C", (xsO[0] + xsO[1]) / 2 - 4, y - 16);
+      var ya2 = y + rOut + 22;
+      cctx.strokeStyle = "#566075"; cctx.lineWidth = 1;
+      cctx.beginPath();
+      cctx.moveTo(cell * 0.9, ya2); cctx.lineTo(cell * 1.9, ya2);
+      cctx.moveTo(cell * 0.9 + 5, ya2 - 3); cctx.lineTo(cell * 0.9, ya2); cctx.lineTo(cell * 0.9 + 5, ya2 + 3);
+      cctx.moveTo(cell * 1.9 - 5, ya2 - 3); cctx.lineTo(cell * 1.9, ya2); cctx.lineTo(cell * 1.9 - 5, ya2 + 3);
+      cctx.stroke();
+      cctx.fillText("a", cell * 1.4 - 3, ya2 + 14);
+      dots(cell * 0.25, y, -1);
+      dots(cell * (NCELLS + 0.35), y, 1);
     }
   }
 
