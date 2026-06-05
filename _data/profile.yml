@@ -81,26 +81,26 @@ experience:
   - name: "PhD - Sustainable architected metamaterials for elastic wave manipulation"
     logo: assets/images/badges/ijl.jpg
     url: "https://ijl.univ-lorraine.fr/"
-    position: '<em>Institut Jean Lamour, UMR CNRS 7198 - Nanomaterials, Electronics and the Living Department (N2EV), Metamaterials and Phononics group</em><br>Design of 3D piezoelectric metamaterials from pillar-based unit cells, with a piezoelectric tensor tunable through the micro-architecture. Characterization of the elastodynamic behaviour (band structures, Willis coupling, electro-momentum coupling) and machine-learning approaches (GNN, inverse design) to speed up prediction and optimization of wave-propagation properties. Targeted applications: defect/impact detection, directional sensing, energy harvesting and non-Hermitian behaviour.'
+    position: '<em>Institut Jean Lamour, UMR CNRS 7198<br>Nanomaterials, Electronics and the Living Department (N2EV) - Metamaterials and Phononics group</em><br>&bull; Design of 3D piezoelectric metamaterials from pillar-based unit cells, with a piezoelectric tensor tunable through the micro-architecture<br>&bull; Elastodynamic characterization: band structures, Willis coupling, electro-momentum coupling<br>&bull; Machine learning (GNN, inverse design) to speed up prediction and optimization of wave-propagation properties<br>&bull; Applications: defect/impact detection, directional sensing, energy harvesting, non-Hermitian behaviour'
     date: 2025 - 2028
   - name: "Internship - Multi-physics optomechanical sensor study"
     logo: assets/images/badges/leti.png
     url: "https://www.leti-cea.fr/"
-    position: '<em>CEA-Leti, Université Grenoble Alpes</em><br>Gas sensing with optomechanical chips and a Mach–Zehnder reference. Built an experimental bench, capping encapsulation (PMMA + tape), RF probe measurements and Comsol/RSoft simulations to analyse the optomechanical coupling and eigenmodes.'
+    position: '<em>CEA-Leti, Université Grenoble Alpes</em><br>&bull; Gas sensing with optomechanical chips and a Mach&ndash;Zehnder reference<br>&bull; Experimental bench, capping encapsulation (PMMA + tape), RF probe measurements<br>&bull; Comsol/RSoft simulations of the optomechanical coupling and eigenmodes'
     date: 2025
   - name: "Internship - Dynamic mechanical characterization of elementary fibres for bio-sourced composites"
     logo: assets/images/badges/femto.svg
     url: "https://www.femto-st.fr/fr"
-    position: '<em>FEMTO-ST Institute, UMR CNRS 6174, Applied Mechanics Department</em><br>Dynamic testing (laser vibrometer, high-speed camera, vacuum pump) on flax fibres: identification of damping by logarithmic decrement and of the storage (stiffness) modulus via FE in COMSOL.'
+    position: '<em>FEMTO-ST Institute, UMR CNRS 6174<br>Applied Mechanics Department</em><br>&bull; Dynamic testing (laser vibrometer, high-speed camera, vacuum pump) on flax fibres<br>&bull; Damping identified by logarithmic decrement; storage (stiffness) modulus via FE in COMSOL'
     date: 2024
 
 experience_fr:
   - name: "Doctorat - Métamatériaux à architecture durable pour la manipulation des ondes élastiques"
-    position: '<em>Institut Jean Lamour, UMR CNRS 7198 - Département Nanomatériaux, Électronique Et Vivant (N2EV), Équipe Métamatériaux et Phononique</em><br>Conception de métamatériaux piézoélectriques 3D à base de cellules unitaires à montants, avec tenseur piézoélectrique personnalisable par design de la microarchitecture. Caractérisation du comportement élastodynamique (structures de bandes, couplage de Willis, couplage électromomentum) et approches par apprentissage automatique (GNN, design inverse) pour accélérer la prédiction et l''optimisation des propriétés de propagation des ondes. Applications visées : détection de défauts/impacts, détection directionnelle, récupération d''énergie et comportement non hermitien.'
+    position: '<em>Institut Jean Lamour, UMR CNRS 7198<br>Département Nanomatériaux, Électronique Et Vivant (N2EV) - Équipe Métamatériaux et Phononique</em><br>&bull; Conception de métamatériaux piézoélectriques 3D à base de cellules unitaires à montants, tenseur piézoélectrique personnalisable par la microarchitecture<br>&bull; Caractérisation élastodynamique : structures de bandes, couplage de Willis, couplage électromomentum<br>&bull; Apprentissage automatique (GNN, design inverse) pour accélérer prédiction et optimisation des propriétés de propagation<br>&bull; Applications : détection de défauts/impacts, détection directionnelle, récupération d''énergie, comportement non hermitien'
   - name: "Stage - Étude d'un capteur multi-physique optomécanique"
-    position: '<em>CEA-Leti, Université Grenoble Alpes</em><br>Exploration de la mesure de gaz avec des puces optomécaniques et Mach–Zehnder en référence. Mise en place d''un banc expérimental, encapsulation par capots (PMMA + scotch), mesures RF par pointes et simulations Comsol/RSoft pour analyser le couplage optomécanique et les modes propres.'
+    position: '<em>CEA-Leti, Université Grenoble Alpes</em><br>&bull; Mesure de gaz avec des puces optomécaniques et Mach&ndash;Zehnder en référence<br>&bull; Banc expérimental, encapsulation par capots (PMMA + scotch), mesures RF par pointes<br>&bull; Simulations Comsol/RSoft du couplage optomécanique et des modes propres'
   - name: "Stage - Caractérisation mécanique dynamique de fibres élémentaires pour les matériaux composites biosourcés"
-    position: '<em>Institut FEMTO-ST, UMR CNRS 6174, département de mécanique appliquée</em><br>Essais dynamiques (vibromètre laser, caméra rapide, pompe à vide) sur des fibres de lin : identification de l''amortissement par décrément logarithmique et du module de stockage (=rigidité) par EF sur COMSOL.'
+    position: '<em>Institut FEMTO-ST, UMR CNRS 6174<br>Département de mécanique appliquée</em><br>&bull; Essais dynamiques (vibromètre laser, caméra rapide, pompe à vide) sur des fibres de lin<br>&bull; Amortissement identifié par décrément logarithmique ; module de stockage (rigidité) par EF sur COMSOL'
 
 # service:
 #   - name: "Reviewer for ..."
