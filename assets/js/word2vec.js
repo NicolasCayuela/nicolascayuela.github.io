@@ -197,10 +197,10 @@
       for (var w = 0; w < data.words.length; w++) index[data.words[w]] = w;
       ready = true; loading = false;
       setStatus("", "");
-      // default demo: king - man + woman
-      document.getElementById("w2v-a").value = "king";
-      document.getElementById("w2v-b").value = "man";
-      document.getElementById("w2v-c").value = "woman";
+      // default demo: paris - france + italy = rome
+      document.getElementById("w2v-a").value = "paris";
+      document.getElementById("w2v-b").value = "france";
+      document.getElementById("w2v-c").value = "italy";
       doMath();
       requestAnimationFrame(tick);
     }).catch(function (e) {
