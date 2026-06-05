@@ -4,15 +4,41 @@ title : Blog
 navbar_name: Blog
 ---
 
+<style>
+    .blog-empty { border-radius: 14px; box-shadow: 0 4px 16px rgba(25,40,80,.08); }
+    .blog-icon { width: 74px; height: 74px; border-radius: 50%; margin: 0 auto 1rem;
+        display: flex; align-items: center; justify-content: center; font-size: 1.7rem;
+        color: #1c54e5; background: linear-gradient(135deg, #e8eefc, #dbe6fa); }
+    .blog-chip { display: inline-block; font-size: .76rem; font-weight: 600; color: #566075;
+        background: #f1f4f9; border: 1px solid #e3e8f0; border-radius: 14px;
+        padding: .2rem .7rem; margin: .15rem; }
+</style>
+
 <div class="row mt-3">
     <div class="col">
-        <div class="card border-0 shadow-sm bg-white">
-            <div class="card-body p-4 text-center text-muted">
-                <h6 class="mb-3"><i class="fas fa-pen-nib"></i> &nbsp;Blog</h6>
-                <p class="small mb-0">
-                    <span class="lang-en">Coming soon.</span>
-                    <span class="lang-fr">Bientôt disponible.</span>
+        <div class="card border-0 bg-white blog-empty">
+            <div class="card-body p-5 text-center">
+                <div class="blog-icon"><i class="fas fa-pen-nib"></i></div>
+                <h5 class="mb-2">
+                    <span class="lang-en">The blog is brewing</span>
+                    <span class="lang-fr">Le blog se prépare</span>
+                </h5>
+                <p class="text-muted small mb-3" style="max-width: 480px; margin-left: auto; margin-right: auto;">
+                    <span class="lang-en">Notes on phononics, metamaterials and machine learning are on their way - first posts coming soon.</span>
+                    <span class="lang-fr">Des notes sur la phononique, les métamatériaux et le machine learning arrivent - premiers billets bientôt.</span>
                 </p>
+                <div class="mb-3">
+                    <span class="blog-chip"><span class="lang-en">Phononic crystals</span><span class="lang-fr">Cristaux phononiques</span></span>
+                    <span class="blog-chip"><span class="lang-en">Metamaterials</span><span class="lang-fr">Métamatériaux</span></span>
+                    <span class="blog-chip">GNN</span>
+                    <span class="blog-chip"><span class="lang-en">Inverse design</span><span class="lang-fr">Design inverse</span></span>
+                    <span class="blog-chip">PyTorch</span>
+                </div>
+                <a href="{{ '/playground' | relative_url }}" class="btn btn-sm btn-outline-dark" style="border-radius: 20px;">
+                    <i class="fas fa-gamepad"></i>&nbsp;
+                    <span class="lang-en">Meanwhile, try the playground</span>
+                    <span class="lang-fr">En attendant, essaie le terrain de jeu</span>
+                </a>
             </div>
         </div>
     </div>
