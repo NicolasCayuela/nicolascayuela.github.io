@@ -5,6 +5,5 @@ authors:
 pub: "Poster"
 date: 2026-06-01
 cover: assets/images/empty_300x200.png
-links:
-  Explanation of the Poster: ./poster-gnn-explanation
+abstract: "Explanation of the Poster: coming soon."
 ---
