@@ -450,29 +450,61 @@
                         <span class="lang-en"><strong>Word embeddings</strong> (<a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">word2vec</a>-style, here <a href="https://nlp.stanford.edu/projects/glove/" target="_blank" rel="noopener">GloVe</a> 50d) map every word to a vector so that similar words are close and directions carry meaning: <em>king - man + woman ≈ queen</em>. The 20,000 most frequent words are shown in 3D (PCA). <strong>Drag to rotate</strong>, search a word for its neighbours, or try vector arithmetic. word2vec: <a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">Mikolov et al. (2013)</a>; GloVe: <a href="https://aclanthology.org/D14-1162/" target="_blank" rel="noopener">Pennington, Socher &amp; Manning (2014)</a>.</span>
                         <span class="lang-fr">Les <strong>plongements de mots</strong> (type <a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">word2vec</a>, ici <a href="https://nlp.stanford.edu/projects/glove/" target="_blank" rel="noopener">GloVe</a> 50d) associent à chaque mot un vecteur : les mots similaires sont proches et les directions portent du sens : <em>king - man + woman ≈ queen</em>. Les 20 000 mots les plus fréquents sont affichés en 3D (ACP). <strong>Glisse pour tourner</strong>, cherche un mot pour voir ses voisins, ou essaie l'arithmétique vectorielle. word2vec : <a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">Mikolov et al. (2013)</a> ; GloVe : <a href="https://aclanthology.org/D14-1162/" target="_blank" rel="noopener">Pennington, Socher &amp; Manning (2014)</a>.</span>
                     </p>
+                    <style>
+                        #w2v-area .wv-panel { background:#f8f9fb; border:1px solid #e9ecf2; border-radius:12px; padding:.8rem .9rem; }
+                        #w2v-area .wv-canvas { border-radius:14px; box-shadow:0 6px 22px rgba(25,40,80,.15); background:#fff;
+                            touch-action:none; cursor:grab; }
+                        #w2v-area .wv-head { font-size:.7rem; letter-spacing:.08em; text-transform:uppercase; color:#9aa3b2;
+                            font-weight:700; margin-bottom:.4rem; }
+                        #w2v-area .wv-chip { display:inline-flex; align-items:center; gap:.35rem; background:#fff;
+                            border:1px solid #dde3ec; border-radius:14px; padding:.12rem .55rem; margin:.12rem;
+                            font-size:.78rem; cursor:pointer; transition:border-color .12s, transform .12s; }
+                        #w2v-area .wv-chip:hover { border-color:#1c54e5; transform:translateY(-1px); }
+                        #w2v-area .wv-bar { display:inline-block; width:34px; height:5px; background:#e8ecf3; border-radius:3px; overflow:hidden; }
+                        #w2v-area .wv-bar > span { display:block; height:100%; background:#1c54e5; border-radius:3px; }
+                        #w2v-area .wv-big { font-size:1.15rem; font-weight:700; color:#1c54e5; }
+                        #w2v-area .wv-ex { font-size:.72rem; color:#8a93a3; cursor:pointer; text-decoration:underline dotted; margin-right:.6rem; }
+                        #w2v-area .wv-ex:hover { color:#1c54e5; }
+                        #w2v-area input.form-control-sm { border-radius:8px; }
+                    </style>
                     <div class="d-flex flex-wrap" style="gap:1.2rem;">
                         <div style="flex:1 1 300px; min-width:260px;">
-                            <canvas id="w2v-canvas" style="border:1px solid #ccc; border-radius:4px; touch-action:none; cursor:grab;"></canvas>
-                            <div id="w2v-status" class="small text-muted mt-1">&nbsp;</div>
+                            <canvas id="w2v-canvas" class="wv-canvas"></canvas>
+                            <div id="w2v-status" class="small text-muted mt-2">&nbsp;</div>
                         </div>
-                        <div style="min-width:230px; max-width:300px;">
-                            <div class="small font-weight-bold mb-1"><span class="lang-en">Nearest neighbours</span><span class="lang-fr">Plus proches voisins</span></div>
-                            <div class="d-flex mb-1" style="gap:.3rem;">
-                                <input id="w2v-search" type="text" class="form-control form-control-sm" placeholder="dog, music, paris…" style="max-width:150px;">
-                                <button id="w2v-search-btn" class="btn btn-sm btn-dark"><i class="fas fa-search"></i></button>
+                        <div style="min-width:250px; max-width:330px;">
+                            <div class="wv-panel mb-3">
+                                <div class="wv-head"><i class="fas fa-search"></i> <span class="lang-en">Nearest neighbours</span><span class="lang-fr">Plus proches voisins</span></div>
+                                <div class="d-flex mb-1" style="gap:.3rem;">
+                                    <input id="w2v-search" type="text" class="form-control form-control-sm" placeholder="dog, music, paris…" style="max-width:160px;">
+                                    <button id="w2v-search-btn" class="btn btn-sm btn-dark" style="border-radius:8px;"><i class="fas fa-search"></i></button>
+                                </div>
+                                <div class="mb-1">
+                                    <span class="small text-muted"><span class="lang-en">try:</span><span class="lang-fr">essaie&nbsp;:</span></span>
+                                    <span class="wv-ex" data-w2v-word="dog">dog</span><span class="wv-ex" data-w2v-word="music">music</span><span class="wv-ex" data-w2v-word="einstein">einstein</span><span class="wv-ex" data-w2v-word="coffee">coffee</span>
+                                </div>
+                                <div id="w2v-neighbors"></div>
                             </div>
-                            <ul id="w2v-neighbors" class="small pl-3 mb-3" style="line-height:1.5;"></ul>
-
-                            <div class="small font-weight-bold mb-1"><span class="lang-en">Vector arithmetic</span><span class="lang-fr">Arithmétique vectorielle</span></div>
-                            <div class="d-flex align-items-center mb-1 flex-wrap" style="gap:.25rem;">
-                                <input id="w2v-a" type="text" class="form-control form-control-sm" style="width:72px;">
-                                <span class="small">-</span>
-                                <input id="w2v-b" type="text" class="form-control form-control-sm" style="width:72px;">
-                                <span class="small">+</span>
-                                <input id="w2v-c" type="text" class="form-control form-control-sm" style="width:72px;">
-                                <button id="w2v-math-btn" class="btn btn-sm btn-dark">=</button>
+                            <div class="wv-panel">
+                                <div class="wv-head"><i class="fas fa-calculator"></i> <span class="lang-en">Vector arithmetic</span><span class="lang-fr">Arithmétique vectorielle</span></div>
+                                <div class="d-flex align-items-center mb-1 flex-wrap" style="gap:.25rem;">
+                                    <input id="w2v-a" type="text" class="form-control form-control-sm" style="width:76px;">
+                                    <span class="small font-weight-bold">-</span>
+                                    <input id="w2v-b" type="text" class="form-control form-control-sm" style="width:76px;">
+                                    <span class="small font-weight-bold">+</span>
+                                    <input id="w2v-c" type="text" class="form-control form-control-sm" style="width:76px;">
+                                    <button id="w2v-math-btn" class="btn btn-sm btn-dark" style="border-radius:8px;">=</button>
+                                </div>
+                                <div class="mb-1">
+                                    <span class="small text-muted"><span class="lang-en">try:</span><span class="lang-fr">essaie&nbsp;:</span></span>
+                                    <span class="wv-ex" data-w2v-analogy="paris,france,italy">paris - france + italy</span>
+                                    <span class="wv-ex" data-w2v-analogy="king,man,woman">king - man + woman</span>
+                                    <span class="wv-ex" data-w2v-analogy="actor,man,woman">actor - man + woman</span>
+                                    <span class="wv-ex" data-w2v-analogy="tokyo,japan,germany">tokyo - japan + germany</span>
+                                </div>
+                                <div id="w2v-best" class="wv-big mb-1"></div>
+                                <div id="w2v-result"></div>
                             </div>
-                            <ul id="w2v-result" class="small pl-3 mb-0" style="line-height:1.5;"></ul>
                         </div>
                     </div>
                 </div>
@@ -489,4 +521,4 @@
 <script src="{{ '/assets/js/dog-creator.js' | relative_url }}?v=4"></script>
 <script src="{{ '/assets/js/dog-diffusion.js' | relative_url }}?v=3"></script>
 <script src="{{ '/assets/js/style-transfer.js' | relative_url }}?v=5"></script>
-<script src="{{ '/assets/js/word2vec.js' | relative_url }}?v=3"></script>
+<script src="{{ '/assets/js/word2vec.js' | relative_url }}?v=4"></script>

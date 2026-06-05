@@ -123,12 +123,22 @@
     return index.hasOwnProperty(w) ? index[w] : -1;
   }
 
+  // clickable word chips with a similarity bar; clicking explores that word
   function showList(el, items) {
     el.innerHTML = "";
     items.forEach(function (it) {
-      var li = document.createElement("li");
-      li.innerHTML = "<strong>" + data.words[it.i] + "</strong> <span class='text-muted'>" + it.c.toFixed(3) + "</span>";
-      el.appendChild(li);
+      var chip = document.createElement("span");
+      chip.className = "wv-chip";
+      var frac = Math.max(0, Math.min(1, it.c));
+      chip.innerHTML = "<strong>" + data.words[it.i] + "</strong>" +
+        '<span class="wv-bar"><span style="width:' + Math.round(frac * 100) + '%"></span></span>' +
+        '<span class="text-muted" style="font-size:.68rem;">' + it.c.toFixed(2) + "</span>";
+      chip.title = it.c.toFixed(3);
+      chip.addEventListener("click", function () {
+        document.getElementById("w2v-search").value = data.words[it.i];
+        doSearch();
+      });
+      el.appendChild(chip);
     });
   }
 
@@ -169,7 +179,9 @@
       { i: a, color: "#0a8f1a" }, { i: b, color: "#f57c00" }, { i: c, color: "#8e24aa" },
       { i: res[0].i, color: "#e51c23" }
     ];
-    showList(list, res);
+    var best = document.getElementById("w2v-best");
+    if (best) best.textContent = "= " + data.words[res[0].i];
+    showList(list, res.slice(1));
     render();
   }
 
@@ -179,6 +191,22 @@
   on("w2v-math-btn", "click", doMath);
   ["w2v-a", "w2v-b", "w2v-c"].forEach(function (id) {
     on(id, "keydown", function (e) { if (e.key === "Enter") doMath(); });
+  });
+  // example chips
+  Array.prototype.forEach.call(document.querySelectorAll("[data-w2v-word]"), function (el) {
+    el.addEventListener("click", function () {
+      document.getElementById("w2v-search").value = el.getAttribute("data-w2v-word");
+      doSearch();
+    });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-w2v-analogy]"), function (el) {
+    el.addEventListener("click", function () {
+      var p = el.getAttribute("data-w2v-analogy").split(",");
+      document.getElementById("w2v-a").value = p[0];
+      document.getElementById("w2v-b").value = p[1];
+      document.getElementById("w2v-c").value = p[2];
+      doMath();
+    });
   });
 
   function init() {
