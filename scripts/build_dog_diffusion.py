@@ -23,8 +23,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 CACHE = os.path.join(HERE, "afhq_cache")
 OUT_MODELS = os.path.join(HERE, "..", "assets", "models")
 IMG = 32
-EPOCHS = 600
+EPOCHS = 2000
 BATCH = 128
+LR_MAX, LR_MIN = 2e-4, 2e-5   # cosine decay over the full run
 TSTEPS = 1000
 DOG_LABEL = 1                 # huggan/AFHQ: cat=0, dog=1, wild=2
 EMA_DECAY = 0.999
@@ -138,6 +139,10 @@ def main():
 
     torch.set_num_threads(os.cpu_count() or 4)
     for epoch in range(start_epoch, EPOCHS):
+        # cosine learning-rate decay
+        lr = LR_MIN + 0.5 * (LR_MAX - LR_MIN) * (1 + math.cos(math.pi * epoch / EPOCHS))
+        for g in opt.param_groups:
+            g["lr"] = lr
         perm = torch.randperm(n)
         tot, nb = 0.0, 0
         for b in range(0, n, BATCH):
