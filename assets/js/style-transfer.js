@@ -218,11 +218,20 @@
     for (j = 0; j < styleBtns.length; j++) styleBtns[j].classList.remove("active");
     for (j = 0; j < adainBtns.length; j++) adainBtns[j].classList.remove("active");
   }
+  // show the selected painting next to the result
+  function setPaintingPreview(btn) {
+    var img = btn.querySelector("img");
+    var prev = document.getElementById("style-painting");
+    var name = document.getElementById("style-painting-name");
+    if (img && prev) prev.src = img.src;
+    if (img && name) name.textContent = img.alt || btn.title || "";
+  }
   for (var i = 0; i < styleBtns.length; i++) {
     (function (btn) {
       btn.addEventListener("click", function () {
         clearActive();
         btn.classList.add("active");
+        setPaintingPreview(btn);
         cur = { type: "fast", style: btn.getAttribute("data-style") };
         stylize();
       });
@@ -233,6 +242,7 @@
       btn.addEventListener("click", function () {
         clearActive();
         btn.classList.add("active");
+        setPaintingPreview(btn);
         cur = { type: "adain", style: btn.getAttribute("data-adain") };
         stylize();
       });
