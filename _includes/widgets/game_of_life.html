@@ -475,16 +475,16 @@
                             <div id="style-painting-name" class="small text-muted mt-1"><span class="lang-en">The Starry Night - Van Gogh</span><span class="lang-fr">La Nuit étoilée - Van Gogh</span></div>
                         </div>
                         <div class="text-center">
-                            <div class="d-flex align-items-center justify-content-center mb-1" style="gap:.4rem;">
+                            <canvas id="style-out" width="280" height="280" style="border:1px solid #ccc; border-radius:4px; width:280px; height:280px; background:#eee;"></canvas>
+                            <div id="style-progress" class="st-progress"><span></span></div>
+                            <div class="small text-muted mt-1"><span class="lang-en">stylized</span><span class="lang-fr">stylisée</span></div>
+                            <div class="d-flex align-items-center justify-content-center mt-1" style="gap:.4rem;">
                                 <label class="small text-muted mb-0">
                                     <span class="lang-en">Intensity</span><span class="lang-fr">Intensité</span>
                                     <input id="style-strength" type="range" min="10" max="100" value="100" style="vertical-align:middle; width:140px;">
                                 </label>
                                 <span id="style-strength-val" class="small text-muted">100%</span>
                             </div>
-                            <canvas id="style-out" width="280" height="280" style="border:1px solid #ccc; border-radius:4px; width:280px; height:280px; background:#eee;"></canvas>
-                            <div id="style-progress" class="st-progress"><span></span></div>
-                            <div class="small text-muted mt-1"><span class="lang-en">stylized</span><span class="lang-fr">stylisée</span></div>
                         </div>
                     </div>
                     <div id="style-status" class="small text-muted mt-2">&nbsp;</div>
