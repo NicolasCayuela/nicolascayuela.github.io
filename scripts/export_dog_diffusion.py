@@ -11,9 +11,9 @@ import torch
 from PIL import Image
 import numpy as np
 
-from build_dog_diffusion import UNet, TSTEPS, IMG, HERE, OUT_MODELS
+from build_dog_diffusion import UNet, TSTEPS, IMG, HERE, OUT_MODELS, CKPT_NAME
 
-CKPT = os.path.join(HERE, "dog_ddpm.pt")
+CKPT = os.path.join(HERE, CKPT_NAME)
 
 
 def main(mode):

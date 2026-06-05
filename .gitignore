@@ -40,3 +40,4 @@ scripts/dog_ddpm_preview_e*.png
 scripts/dog_ae2.pt
 __pycache__/
 scripts/dog_ae3.pt
+scripts/dog_ddpm2.pt

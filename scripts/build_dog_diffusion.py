@@ -23,9 +23,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 CACHE = os.path.join(HERE, "afhq_cache")
 OUT_MODELS = os.path.join(HERE, "..", "assets", "models")
 IMG = 32
-EPOCHS = 2000
+EPOCHS = 800
 BATCH = 128
 LR_MAX, LR_MIN = 2e-4, 2e-5   # cosine decay over the full run
+CKPT_NAME = "dog_ddpm2.pt"    # v2: wider UNet with attention
 TSTEPS = 1000
 DOG_LABEL = 1                 # huggan/AFHQ: cat=0, dog=1, wild=2
 EMA_DECAY = 0.9995              # ~50-epoch horizon, smoother late-training average
@@ -81,33 +82,52 @@ class ResBlock(nn.Module):
         return h + self.skip(x)
 
 
+class SelfAttention(nn.Module):
+    """Single-head self-attention over spatial positions (used at 8x8)."""
+    def __init__(self, c):
+        super().__init__()
+        self.norm = nn.GroupNorm(8, c)
+        self.qkv = nn.Conv2d(c, 3 * c, 1)
+        self.proj = nn.Conv2d(c, c, 1)
+        self.scale = c ** -0.5
+
+    def forward(self, x):
+        n, c, h, w = x.shape
+        qkv = self.qkv(self.norm(x)).reshape(n, 3, c, h * w)
+        q, k, v = qkv[:, 0], qkv[:, 1], qkv[:, 2]          # n, c, hw
+        attn = torch.softmax(q.transpose(1, 2) @ k * self.scale, dim=-1)  # n, hw, hw
+        out = (v @ attn.transpose(1, 2)).reshape(n, c, h, w)
+        return x + self.proj(out)
+
+
 class UNet(nn.Module):
+    """v2: wider (48/96/192), two ResBlocks per level, attention at 8x8."""
     def __init__(self):
         super().__init__()
         self.mlp = nn.Sequential(nn.Linear(TDIM, TDIM), nn.SiLU(), nn.Linear(TDIM, TDIM))
-        self.stem = nn.Conv2d(3, 32, 3, padding=1)
-        self.d1 = ResBlock(32, 32)
-        self.down1 = nn.Conv2d(32, 64, 4, 2, 1)      # 16
-        self.d2 = ResBlock(64, 64)
-        self.down2 = nn.Conv2d(64, 128, 4, 2, 1)     # 8
-        self.mid1 = ResBlock(128, 128)
-        self.mid2 = ResBlock(128, 128)
-        self.up1 = nn.ConvTranspose2d(128, 64, 4, 2, 1)   # 16
-        self.u1 = ResBlock(128, 64)
-        self.up2 = nn.ConvTranspose2d(64, 32, 4, 2, 1)    # 32
-        self.u2 = ResBlock(64, 32)
-        self.out_norm = nn.GroupNorm(8, 32)
-        self.out_conv = nn.Conv2d(32, 3, 3, padding=1)
+        self.stem = nn.Conv2d(3, 48, 3, padding=1)
+        self.d1a = ResBlock(48, 48); self.d1b = ResBlock(48, 48)
+        self.down1 = nn.Conv2d(48, 96, 4, 2, 1)            # 16
+        self.d2a = ResBlock(96, 96); self.d2b = ResBlock(96, 96)
+        self.down2 = nn.Conv2d(96, 192, 4, 2, 1)           # 8
+        self.mid1 = ResBlock(192, 192)
+        self.attn = SelfAttention(192)
+        self.mid2 = ResBlock(192, 192)
+        self.up1 = nn.ConvTranspose2d(192, 96, 4, 2, 1)    # 16
+        self.u1a = ResBlock(192, 96); self.u1b = ResBlock(96, 96)
+        self.up2 = nn.ConvTranspose2d(96, 48, 4, 2, 1)     # 32
+        self.u2a = ResBlock(96, 48); self.u2b = ResBlock(48, 48)
+        self.out_norm = nn.GroupNorm(8, 48)
+        self.out_conv = nn.Conv2d(48, 3, 3, padding=1)
         self.act = nn.SiLU()
 
     def forward(self, x, t):
         emb = self.mlp(time_embedding(t))
-        h0 = self.stem(x)
-        h1 = self.d1(h0, emb)                        # 32ch, 32px
-        h2 = self.d2(self.down1(h1), emb)            # 64ch, 16px
-        m = self.mid2(self.mid1(self.down2(h2), emb), emb)
-        u = self.u1(torch.cat([self.up1(m), h2], 1), emb)
-        u = self.u2(torch.cat([self.up2(u), h1], 1), emb)
+        h1 = self.d1b(self.d1a(self.stem(x), emb), emb)            # 48ch, 32px
+        h2 = self.d2b(self.d2a(self.down1(h1), emb), emb)          # 96ch, 16px
+        m = self.mid2(self.attn(self.mid1(self.down2(h2), emb)), emb)
+        u = self.u1b(self.u1a(torch.cat([self.up1(m), h2], 1), emb), emb)
+        u = self.u2b(self.u2a(torch.cat([self.up2(u), h1], 1), emb), emb)
         return self.out_conv(self.act(self.out_norm(u)))
 
 
@@ -129,7 +149,7 @@ def main():
         p.requires_grad_(False)
     opt = torch.optim.Adam(model.parameters(), lr=2e-4)
 
-    ckpt_path = os.path.join(HERE, "dog_ddpm.pt")
+    ckpt_path = os.path.join(HERE, CKPT_NAME)
     start_epoch = 0
     if os.path.exists(ckpt_path):
         ck = torch.load(ckpt_path, map_location="cpu", weights_only=True)
