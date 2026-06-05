@@ -404,6 +404,14 @@
                         <span class="lang-fr"><strong>Transfert de style neuronal</strong> : un réseau feed-forward (<a href="https://arxiv.org/abs/1603.08155" target="_blank" rel="noopener">Johnson et al.</a>, entraîné avec PyTorch) repeint ta photo dans le style d'un tableau - tourbillons à la Van Gogh, mosaïques, aquarelles. Les vignettes de tableaux utilisent <strong>AdaIN</strong> (<a href="https://arxiv.org/abs/1703.06868" target="_blank" rel="noopener">Huang &amp; Belongie</a>), un seul réseau capable d'appliquer le style de <em>n'importe quel</em> tableau. Choisis un style, charge une image (elle reste dans ton navigateur) et le réseau tourne en direct avec ONNX. Poids : <a href="https://github.com/igreat/fast-style-transfer" target="_blank" rel="noopener">igreat/fast-style-transfer</a> et <a href="https://github.com/naoto0804/pytorch-AdaIN" target="_blank" rel="noopener">naoto0804/pytorch-AdaIN</a> (MIT) ; tableaux via Wikimedia Commons (domaine public).</span>
                     </p>
                     <style>
+                        #style-area .st-panel { background:#f8f9fb; border:1px solid #e9ecf2; border-radius:12px;
+                            padding:.6rem .8rem .7rem; margin-bottom:1rem; }
+                        #style-area .st-head { font-size:.7rem; letter-spacing:.08em; text-transform:uppercase;
+                            color:#9aa3b2; font-weight:700; margin-bottom:.5rem; }
+                        #style-area .st-grid { display:flex; flex-wrap:wrap; gap:.45rem; }
+                        #style-area .st-thumb { width:52px; height:52px; overflow:hidden; border-radius:10px;
+                            padding:0; border:1px solid #dde3ec; }
+                        #style-area .st-thumb img { width:100%; height:100%; object-fit:cover; }
                         #style-area .st-thumb.active { outline:3px solid #1c54e5; outline-offset:1px; }
                         #style-area .st-thumb:hover { transform:scale(1.08); transition:transform .12s; }
                         #style-area .st-progress { height:6px; background:#e8ecf3; border-radius:3px; overflow:hidden;
@@ -415,8 +423,12 @@
                             100% { margin-left:100%; }
                         }
                     </style>
-                    <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.45rem;">
-                        <span class="small text-muted mr-1"><span class="lang-en">Paintings:</span><span class="lang-fr">Tableaux&nbsp;:</span></span>
+                    <div class="st-panel">
+                        <div class="st-head">
+                            <i class="fas fa-palette"></i>&nbsp;
+                            <span class="lang-en">Paintings - in chronological order</span><span class="lang-fr">Tableaux - par ordre chronologique</span>
+                        </div>
+                        <div class="st-grid">
                         {% assign adain_styles_a = "mosaic-byz|Byzantine mosaic - Ravenna (c. 547)|Mosaïque byzantine - Ravenne (v. 547),vitrail|Stained glass - Sainte-Chapelle (c. 1248)|Vitrail - Sainte-Chapelle (v. 1248),botticelli|The Birth of Venus - Botticelli (1485)|La Naissance de Vénus - Botticelli (1485),bosch|The Garden of Earthly Delights - Bosch (c. 1500)|Le Jardin des délices - Bosch (v. 1500),bruegel|The Tower of Babel - Bruegel (1563)|La Tour de Babel - Bruegel (1563),vermeer|Girl with a Pearl Earring - Vermeer (1665)|La Jeune Fille à la perle - Vermeer (1665),friedrich|Wanderer above the Sea of Fog - Friedrich (1818)|Le Voyageur contemplant une mer de nuages - Friedrich (1818),wave|The Great Wave - Hokusai (1831)|La Grande Vague de Kanagawa - Hokusai (1831),red-fuji|Red Fuji - Hokusai (1831)|Fuji rouge - Hokusai (1831),turner|The Fighting Temeraire - Turner (1839)|Le Téméraire - Turner (1839),hiroshige|Sudden Shower - Hiroshige (1857)|Averse soudaine - Hiroshige (1857),seurat|La Grande Jatte - Seurat (1884)|Un dimanche à la Grande Jatte - Seurat (1884),cezanne|Mont Sainte-Victoire - Cezanne (c. 1887)|Mont Sainte-Victoire - Cézanne (v. 1887),cafe-terrace|Cafe Terrace at Night - Van Gogh (1888)|Terrasse du café le soir - Van Gogh (1888),sunflowers|Sunflowers - Van Gogh (1888)|Les Tournesols - Van Gogh (1888)" | split: "," %}
                         {% assign adain_styles_b = "scream|The Scream - Munch (1893)|Le Cri - Munch (1893),mucha|Salon des Cent - Mucha (1896)|Salon des Cent - Mucha (1896),monet|Water Lilies - Monet (1899)|Nymphéas - Monet (1899),matisse|Woman with a Hat - Matisse (1905)|Femme au chapeau - Matisse (1905),klimt|The Kiss - Klimt (1907)|Le Baiser - Klimt (1907),rousseau|The Dream - Rousseau (1910)|Le Rêve - Rousseau (1910),kandinsky|Composition VII - Kandinsky (1913)|Composition VII - Kandinsky (1913),klee|Senecio - Klee (1922)|Senecio - Klee (1922),mondrian|Composition II - Mondrian (1930)|Composition II - Mondrian (1930)" | split: "," %}
                         {% for s in adain_styles_a %}
@@ -446,13 +458,7 @@
                                  alt="{{ parts[1] }}" style="width:100%; height:100%; object-fit:cover;">
                         </button>
                         {% endfor %}
-                    </div>
-                    <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.5rem;">
-                        <label class="small text-muted mb-0">
-                            <span class="lang-en">Intensity</span><span class="lang-fr">Intensité</span>
-                            <input id="style-strength" type="range" min="10" max="100" value="100" style="vertical-align:middle; width:140px;">
-                        </label>
-                        <span id="style-strength-val" class="small text-muted">100%</span>
+                        </div>
                     </div>
                     <div class="d-flex flex-wrap align-items-start" style="gap:1.2rem;">
                         <div class="text-center">
@@ -469,6 +475,13 @@
                             <div id="style-painting-name" class="small text-muted mt-1"><span class="lang-en">The Starry Night - Van Gogh</span><span class="lang-fr">La Nuit étoilée - Van Gogh</span></div>
                         </div>
                         <div class="text-center">
+                            <div class="d-flex align-items-center justify-content-center mb-1" style="gap:.4rem;">
+                                <label class="small text-muted mb-0">
+                                    <span class="lang-en">Intensity</span><span class="lang-fr">Intensité</span>
+                                    <input id="style-strength" type="range" min="10" max="100" value="100" style="vertical-align:middle; width:140px;">
+                                </label>
+                                <span id="style-strength-val" class="small text-muted">100%</span>
+                            </div>
                             <canvas id="style-out" width="280" height="280" style="border:1px solid #ccc; border-radius:4px; width:280px; height:280px; background:#eee;"></canvas>
                             <div id="style-progress" class="st-progress"><span></span></div>
                             <div class="small text-muted mt-1"><span class="lang-en">stylized</span><span class="lang-fr">stylisée</span></div>
