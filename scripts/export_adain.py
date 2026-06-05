@@ -37,15 +37,15 @@ vgg = nn.Sequential(
     nn.Conv2d(3, 3, 1),
     nn.ReflectionPad2d((1, 1, 1, 1)), nn.Conv2d(3, 64, 3), nn.ReLU(),       # relu1_1
     nn.ReflectionPad2d((1, 1, 1, 1)), nn.Conv2d(64, 64, 3), nn.ReLU(),      # relu1_2
-    nn.MaxPool2d(2, 2, 0, ceil_mode=True),
+    nn.MaxPool2d(2, 2, 0),  # ceil_mode=False: identical at 224 (even dims), and WebGPU lacks ceil support
     nn.ReflectionPad2d((1, 1, 1, 1)), nn.Conv2d(64, 128, 3), nn.ReLU(),     # relu2_1
     nn.ReflectionPad2d((1, 1, 1, 1)), nn.Conv2d(128, 128, 3), nn.ReLU(),    # relu2_2
-    nn.MaxPool2d(2, 2, 0, ceil_mode=True),
+    nn.MaxPool2d(2, 2, 0),  # ceil_mode=False: identical at 224 (even dims), and WebGPU lacks ceil support
     nn.ReflectionPad2d((1, 1, 1, 1)), nn.Conv2d(128, 256, 3), nn.ReLU(),    # relu3_1
     nn.ReflectionPad2d((1, 1, 1, 1)), nn.Conv2d(256, 256, 3), nn.ReLU(),    # relu3_2
     nn.ReflectionPad2d((1, 1, 1, 1)), nn.Conv2d(256, 256, 3), nn.ReLU(),    # relu3_3
     nn.ReflectionPad2d((1, 1, 1, 1)), nn.Conv2d(256, 256, 3), nn.ReLU(),    # relu3_4
-    nn.MaxPool2d(2, 2, 0, ceil_mode=True),
+    nn.MaxPool2d(2, 2, 0),  # ceil_mode=False: identical at 224 (even dims), and WebGPU lacks ceil support
     nn.ReflectionPad2d((1, 1, 1, 1)), nn.Conv2d(256, 512, 3), nn.ReLU(),    # relu4_1
     # (deeper layers exist in the checkpoint but are not used)
 )

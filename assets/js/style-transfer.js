@@ -16,7 +16,9 @@
 
   var ORT_URL = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.webgpu.min.js";
   // try the GPU execution provider first, fall back to plain wasm
+  var wasmOnly = false;
   function createSession(url) {
+    if (wasmOnly) return window.ort.InferenceSession.create(url);
     return window.ort.InferenceSession.create(url, { executionProviders: ["webgpu", "wasm"] })
       .catch(function () { return window.ort.InferenceSession.create(url); });
   }
@@ -60,7 +62,7 @@
     if (adainSession) return Promise.resolve(adainSession);
     var base = area.getAttribute("data-base");
     setStatus("Loading AdaIN model (~28 MB)…", "Chargement du modèle AdaIN (~28 Mo)…");
-    return createSession(base + "adain.onnx").then(function (s) {
+    return createSession(base + "adain.onnx?v=2").then(function (s) {
       adainSession = s;
       return s;
     });
@@ -152,6 +154,13 @@
       if (queued) { queued = false; stylize(); }
     }).catch(function (e) {
       busy = false;
+      if (!wasmOnly) {
+        // a kernel unsupported on WebGPU: drop cached sessions, retry on wasm
+        wasmOnly = true;
+        sessions = {}; adainSession = null;
+        stylize();
+        return;
+      }
       setStatus("Failed: " + e, "Échec : " + e);
     });
   }
