@@ -1,39 +1,48 @@
+<style>
+    .cv-item { display: flex; gap: 1rem; padding: .9rem .4rem; border-bottom: 1px solid #eef1f5;
+        border-radius: 8px; transition: background .12s; }
+    .cv-item:last-child { border-bottom: 0; }
+    .cv-item:hover { background: #f7f9fc; }
+    .cv-logo { flex: 0 0 165px; display: flex; align-items: center; justify-content: center; }
+    .cv-logo img { height: 58px; width: auto; max-width: 150px; object-fit: contain; }
+    .cv-body { flex: 1 1 auto; min-width: 0; }
+    .cv-title { font-size: 1rem; font-weight: 600; margin: 0; }
+    .cv-date { font-size: .68rem; font-weight: 700; letter-spacing: .05em; color: #1c54e5;
+        background: #e8eefc; border-radius: 10px; padding: .15rem .6rem; white-space: nowrap;
+        align-self: flex-start; margin-left: .6rem; margin-top: .1rem; }
+    .cv-dept { font-size: .8rem; color: #6a7385; margin: .1rem 0 0; }
+    .cv-pos { font-size: .8rem; margin: .15rem 0 0; }
+    .cv-pos em { color: #6a7385; }
+</style>
 {% if site.data.profile.education %}
 <div class="row mt-3">
     <div class="col">
         <div class="card border-0 shadow-sm bg-white">
             <div class="card-body p-4">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="my-1">
-                            <h6><i class="fas fa-school"></i> &nbsp; {% include i18n.html key="education" %}</h6>
-                            <div class="mx-2">
-                                <ul class="list-unstyled mb-1">
-                                    {% for item in site.data.profile.education %}
-                                    <li class="media align-items-center mb-3">
-                                        <div class="mr-3 d-flex justify-content-center align-items-center" style="flex: 0 0 165px; width: 165px;">
-                                          {% if item.logo %}
-                                          {% if item.url %}
-                                            <a href="{{ item.url }}" target="_blank" class="text-black text-decoration-none">
-                                                <img src="{{ item.logo }}" alt="{{ item.name }}" style="height: 58px; width: auto; max-width: 150px; object-fit: contain;">
-                                            </a>
-                                          {% else %}
-                                            <img src="{{ item.logo }}" alt="{{ item.name }}" style="height: 58px; width: auto; max-width: 150px; object-fit: contain;">
-                                          {% endif %}
-                                          {% endif %}
-                                        </div>
-                                        <div class="media-body">
-                                            <p class="my-0"><span class="lang-en">{{ item.name }}</span><span class="lang-fr">{{ site.data.profile.education_fr[forloop.index0].name }}</span></p>
-                                            <p class="small my-0">{{ item.dept }}</p>
-                                            <p class="small my-0"><span class="lang-en">{{ item.position }}</span><span class="lang-fr">{{ site.data.profile.education_fr[forloop.index0].position }}</span> <em class="float-right">{{ item.date }}</em></p>
-                                        </div>
-                                    </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
+                <h6><i class="fas fa-school"></i> &nbsp; {% include i18n.html key="education" %}</h6>
+                <ul class="list-unstyled mb-0">
+                    {% for item in site.data.profile.education %}
+                    <li class="cv-item">
+                        <div class="cv-logo">
+                          {% if item.logo %}
+                          {% if item.url %}
+                            <a href="{{ item.url }}" target="_blank"><img src="{{ item.logo }}" alt="{{ item.name }}"></a>
+                          {% else %}
+                            <img src="{{ item.logo }}" alt="{{ item.name }}">
+                          {% endif %}
+                          {% endif %}
                         </div>
-                    </div>
-                </div>
+                        <div class="cv-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <p class="cv-title"><span class="lang-en">{{ item.name }}</span><span class="lang-fr">{{ site.data.profile.education_fr[forloop.index0].name }}</span></p>
+                                {% if item.date %}<span class="cv-date">{{ item.date }}</span>{% endif %}
+                            </div>
+                            {% if item.dept %}<p class="cv-dept">{{ item.dept }}</p>{% endif %}
+                            <p class="cv-pos"><span class="lang-en">{{ item.position }}</span><span class="lang-fr">{{ site.data.profile.education_fr[forloop.index0].position }}</span></p>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
             </div>
         </div>
     </div>
@@ -44,37 +53,30 @@
     <div class="col">
         <div class="card border-0 shadow-sm bg-white">
             <div class="card-body p-4">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="my-1">
-                            <h6><i class="fas fa-laptop-code"></i> &nbsp; {% include i18n.html key="experience" %}</h6>
-                            <div class="mx-2">
-                                <ul class="list-unstyled mb-1">
-                                    {% for item in site.data.profile.experience %}
-                                    <li class="media align-items-center mb-3">
-                                        <div class="mr-3 d-flex justify-content-center align-items-center" style="flex: 0 0 165px; width: 165px;">
-                                          {% if item.logo %}
-                                          {% if item.url %}
-                                            <a href="{{ item.url }}" target="_blank" class="text-black text-decoration-none">
-                                                <img src="{{ item.logo }}" alt="{{ item.name }}" style="height: 58px; width: auto; max-width: 150px; object-fit: contain;">
-                                            </a>
-                                          {% else %}
-                                            <img src="{{ item.logo }}" alt="{{ item.name }}" style="height: 58px; width: auto; max-width: 150px; object-fit: contain;">
-                                          {% endif %}
-                                          {% endif %}
-                                        </div>
-                                        <div class="media-body">
-                                            <p class="my-0"><span class="lang-en">{{ item.name }}</span><span class="lang-fr">{{ site.data.profile.experience_fr[forloop.index0].name }}</span></p>
-                                            <p class="small my-0">{{ item.dept }}</p>
-                                            <p class="small my-0"><span class="lang-en">{{ item.position }}</span><span class="lang-fr">{{ site.data.profile.experience_fr[forloop.index0].position }}</span> <em class="float-right">{{ item.date }}</em></p>
-                                        </div>
-                                    </li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
+                <h6><i class="fas fa-laptop-code"></i> &nbsp; {% include i18n.html key="experience" %}</h6>
+                <ul class="list-unstyled mb-0">
+                    {% for item in site.data.profile.experience %}
+                    <li class="cv-item">
+                        <div class="cv-logo">
+                          {% if item.logo %}
+                          {% if item.url %}
+                            <a href="{{ item.url }}" target="_blank"><img src="{{ item.logo }}" alt="{{ item.name }}"></a>
+                          {% else %}
+                            <img src="{{ item.logo }}" alt="{{ item.name }}">
+                          {% endif %}
+                          {% endif %}
                         </div>
-                    </div>
-                </div>
+                        <div class="cv-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <p class="cv-title"><span class="lang-en">{{ item.name }}</span><span class="lang-fr">{{ site.data.profile.experience_fr[forloop.index0].name }}</span></p>
+                                {% if item.date %}<span class="cv-date">{{ item.date }}</span>{% endif %}
+                            </div>
+                            {% if item.dept %}<p class="cv-dept">{{ item.dept }}</p>{% endif %}
+                            <p class="cv-pos"><span class="lang-en">{{ item.position }}</span><span class="lang-fr">{{ site.data.profile.experience_fr[forloop.index0].position }}</span></p>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
             </div>
         </div>
     </div>
