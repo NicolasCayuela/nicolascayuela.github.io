@@ -6,6 +6,30 @@ body_attr: >-
   data-spy="scroll" data-target="#navbar-year" data-offset="100"
 ---
 
+<style>
+    .pub-item { padding: 1rem 1.1rem; border-bottom: 1px solid #eef1f5; transition: background .12s; display: flex; gap: 1rem; }
+    .pub-item:last-child { border-bottom: 0; }
+    .pub-item:hover { background: #f7f9fc; }
+    .pub-cover { flex: 0 0 150px; }
+    .pub-cover img { width: 150px; border-radius: 10px; }
+    .pub-cover-placeholder { width: 150px; height: 100px; border-radius: 10px; display: flex; align-items: center;
+        justify-content: center; font-size: 2rem; color: #aab6cb;
+        background: linear-gradient(135deg, #eef2f8, #dde5f0); }
+    .pub-body { flex: 1 1 auto; min-width: 0; }
+    .pub-title { font-size: 1.02rem; font-weight: 600; margin: 0 0 .25rem; }
+    .pub-badge { display: inline-block; font-size: .66rem; font-weight: 700; letter-spacing: .05em;
+        text-transform: uppercase; color: #1c54e5; background: #e8eefc; border-radius: 10px;
+        padding: .15rem .55rem; white-space: nowrap; margin-top: .2rem; }
+    .pub-authors { font-size: .82rem; margin: 0 0 .15rem; }
+    .pub-venue { font-size: .8rem; font-style: italic; color: #6a7385; margin: 0 0 .15rem; }
+    .pub-abstract { font-size: .8rem; color: #6a7385; margin: 0 0 .4rem; }
+    .pub-links a { display: inline-block; font-size: .74rem; font-weight: 600; color: #1c54e5;
+        border: 1px solid #cdd9f3; border-radius: 12px; padding: .12rem .6rem; margin: 0 .25rem .25rem 0;
+        text-decoration: none; transition: background .12s, color .12s; }
+    .pub-links a:hover { background: #1c54e5; color: #fff; }
+    .pub-year-card { border-radius: 14px; box-shadow: 0 4px 16px rgba(25,40,80,.08); overflow: hidden; }
+</style>
+
 {% if site.data.profile.gscholar %}
 <blockquote>
     <span class="lang-en">You can also find all my papers on <a href="https://scholar.google.com/citations?user={{ site.data.profile.gscholar }}">🔗 Google Scholar</a>.</span>
@@ -27,7 +51,7 @@ body_attr: >-
         {% for year in pubs_by_year %}
         {% assign num_papers = year.items | size %}
         <h2 class="pt-4" id="year-{{ year.name }}">{{ year.name }}</h2>
-        <div class="my-0 p-0 bg-white shadow-sm rounded-sm">
+        <div class="my-0 p-0 bg-white pub-year-card">
             {% for item in year.items %}
                 {% include widgets/publication_item.html item=item %}
             {% endfor %}

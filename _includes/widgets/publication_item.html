@@ -1,47 +1,57 @@
 {% assign item = include.item %}
-<div class="d-none d-md-block">
-    <div class="row no-gutters border-bottom border-gray">
-        <div class="col-md-3 col-xl-2 mb-md-0 p-md-3">
-            <img data-src="{{ item.cover }}" alt="{{ item.title }}" class="lazy w-100 rounded-sm" src="assets/images/empty_300x200.png">
-        </div>
-        <div class="col-md-9 col-xl-10 p-3 pl-md-0">
-            <h5 class="mt-0 mb-1 font-weight-normal">{{ item.title }}</h5>
-            <p class="mt-0 mb-0 small">{% include widgets/author_list.html authors=item.authors %}</p>
-            <p class="mt-0 mb-0 small">{{item.pub_pre}}<i>{{ item.pub }}</i>{{ item.pub_post }} {{ item.pub_date }} {{ item.pub_last }}</p>
-            <p class="mt-0 mb-0 small text-muted">{{ item.abstract }}</p>
-            
-            <p class="small pb-0 mb-0 lh-125 text-muted abstract-links">
-                {% for link in item.links %}
-                {% if link[1].url %}
-                <a target="{{ link[1]['target'] }}" href="{{ link[1]['url'] }}">[{{ link[0] }}]</a>
-                {% else %}
-                <a target="_blank" href="{{ link[1] }}">[{{ link[0] }}]</a>
-                {% endif %}
-                {% endfor %}
-            </p>
+{% assign has_cover = true %}
+{% if item.cover == nil or item.cover == "" or item.cover contains "empty_300x200" %}{% assign has_cover = false %}{% endif %}
 
+<div class="pub-item d-none d-md-flex">
+    <div class="pub-cover">
+        {% if has_cover %}
+        <img data-src="{{ item.cover }}" alt="{{ item.title }}" class="lazy" src="assets/images/empty_300x200.png">
+        {% else %}
+        <div class="pub-cover-placeholder"><i class="far fa-file-alt"></i></div>
+        {% endif %}
+    </div>
+    <div class="pub-body">
+        <div class="d-flex align-items-start" style="gap:.6rem;">
+            <h5 class="pub-title">{{ item.title }}</h5>
+            {% if item.pub %}<span class="pub-badge">{{ item.pub }}</span>{% endif %}
         </div>
+        <p class="pub-authors">{% include widgets/author_list.html authors=item.authors %}</p>
+        {% if item.pub_pre or item.pub_date or item.pub_post %}
+        <p class="pub-venue">{{ item.pub_pre }}{{ item.pub_post }} {{ item.pub_date }} {{ item.pub_last }}</p>
+        {% endif %}
+        {% if item.abstract %}<p class="pub-abstract">{{ item.abstract }}</p>{% endif %}
+        {% if item.links %}
+        <p class="pub-links mb-0">
+            {% for link in item.links %}
+            {% if link[1].url %}
+            <a target="{{ link[1]['target'] }}" href="{{ link[1]['url'] }}">{{ link[0] }}</a>
+            {% else %}
+            <a target="_blank" href="{{ link[1] }}">{{ link[0] }}</a>
+            {% endif %}
+            {% endfor %}
+        </p>
+        {% endif %}
     </div>
 </div>
 
-<div class="card w-100 d-md-none border-top-0 border-right-0 border-left-0 rounded-0" style="overflow-y: scroll;">
-    <img data-src="{{ item.cover }}" alt="{{ item.title }}" class="lazy card-img w-100" src="assets/images/empty_300x200.png">
-    <div class="card-img-overlay d-flex align-items-start flex-column" style="background-color: rgba(255, 255, 255, 0.85);">
-        <div class="mb-auto"></div>
-        <div>
-            <h5 class="mt-0 mb-1 font-weight-normal">{{ item.title }}</h5>
-            <p class="mt-0 mb-0 small">{% include widgets/author_list.html authors=item.authors %}</p>
-            <p class="mt-0 mb-0 small">{{item.pub_pre}}<i>{{ item.pub }}</i>{{ item.pub_post }} {{ item.pub_date }} {{ item.pub_last }}</p>
-            <p class="mt-0 mb-0 small text-muted">{{ item.abstract }}</p>
-            <p class="small pb-0 mb-0 lh-125 text-muted abstract-links">
-                {% for link in item.links %}
-                {% if link[1].url %}
-                <a target="{{ link[1]['target'] }}" href="{{ link[1]['url'] }}">[{{ link[0] }}]</a>
-                {% else %}
-                <a target="_blank" href="{{ link[1] }}">[{{ link[0] }}]</a>
-                {% endif %}
-                {% endfor %}
-            </p>
-        </div>
+<div class="pub-item d-md-none flex-column">
+    {% if has_cover %}
+    <img data-src="{{ item.cover }}" alt="{{ item.title }}" class="lazy w-100 rounded-sm mb-2" src="assets/images/empty_300x200.png">
+    {% endif %}
+    <div>
+        <h5 class="pub-title">{{ item.title }} {% if item.pub %}<span class="pub-badge">{{ item.pub }}</span>{% endif %}</h5>
+        <p class="pub-authors">{% include widgets/author_list.html authors=item.authors %}</p>
+        {% if item.abstract %}<p class="pub-abstract">{{ item.abstract }}</p>{% endif %}
+        {% if item.links %}
+        <p class="pub-links mb-0">
+            {% for link in item.links %}
+            {% if link[1].url %}
+            <a target="{{ link[1]['target'] }}" href="{{ link[1]['url'] }}">{{ link[0] }}</a>
+            {% else %}
+            <a target="_blank" href="{{ link[1] }}">{{ link[0] }}</a>
+            {% endif %}
+            {% endfor %}
+        </p>
+        {% endif %}
     </div>
 </div>
