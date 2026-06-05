@@ -64,8 +64,7 @@
   }
 
   function steps() {
-    var el = document.querySelector('input[name="ddpm-steps"]:checked');
-    return el ? parseInt(el.value, 10) : 100;
+    return 25;                                 // fixed DDIM step count
   }
 
   function generate() {
