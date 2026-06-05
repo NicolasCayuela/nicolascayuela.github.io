@@ -20,18 +20,25 @@ linkedin: nicolas-cayuela
 #resume: assets/cv/Resume_Nicolas_Cayuela.pdf
 
 short_bio: >-
-  Hello, I am <strong>Nicolas Cayuela</strong>, a PhD student in phononics and metamaterials
-  at <strong>Institut Jean Lamour</strong> in Nancy, France. My research focuses on the design
-  and study of phononic crystals and acoustic/elastic metamaterials using
-  <strong>machine learning with graphs</strong>.
-  <br> <span style="color: red; font-style: italic;">Feel free to contact me if you are interested in discussing or collaborating.</span>
+  Hello, I am <strong>Nicolas Cayuela</strong>, a PhD student in phononics and metamaterials at
+  <strong>Institut Jean Lamour</strong> (UMR CNRS 7198, Nancy, France). I design <strong>3D architected
+  piezoelectric metamaterials</strong> that shape how elastic waves propagate - band gaps, Willis and
+  electro-momentum couplings - and I build <strong>graph neural networks</strong> to predict band
+  structures and inverse-design unit cells. Target applications: vibration control, directional
+  sensing and energy harvesting.
+  <br> <span style="color: #1c54e5; font-style: italic;"><i class="far fa-envelope"></i>&nbsp;
+  Feel free to reach out to discuss or collaborate.</span>
 
 short_bio_fr: >-
-  Bonjour, je suis <strong>Nicolas Cayuela</strong>, doctorant en phononique et métamatériaux
-  à l'<strong>Institut Jean Lamour</strong> à Nancy. Mes recherches portent sur la conception
-  et l'étude des cristaux phononiques et des métamatériaux acoustiques/élastiques à l'aide du
-  <strong>machine learning sur graphes</strong>.
-  <br> <span style="color: red; font-style: italic;">N'hésitez pas à me contacter pour échanger ou collaborer.</span>
+  Bonjour, je suis <strong>Nicolas Cayuela</strong>, doctorant en phononique et métamatériaux à
+  l'<strong>Institut Jean Lamour</strong> (UMR CNRS 7198, Nancy). Je conçois des <strong>métamatériaux
+  piézoélectriques architecturés 3D</strong> qui façonnent la propagation des ondes élastiques - bandes
+  interdites, couplages de Willis et électromomentum - et je développe des <strong>réseaux de neurones
+  sur graphes</strong> pour prédire les structures de bandes et faire du design inverse de cellules
+  unitaires. Applications visées : contrôle vibratoire, détection directionnelle et récupération
+  d'énergie.
+  <br> <span style="color: #1c54e5; font-style: italic;"><i class="far fa-envelope"></i>&nbsp;
+  N'hésitez pas à me contacter pour échanger ou collaborer.</span>
 
 show_portrait: true
 portrait_url: assets/images/photos/profile.jpg
