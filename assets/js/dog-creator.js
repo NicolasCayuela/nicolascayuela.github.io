@@ -1,7 +1,8 @@
 /*
- * Dog Creator: explore the 256-dimensional PCA latent space of a convolutional
- * autoencoder trained (in PyTorch) on AFHQ dog faces. The decoder runs in the
- * browser with onnxruntime-web; each slider moves along one principal component.
+ * Dog Creator: explore the PCA latent space (top 64 components) of a
+ * convolutional autoencoder trained (in PyTorch) on AFHQ dog faces. The decoder
+ * runs in the browser with onnxruntime-web; each slider moves along one
+ * principal component.
  */
 (function () {
   "use strict";

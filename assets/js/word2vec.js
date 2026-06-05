@@ -1,5 +1,5 @@
 /*
- * Word embeddings explorer: the 5000 most frequent words of GloVe 6B 50d
+ * Word embeddings explorer: the 20000 most frequent words of GloVe 6B 50d
  * (word2vec-style embeddings). 3D PCA scatter, nearest-neighbour search and
  * vector arithmetic (king - man + woman ≈ queen), all in the browser.
  */

@@ -250,7 +250,7 @@
     });
   })(fireBtns[fi]);
 
-  // Mode switch (life / fire / symmetry)
+  // Mode switch between all playground tabs
   function show(id, vis) { var el = document.getElementById(id); if (el) el.classList.toggle("d-none", !vis); }
   function setMode(m, btn) {
     setRunning(false);
