@@ -415,10 +415,6 @@
                                  alt="{{ parts[1] }}" style="width:100%; height:100%; object-fit:cover;">
                         </button>
                         {% endfor %}
-                        <label class="btn btn-sm btn-outline-secondary mb-0 ml-2">
-                            <i class="fas fa-upload"></i> <span class="lang-en">Upload image</span><span class="lang-fr">Charger une image</span>
-                            <input id="style-file" type="file" accept="image/*" style="display:none;">
-                        </label>
                     </div>
                     <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.5rem;">
                         <label class="small text-muted mb-0">
@@ -431,6 +427,10 @@
                         <div class="text-center">
                             <canvas id="style-src" width="280" height="280" style="border:1px solid #ccc; border-radius:4px; width:280px; height:280px;"></canvas>
                             <div class="small text-muted mt-1"><span class="lang-en">original</span><span class="lang-fr">originale</span></div>
+                            <label class="btn btn-sm btn-outline-dark mt-1 mb-0">
+                                <i class="fas fa-upload"></i> <span class="lang-en">Upload your image</span><span class="lang-fr">Charger ton image</span>
+                                <input id="style-file" type="file" accept="image/*" style="display:none;">
+                            </label>
                         </div>
                         <div class="text-center">
                             <canvas id="style-out" width="280" height="280" style="border:1px solid #ccc; border-radius:4px; width:280px; height:280px; background:#eee;"></canvas>
