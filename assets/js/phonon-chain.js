@@ -114,78 +114,158 @@
     drawDisp();
   }
 
-  // plot: x in [-0.55, 1] -> Im(k) on the left of 0, Re(k)/pi on the right
-  var PAD = { l: 40, r: 12, t: 14, b: 32 }, IMW = 0.55;
-  function uToX(u) { return PAD.l + (u + IMW) / (1 + IMW) * (DW - PAD.l - PAD.r); }
+  // evanescent branch above the top band: cosh(ki a) from the implicit relation
+  function kiAboveTop(w) {
+    if (mech === "bragg") {
+      var O1 = 2 * K / m1(), O2 = 2 * K / M2;
+      var arg = 2 * (w * w - O1) * (w * w - O2) / (O1 * O2) - 1;
+      return arg >= 1 ? Math.acosh(arg) : 0;
+    }
+    var c = resRHS(w);
+    return c < -1 ? Math.acosh(-c) : 0;
+  }
+
+  // ---- Laude-style two-panel plot: kr(w)/b extended zones | ki(w)/b ----
+  var PAD = { l: 40, r: 10, t: 14, b: 34 }, GAPX = 26;
+  var KRMAX = 1.6, KIMAX = 0.6;            // in units of k/b (b = 2pi/a)
+  var reX0, reX1, imX0, imX1;
+  function computePanels() {
+    var w = DW - PAD.l - PAD.r - GAPX;
+    reX0 = PAD.l; reX1 = PAD.l + w * 0.66;
+    imX0 = reX1 + GAPX; imX1 = DW - PAD.r;
+  }
+  function krToX(kb) { return reX0 + (kb + KRMAX) / (2 * KRMAX) * (reX1 - reX0); }
+  function kiToX(kb) { return imX0 + (kb + KIMAX) / (2 * KIMAX) * (imX1 - imX0); }
   function wToY(w) { return DH - PAD.b - (w / maxPlotW()) * (DH - PAD.t - PAD.b); }
-  function xToU(x) { return (x - PAD.l) / (DW - PAD.l - PAD.r) * (1 + IMW) - IMW; }
+  function fold(kb) {                      // k/b -> qa in [0, pi]
+    var u = Math.abs(kb) % 1;
+    return (u <= 0.5 ? u : 1 - u) * 2 * Math.PI;
+  }
 
   function drawDisp() {
+    computePanels();
     dctx.clearRect(0, 0, DW, DH);
     dctx.fillStyle = "#fff"; dctx.fillRect(0, 0, DW, DH);
-    var g = gap(), i, qq, x, y;
-    var x0 = uToX(0);
+    var g = gap(), i, x, y, kb, w;
+    var wTop = mech === "bragg" ? Math.sqrt(2 * K * (1 / m1() + 1 / M2)) : resOmega(Math.PI, 1);
+    var yB = DH - PAD.b;
 
-    // Im region background
-    dctx.fillStyle = "rgba(240,243,248,0.9)";
-    dctx.fillRect(PAD.l, PAD.t, x0 - PAD.l, DH - PAD.t - PAD.b);
-
-    // gap shading
+    // gap shading on both panels
     if (g[1] > g[0] + 1e-4) {
-      dctx.fillStyle = "rgba(150,160,180,0.18)";
-      dctx.fillRect(PAD.l, wToY(g[1]), DW - PAD.l - PAD.r, wToY(g[0]) - wToY(g[1]));
+      dctx.fillStyle = "rgba(150,160,180,0.16)";
+      dctx.fillRect(reX0, wToY(g[1]), reX1 - reX0, wToY(g[0]) - wToY(g[1]));
+      dctx.fillRect(imX0, wToY(g[1]), imX1 - imX0, wToY(g[0]) - wToY(g[1]));
     }
 
-    // axes
-    dctx.strokeStyle = "#c8cdd6"; dctx.lineWidth = 1;
-    dctx.beginPath();
-    dctx.moveTo(PAD.l, PAD.t); dctx.lineTo(PAD.l, DH - PAD.b); dctx.lineTo(DW - PAD.r, DH - PAD.b);
-    dctx.moveTo(x0, PAD.t); dctx.lineTo(x0, DH - PAD.b);
-    dctx.stroke();
-    dctx.fillStyle = "#8a93a3"; dctx.font = "11px sans-serif";
-    dctx.fillText("ω", 8, PAD.t + 8);
-    dctx.fillText("Im(k)·a/π", PAD.l + 4, DH - PAD.b + 14);
-    dctx.fillText("Re(k)·a/π", DW - PAD.r - 58, DH - PAD.b + 14);
-    dctx.fillText("0", x0 - 3, DH - PAD.b + 14);
+    // frequency gridlines (band edges)
+    var marks = mech === "bragg"
+      ? [[g[0], "Ω₁"], [g[1], "Ω₂"], [wTop, "√(Ω₁²+Ω₂²)"]]
+      : [[g[0], ""], [wr, "ω᷊"], [g[1], ""], [wTop, ""]];
+    dctx.strokeStyle = "#e2e6ec"; dctx.lineWidth = 1;
+    dctx.fillStyle = "#8a93a3"; dctx.font = "10px sans-serif";
+    for (i = 0; i < marks.length; i++) {
+      y = wToY(marks[i][0]);
+      dctx.beginPath(); dctx.moveTo(reX0, y); dctx.lineTo(reX1, y);
+      dctx.moveTo(imX0, y); dctx.lineTo(imX1, y); dctx.stroke();
+      if (marks[i][1]) dctx.fillText(marks[i][1], 2, y + 3);
+    }
 
-    // real branches
+    // panel frames + zone-boundary gridlines
+    dctx.strokeStyle = "#c8cdd6";
+    dctx.strokeRect(reX0, PAD.t, reX1 - reX0, yB - PAD.t);
+    dctx.strokeRect(imX0, PAD.t, imX1 - imX0, yB - PAD.t);
+    dctx.strokeStyle = "#eef1f5";
+    for (kb = -1.5; kb <= 1.51; kb += 0.5) {
+      x = krToX(kb);
+      dctx.beginPath(); dctx.moveTo(x, PAD.t); dctx.lineTo(x, yB); dctx.stroke();
+    }
+    x = kiToX(0);
+    dctx.beginPath(); dctx.moveTo(x, PAD.t); dctx.lineTo(x, yB); dctx.stroke();
+
+    // axis labels
+    dctx.fillStyle = "#8a93a3"; dctx.font = "11px sans-serif";
+    dctx.fillText("ω", 6, PAD.t + 8);
+    dctx.fillText("kr(ω)/b", (reX0 + reX1) / 2 - 22, DH - 8);
+    dctx.fillText("ki(ω)/b", (imX0 + imX1) / 2 - 20, DH - 8);
+    for (i = -1; i <= 1; i++) {
+      dctx.fillText(String(i), krToX(i) - 3, yB + 13);
+    }
+    dctx.fillText("-0.5", kiToX(-0.5) - 10, yB + 13);
+    dctx.fillText("0.5", kiToX(0.5) - 8, yB + 13);
+
+    // ---- real branches over extended zones ----
     var cols = ["#1c54e5", "#f57c00"];
     for (var b = 0; b < 2; b++) {
-      dctx.strokeStyle = cols[b]; dctx.lineWidth = 2.2;
+      dctx.strokeStyle = cols[b]; dctx.lineWidth = 2;
       dctx.beginPath();
       var started = false;
-      for (i = 0; i <= 160; i++) {
-        qq = (i / 160) * Math.PI;
-        var w = omega(qq, b);
-        if (!isFinite(w)) continue;
-        x = uToX(qq / Math.PI); y = wToY(w);
+      for (i = 0; i <= 480; i++) {
+        kb = -KRMAX + (2 * KRMAX) * i / 480;
+        w = omega(fold(kb), b);
+        if (!isFinite(w)) { started = false; continue; }
+        x = krToX(kb); y = wToY(w);
         if (!started) { dctx.moveTo(x, y); started = true; } else dctx.lineTo(x, y);
       }
       dctx.stroke();
     }
 
-    // complex band structure inside the gap (dashed, dark red)
-    dctx.strokeStyle = "#c0392b"; dctx.lineWidth = 1.8; dctx.setLineDash([5, 4]);
-    dctx.beginPath();
-    var startedIm = false;
-    for (i = 1; i < 120; i++) {
-      var wg = g[0] + (g[1] - g[0]) * i / 120;
-      var ki = mech === "bragg" ? braggKi(wg) : resKi(wg)[1];
-      if (ki <= 0) { startedIm = false; continue; }
-      x = uToX(-Math.min(IMW, ki / Math.PI)); y = wToY(wg);
-      if (!startedIm) { dctx.moveTo(x, y); startedIm = true; } else dctx.lineTo(x, y);
+    // vertical evanescent segments on the real panel (kr constant in the gap)
+    dctx.strokeStyle = "#9aa3b2"; dctx.lineWidth = 1.4; dctx.setLineDash([4, 3]);
+    function vline(kb, w0, w1) {
+      if (kb < -KRMAX - 1e-9 || kb > KRMAX + 1e-9) return;
+      dctx.beginPath(); dctx.moveTo(krToX(kb), wToY(w0)); dctx.lineTo(krToX(kb), wToY(w1)); dctx.stroke();
     }
-    dctx.stroke();
+    if (g[1] > g[0] + 1e-4) {
+      if (mech === "bragg") {
+        for (kb = -1.5; kb <= 1.51; kb += 1) vline(kb, g[0], g[1]);        // odd half-integers
+      } else {
+        // kr = 0.5 below the resonance, kr = 0 above (flip at w0)
+        var wFlip = g[0];
+        for (i = 1; i < 60; i++) {                                          // find flip frequency
+          var wt = g[0] + (g[1] - g[0]) * i / 60;
+          if (resKi(wt)[0] < 1) { wFlip = wt; break; }
+          wFlip = wt;
+        }
+        for (kb = -1.5; kb <= 1.51; kb += 1) vline(kb, g[0], wFlip);
+        for (kb = -1; kb <= 1.01; kb += 1) vline(kb, wFlip, g[1]);
+      }
+    }
+    // above the top band: kr pinned at the band-edge wavenumber
+    var topKb = (mech === "bragg") ? 0 : 0.5;   // diatomic top at zone centre (q=0), mass-in-mass at boundary
+    for (kb = -1.5; kb <= 1.51; kb += 0.5) {
+      var isCentre = Math.abs(kb % 1) < 1e-6;
+      if ((topKb === 0 && isCentre) || (topKb === 0.5 && !isCentre)) vline(kb, wTop, maxPlotW());
+    }
     dctx.setLineDash([]);
 
-    // gap label
-    if (g[1] - g[0] > 0.02) {
-      dctx.fillStyle = "#6a7385"; dctx.font = "italic 11px sans-serif";
-      dctx.fillText("band gap", x0 + 8, (wToY(g[0]) + wToY(g[1])) / 2 + 4);
+    // ---- imaginary panel: gap loop + evanescent branch above the top band ----
+    dctx.strokeStyle = "#c0392b"; dctx.lineWidth = 1.8;
+    for (var sgn = -1; sgn <= 1; sgn += 2) {
+      // gap branches
+      dctx.beginPath();
+      var st = false;
+      dctx.moveTo(kiToX(0), wToY(g[0]));
+      for (i = 0; i <= 120; i++) {
+        w = g[0] + (g[1] - g[0]) * i / 120;
+        var ki = (mech === "bragg" ? braggKi(w) : resKi(w)[1]) / (2 * Math.PI);
+        x = kiToX(sgn * Math.min(KIMAX, ki)); y = wToY(w);
+        if (!st) { dctx.moveTo(x, y); st = true; } else dctx.lineTo(x, y);
+      }
+      dctx.stroke();
+      // above-top branches
+      dctx.beginPath(); st = false;
+      for (i = 1; i <= 60; i++) {
+        w = wTop + (maxPlotW() - wTop) * i / 60;
+        var ki2 = kiAboveTop(w) / (2 * Math.PI);
+        if (ki2 <= 0) continue;
+        x = kiToX(sgn * Math.min(KIMAX, ki2)); y = wToY(w);
+        if (!st) { dctx.moveTo(kiToX(0), wToY(wTop)); dctx.lineTo(x, y); st = true; } else dctx.lineTo(x, y);
+      }
+      dctx.stroke();
     }
 
-    // marker
-    var mx = uToX(q / Math.PI), my = wToY(omega(q, branch));
+    // marker on the real panel (first zone)
+    var mx = krToX(q / (2 * Math.PI)), my = wToY(omega(q, branch));
     dctx.beginPath(); dctx.arc(mx, my, 7, 0, 6.2832);
     dctx.fillStyle = cols[branch]; dctx.fill();
     dctx.strokeStyle = "#fff"; dctx.lineWidth = 2; dctx.stroke();
@@ -196,7 +276,7 @@
       var wv = omega(q, branch);
       var bEn = branch === 0 ? (mech === "bragg" ? "acoustic" : "lower") : (mech === "bragg" ? "optical" : "upper");
       var bFr = branch === 0 ? (mech === "bragg" ? "acoustique" : "basse") : (mech === "bragg" ? "optique" : "haute");
-      var tail = " &nbsp; q·a/π = " + (q / Math.PI).toFixed(2) + " &nbsp; ω = " + wv.toFixed(3) +
+      var tail = " &nbsp; k/b = " + (q / (2 * Math.PI)).toFixed(3) + " &nbsp; ω = " + wv.toFixed(3) +
                  " &nbsp; gap: [" + g[0].toFixed(2) + ", " + g[1].toFixed(2) + "]";
       label.innerHTML = '<span class="lang-en">' + bEn + " branch" + tail + "</span>" +
                         '<span class="lang-fr">branche ' + bFr + tail.replace("gap:", "gap :") + "</span>";
@@ -272,9 +352,10 @@
   function pickMode(e) {
     var rect = dispC.getBoundingClientRect();
     var src = e.touches ? e.touches[0] : e;
-    var u = xToU(src.clientX - rect.left), yy = src.clientY - rect.top;
-    if (u < 0) return;                          // Im region is display-only
-    var qv = Math.max(0.001, Math.min(Math.PI, u * Math.PI));
+    var x = src.clientX - rect.left, yy = src.clientY - rect.top;
+    if (x < reX0 || x > reX1) return;           // Im panel is display-only
+    var kb = (x - reX0) / (reX1 - reX0) * 2 * KRMAX - KRMAX;
+    var qv = Math.max(0.001, Math.min(Math.PI, fold(kb)));
     var d0 = Math.abs(wToY(omega(qv, 0)) - yy);
     var d1 = Math.abs(wToY(omega(qv, 1)) - yy);
     q = qv; branch = d0 <= d1 ? 0 : 1;
