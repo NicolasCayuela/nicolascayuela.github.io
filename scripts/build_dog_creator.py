@@ -27,12 +27,14 @@ OUT_MODELS = os.path.join(HERE, "..", "assets", "models")
 IMG = 64
 LATENT = 256
 PCS = 64                      # principal components exposed as sliders
-EPOCHS = 200
+EPOCHS = 150
 BATCH = 64
-LR_MAX, LR_MIN = 1e-3, 1e-4   # cosine decay
-THREADS = 6                   # leave most cores to the concurrent DDPM run
+LR_MAX, LR_MIN = 5e-4, 5e-5   # cosine decay (warm start from the v2 weights)
+THREADS = os.cpu_count() or 6
+PERC_W = 0.1                  # weight of the VGG perceptual loss vs pixel MSE
 DOG_LABEL = 1                 # huggan/AFHQ: cat=0, dog=1, wild=2
 SAMPLES_IN_JSON = 300
+WARM_START = "dog_ae2.pt"     # previous-arch checkpoint to initialize from
 
 torch.manual_seed(7)
 np.random.seed(7)
@@ -96,6 +98,32 @@ class Decoder(nn.Module):
         return self.net(h)
 
 
+class VGGFeats(nn.Module):
+    """Frozen slice of the AdaIN-normalised VGG (up to relu3_1) used as a
+    perceptual loss: feature-space MSE makes reconstructions much sharper
+    than pixel MSE alone. Weights: scripts/adain_vgg.pth (MIT)."""
+    def __init__(self):
+        super().__init__()
+        vgg = nn.Sequential(
+            nn.Conv2d(3, 3, 1),
+            nn.ReflectionPad2d(1), nn.Conv2d(3, 64, 3), nn.ReLU(),       # relu1_1
+            nn.ReflectionPad2d(1), nn.Conv2d(64, 64, 3), nn.ReLU(),      # relu1_2
+            nn.MaxPool2d(2, 2),
+            nn.ReflectionPad2d(1), nn.Conv2d(64, 128, 3), nn.ReLU(),     # relu2_1
+            nn.ReflectionPad2d(1), nn.Conv2d(128, 128, 3), nn.ReLU(),    # relu2_2
+            nn.MaxPool2d(2, 2),
+            nn.ReflectionPad2d(1), nn.Conv2d(128, 256, 3), nn.ReLU(),    # relu3_1
+        )
+        vgg.load_state_dict(torch.load(os.path.join(HERE, "adain_vgg.pth"),
+                                       map_location="cpu", weights_only=True), strict=False)
+        for p in vgg.parameters():
+            p.requires_grad_(False)
+        self.net = vgg.eval()
+
+    def forward(self, x):                        # x in [0, 1]
+        return self.net(x)
+
+
 class PCADecoder(nn.Module):
     """ONNX export wrapper: PCA coordinates -> image."""
     def __init__(self, decoder, mean, components):
@@ -115,16 +143,21 @@ def main():
     print("dogs:", n)
 
     enc, dec = Encoder(), Decoder()
-    opt = torch.optim.Adam(list(enc.parameters()) + list(dec.parameters()), lr=1e-3)
+    vgg = VGGFeats()
+    opt = torch.optim.Adam(list(enc.parameters()) + list(dec.parameters()), lr=LR_MAX)
     loss_fn = nn.MSELoss()
 
-    ckpt_path = os.path.join(HERE, "dog_ae2.pt")
+    ckpt_path = os.path.join(HERE, "dog_ae3.pt")
     start_epoch = 0
     if os.path.exists(ckpt_path):
         ck = torch.load(ckpt_path, map_location="cpu", weights_only=True)
         enc.load_state_dict(ck["enc"]); dec.load_state_dict(ck["dec"])
         opt.load_state_dict(ck["opt"]); start_epoch = ck["epoch"]
         print("resumed at epoch", start_epoch)
+    elif os.path.exists(os.path.join(HERE, WARM_START)):
+        ck = torch.load(os.path.join(HERE, WARM_START), map_location="cpu", weights_only=True)
+        enc.load_state_dict(ck["enc"]); dec.load_state_dict(ck["dec"])
+        print("warm start from", WARM_START)
 
     torch.set_num_threads(THREADS)
     for epoch in range(start_epoch, EPOCHS):
@@ -141,11 +174,13 @@ def main():
             x[flip] = x[flip].flip(-1)
             opt.zero_grad()
             out = dec(enc(x))
-            loss = loss_fn(out, x)
+            pix = loss_fn(out, x)
+            perc = loss_fn(vgg(out), vgg(x))
+            loss = pix + PERC_W * perc
             loss.backward()
             opt.step()
-            tot += loss.item(); nb += 1
-        print(f"epoch {epoch + 1}/{EPOCHS}  mse {tot / nb:.5f}", flush=True)
+            tot += pix.item(); nb += 1
+        print(f"epoch {epoch + 1}/{EPOCHS}  pix-mse {tot / nb:.5f}", flush=True)
         torch.save({"enc": enc.state_dict(), "dec": dec.state_dict(),
                     "opt": opt.state_dict(), "epoch": epoch + 1}, ckpt_path)
 
