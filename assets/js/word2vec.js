@@ -138,8 +138,8 @@
     var i = lookup(inp.value);
     var list = document.getElementById("w2v-neighbors");
     if (i < 0) {
-      setStatus('"' + inp.value + '" is not in the 5000-word vocabulary.',
-                "« " + inp.value + " » n'est pas dans le vocabulaire de 5000 mots.");
+      setStatus('"' + inp.value + '" is not in the 20,000-word vocabulary.',
+                "« " + inp.value + " » n'est pas dans le vocabulaire de 20 000 mots.");
       return;
     }
     setStatus("", "");
@@ -157,8 +157,8 @@
     var c = lookup(document.getElementById("w2v-c").value);
     var list = document.getElementById("w2v-result");
     if (a < 0 || b < 0 || c < 0) {
-      setStatus("All three words must be in the 5000-word vocabulary.",
-                "Les trois mots doivent appartenir au vocabulaire de 5000 mots.");
+      setStatus("All three words must be in the 20,000-word vocabulary.",
+                "Les trois mots doivent appartenir au vocabulaire de 20 000 mots.");
       return;
     }
     setStatus("", "");
@@ -184,11 +184,17 @@
   function init() {
     if (loading || ready) return;
     loading = true;
-    setStatus("Loading embeddings (~2 MB)…", "Chargement des plongements (~2 Mo)…");
+    setStatus("Loading embeddings (~5 MB)…", "Chargement des plongements (~5 Mo)…");
     layoutSize();
     fetch(area.getAttribute("data-json")).then(function (r) { return r.json(); }).then(function (j) {
       data = j;
-      for (var i = 0; i < data.words.length; i++) index[data.words[i]] = i;
+      var sc = data.scale || 1;
+      // xyz needs real units for the projection; v stays integer
+      // (cosine and vector arithmetic are scale-invariant)
+      for (var i = 0; i < data.xyz.length; i++) {
+        data.xyz[i] = [data.xyz[i][0] / sc, data.xyz[i][1] / sc, data.xyz[i][2] / sc];
+      }
+      for (var w = 0; w < data.words.length; w++) index[data.words[w]] = w;
       ready = true; loading = false;
       setStatus("", "");
       // default demo: king - man + woman

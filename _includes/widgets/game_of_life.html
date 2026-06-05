@@ -439,10 +439,10 @@
                 </div>
 
                 <!-- ============ Word embeddings (word2vec / GloVe) ============ -->
-                <div id="w2v-area" class="d-none" data-json="{{ '/assets/models/word_embeddings.json' | relative_url }}">
+                <div id="w2v-area" class="d-none" data-json="{{ '/assets/models/word_embeddings.json' | relative_url }}?v=2">
                     <p class="small text-muted mx-1 mb-3">
-                        <span class="lang-en"><strong>Word embeddings</strong> (<a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">word2vec</a>-style, here <a href="https://nlp.stanford.edu/projects/glove/" target="_blank" rel="noopener">GloVe</a> 50d) map every word to a vector so that similar words are close and directions carry meaning: <em>king - man + woman ≈ queen</em>. The 5000 most frequent words are shown in 3D (PCA). <strong>Drag to rotate</strong>, search a word for its neighbours, or try vector arithmetic.</span>
-                        <span class="lang-fr">Les <strong>plongements de mots</strong> (type <a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">word2vec</a>, ici <a href="https://nlp.stanford.edu/projects/glove/" target="_blank" rel="noopener">GloVe</a> 50d) associent à chaque mot un vecteur : les mots similaires sont proches et les directions portent du sens : <em>king - man + woman ≈ queen</em>. Les 5000 mots les plus fréquents sont affichés en 3D (ACP). <strong>Glisse pour tourner</strong>, cherche un mot pour voir ses voisins, ou essaie l'arithmétique vectorielle.</span>
+                        <span class="lang-en"><strong>Word embeddings</strong> (<a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">word2vec</a>-style, here <a href="https://nlp.stanford.edu/projects/glove/" target="_blank" rel="noopener">GloVe</a> 50d) map every word to a vector so that similar words are close and directions carry meaning: <em>king - man + woman ≈ queen</em>. The 20,000 most frequent words are shown in 3D (PCA). <strong>Drag to rotate</strong>, search a word for its neighbours, or try vector arithmetic.</span>
+                        <span class="lang-fr">Les <strong>plongements de mots</strong> (type <a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">word2vec</a>, ici <a href="https://nlp.stanford.edu/projects/glove/" target="_blank" rel="noopener">GloVe</a> 50d) associent à chaque mot un vecteur : les mots similaires sont proches et les directions portent du sens : <em>king - man + woman ≈ queen</em>. Les 20 000 mots les plus fréquents sont affichés en 3D (ACP). <strong>Glisse pour tourner</strong>, cherche un mot pour voir ses voisins, ou essaie l'arithmétique vectorielle.</span>
                     </p>
                     <div class="d-flex flex-wrap" style="gap:1.2rem;">
                         <div style="flex:1 1 300px; min-width:260px;">
@@ -483,4 +483,4 @@
 <script src="{{ '/assets/js/dog-creator.js' | relative_url }}?v=4"></script>
 <script src="{{ '/assets/js/dog-diffusion.js' | relative_url }}?v=3"></script>
 <script src="{{ '/assets/js/style-transfer.js' | relative_url }}?v=5"></script>
-<script src="{{ '/assets/js/word2vec.js' | relative_url }}?v=1"></script>
+<script src="{{ '/assets/js/word2vec.js' | relative_url }}?v=2"></script>
