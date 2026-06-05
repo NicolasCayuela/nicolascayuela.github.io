@@ -8,7 +8,6 @@ Built with Jekyll on GitHub Pages, bilingual EN/FR, with an interactive ML/physi
 
 | Demo | What it shows | Tech |
 |---|---|---|
-| Phonon dispersion | 1D diatomic chain (Bragg) vs mass-in-mass chain (local resonance): band gaps, complex band structure kr/ki, animated Bloch modes | pure JS, after Laude, *Phononic Crystals* |
 | CIFAR-100 latent space | 3D point cloud of 1000 real CIFAR-100 images, nearest-image lookup | canvas 3D |
 | Word embeddings | GloVe 6B 50d, 20k words, neighbour search and vector arithmetic (paris - france + italy = rome) | pure JS |
 | Game of Life / Forest fire | classic cellular automata | pure JS |

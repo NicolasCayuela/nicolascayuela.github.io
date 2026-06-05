@@ -36,9 +36,6 @@
                     <button id="gol-mode-style" type="button" class="btn btn-outline-dark">
                         <i class="fas fa-palette"></i> <span class="lang-en">Style transfer</span><span class="lang-fr">Transfert de style</span>
                     </button>
-                    <button id="gol-mode-phonon" type="button" class="btn btn-outline-dark">
-                        <i class="fas fa-wave-square"></i> <span class="lang-en">Phonon dispersion</span><span class="lang-fr">Dispersion phononique</span>
-                    </button>
                 </div>
 
                 <!-- ============ Game of Life / Forest fire ============ -->
@@ -265,50 +262,6 @@
                     </div>
                     <div id="gd-wrap" style="width:100%;">
                         <canvas id="gd-canvas" style="background:#fff; border-radius:4px; touch-action:none; cursor:grab; width:100%;"></canvas>
-                    </div>
-                </div>
-
-                <!-- ============ Phonon dispersion (1D diatomic chain) ============ -->
-                <div id="phonon-area" class="d-none">
-                    <p class="small text-muted mx-1 mb-3">
-                        <span class="lang-en">Two mechanisms open a phononic <strong>band gap</strong> - frequencies where no wave propagates. <strong>Bragg scattering</strong> (diatomic chain): the gap comes from periodicity, pinned at λ ≈ 2a; <span style="color:#1c54e5; font-weight:600;">acoustic</span> and <span style="color:#f57c00; font-weight:600;">optical</span> branches split as the mass ratio grows. <strong>Local resonance</strong> (mass-in-mass chain): the gap is pinned to the internal resonator frequency ω᷊, independent of the lattice constant - sub-wavelength, the founding idea of acoustic metamaterials. The left half of the plot shows the <strong>complex band structure</strong> Im(k) inside the gap (dashed): a symmetric loop for Bragg, an asymmetric resonance peak for local resonance - the tell-tale signature distinguishing the two. <strong>Drag the marker</strong> to pick a mode and watch the chain vibrate. After Laude, <em>Phononic Crystals</em> (<a href="https://doi.org/10.1515/9783110641189" target="_blank" rel="noopener">De Gruyter</a>), ch. 1-2.</span>
-                        <span class="lang-fr">Deux mécanismes ouvrent une <strong>bande interdite</strong> phononique - des fréquences où aucune onde ne se propage. <strong>Diffusion de Bragg</strong> (chaîne diatomique) : le gap vient de la périodicité, fixé à λ ≈ 2a ; les branches <span style="color:#1c54e5; font-weight:600;">acoustique</span> et <span style="color:#f57c00; font-weight:600;">optique</span> se séparent quand le rapport de masses augmente. <strong>Résonance locale</strong> (chaîne masse-dans-masse) : le gap est accroché à la fréquence du résonateur interne ω᷊, indépendamment du pas du réseau - sub-longueur d'onde, l'idée fondatrice des métamatériaux acoustiques. La moitié gauche du graphe montre la <strong>structure de bandes complexe</strong> Im(k) dans le gap (pointillés) : boucle symétrique pour Bragg, pic de résonance asymétrique pour la résonance locale - la signature qui distingue les deux. <strong>Déplace le marqueur</strong> pour choisir un mode et regarde la chaîne vibrer. D'après Laude, <em>Phononic Crystals</em> (<a href="https://doi.org/10.1515/9783110641189" target="_blank" rel="noopener">De Gruyter</a>), chap. 1-2.</span>
-                    </p>
-                    <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.5rem;">
-                        <button id="phonon-mech-bragg" class="btn btn-sm btn-outline-dark active">
-                            <span class="lang-en">Bragg (diatomic)</span><span class="lang-fr">Bragg (diatomique)</span>
-                        </button>
-                        <button id="phonon-mech-res" class="btn btn-sm btn-outline-dark">
-                            <span class="lang-en">Local resonance</span><span class="lang-fr">Résonance locale</span>
-                        </button>
-                        <span id="phonon-bragg-controls" class="d-flex align-items-center" style="gap:.5rem;">
-                            <label class="small text-muted mb-0 ml-2">
-                                <span class="lang-en">Mass ratio</span><span class="lang-fr">Rapport de masses</span>
-                                <input id="phonon-ratio" type="range" min="1" max="4" step="0.05" value="2" style="vertical-align:middle; width:140px;">
-                            </label>
-                            <span id="phonon-ratio-val" class="small text-muted" style="font-variant-numeric:tabular-nums;">m₁/m₂ = 2.00</span>
-                        </span>
-                        <span id="phonon-res-controls" class="d-none d-flex align-items-center flex-wrap" style="gap:.5rem;">
-                            <label class="small text-muted mb-0 ml-2">
-                                <span class="lang-en">Resonator frequency</span><span class="lang-fr">Fréquence du résonateur</span>
-                                <input id="phonon-wr" type="range" min="0.4" max="1.5" step="0.02" value="0.8" style="vertical-align:middle; width:120px;">
-                            </label>
-                            <span id="phonon-wr-val" class="small text-muted" style="font-variant-numeric:tabular-nums;">ω᷊ = 0.80</span>
-                            <label class="small text-muted mb-0 ml-2">
-                                <span class="lang-en">Resonator mass</span><span class="lang-fr">Masse du résonateur</span>
-                                <input id="phonon-mr" type="range" min="0.1" max="1.5" step="0.05" value="0.5" style="vertical-align:middle; width:120px;">
-                            </label>
-                            <span id="phonon-mr-val" class="small text-muted" style="font-variant-numeric:tabular-nums;">m᷊/M = 0.50</span>
-                        </span>
-                    </div>
-                    <div class="d-flex flex-wrap align-items-start" style="gap:1rem;">
-                        <div>
-                            <canvas id="phonon-disp" style="border-radius:14px; box-shadow:0 6px 22px rgba(25,40,80,.15); background:#fff; touch-action:none; cursor:crosshair;"></canvas>
-                            <div id="phonon-readout" class="small text-muted mt-2" style="font-variant-numeric:tabular-nums;">&nbsp;</div>
-                        </div>
-                    </div>
-                    <div class="mt-3" style="overflow-x:auto;">
-                        <canvas id="phonon-chain" style="border-radius:14px; box-shadow:0 6px 22px rgba(25,40,80,.15); background:#fff;"></canvas>
                     </div>
                 </div>
 
@@ -582,4 +535,3 @@
 <script src="{{ '/assets/js/dog-diffusion.js' | relative_url }}?v=6"></script>
 <script src="{{ '/assets/js/style-transfer.js' | relative_url }}?v=7"></script>
 <script src="{{ '/assets/js/word2vec.js' | relative_url }}?v=5"></script>
-<script src="{{ '/assets/js/phonon-chain.js' | relative_url }}?v=6"></script>
