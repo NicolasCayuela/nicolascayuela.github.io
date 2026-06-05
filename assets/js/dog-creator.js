@@ -148,10 +148,16 @@
     });
   }
 
+  function setProgress(on) {
+    var bar = document.getElementById("dog-progress");
+    if (bar) bar.style.display = on ? "block" : "none";
+  }
+
   function init() {
     if (loading || ready) return;
     loading = true;
-    setStatus("Loading model…", "Chargement du modèle…");
+    setProgress(true);
+    setStatus("Loading model (~10 MB)…", "Chargement du modèle (~10 Mo)…");
     var base = area.getAttribute("data-base");
     Promise.all([
       loadScript(ORT_URL),
@@ -163,11 +169,13 @@
       return createSession(base + "dog_decoder.onnx?v=3");
     }).then(function (s) {
       session = s; ready = true; loading = false;
+      setProgress(false);
       setStatus("", "");
       buildSliders();
       render();                              // average dog
     }).catch(function (e) {
       loading = false;
+      setProgress(false);
       setStatus("Failed to load the model: " + e, "Échec du chargement du modèle : " + e);
     });
   }
