@@ -271,7 +271,7 @@
                         <span class="lang-en">A <strong>latent space</strong> is a low-dimensional map where each image is encoded to a point, so that visually similar images land close together. Here every real CIFAR-100 image is a dot, coloured by its class (100 classes), laid out in 3D. <strong>Drag to rotate</strong> the cloud, <strong>scroll to zoom</strong>, <strong>move the cursor</strong> through the space and the left panel shows the image at the nearest point. Dataset: <a href="https://www.cs.toronto.edu/~kriz/cifar.html" target="_blank" rel="noopener">CIFAR-100</a> (Krizhevsky, 2009).</span>
                         <span class="lang-fr">Un <strong>espace latent</strong> est une carte en faible dimension où chaque image est encodée en un point, de sorte que les images visuellement proches se retrouvent voisines. Ici chaque vraie image CIFAR-100 est un point, coloré selon sa classe (100 classes), disposé en 3D. <strong>Glisse pour tourner</strong> le nuage, <strong>molette pour zoomer</strong>, <strong>déplace le curseur</strong> dans l'espace et le panneau de gauche montre l'image du point le plus proche. Jeu de données : <a href="https://www.cs.toronto.edu/~kriz/cifar.html" target="_blank" rel="noopener">CIFAR-100</a> (Krizhevsky, 2009).</span>
                     </p>
-                    <div class="d-flex flex-wrap align-items-start" style="gap:1rem;">
+                    <div class="d-flex flex-wrap align-items-start justify-content-center" style="gap:1.4rem;">
                     <style>
                         #cifar-area .cf-canvas { border-radius:14px; box-shadow:0 6px 22px rgba(25,40,80,.15); background:#fff; }
                     </style>
@@ -285,7 +285,7 @@
                                 <span class="lang-fr">vecteur latent du point sélectionné</span>
                             </div>
                         </div>
-                        <div id="cifar-mapwrap" style="flex:1 1 260px; min-width:220px;">
+                        <div id="cifar-mapwrap" style="flex:0 1 360px; width:360px; max-width:100%;">
                             <canvas id="cifar-map" class="cf-canvas"
                                     data-sprite="{{ '/assets/images/cifar/cifar_sprite.png' | relative_url }}?v=2"
                                     data-json="{{ '/assets/images/cifar/cifar_data.json' | relative_url }}?v=2"
@@ -510,12 +510,12 @@
                         #w2v-area .wv-ex:hover { color:#1c54e5; }
                         #w2v-area input.form-control-sm { border-radius:8px; }
                     </style>
-                    <div class="d-flex flex-wrap" style="gap:1.2rem;">
-                        <div style="flex:1 1 300px; min-width:260px;">
+                    <div class="d-flex flex-wrap justify-content-center" style="gap:1.4rem;">
+                        <div style="flex:0 1 420px; width:420px; max-width:100%;">
                             <canvas id="w2v-canvas" class="wv-canvas"></canvas>
                             <div id="w2v-status" class="small text-muted mt-2">&nbsp;</div>
                         </div>
-                        <div class="d-flex flex-column align-self-stretch" style="min-width:280px; max-width:340px; flex:1 1 280px; gap:1rem;">
+                        <div class="d-flex flex-column align-self-stretch" style="width:330px; max-width:100%; gap:1rem;">
                             <div class="wv-panel" style="flex:1;">
                                 <div class="wv-head"><i class="fas fa-search"></i> <span class="lang-en">Nearest neighbours</span><span class="lang-fr">Plus proches voisins</span></div>
                                 <div class="d-flex mb-1" style="gap:.3rem;">
