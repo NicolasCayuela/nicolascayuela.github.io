@@ -3,7 +3,39 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% if page.url == "/" or page.url == "/index.html" %}
+    <title>Nicolas Cayuela - PhD Phononics &amp; Metamaterials | Machine Learning, GNN</title>
+    {% else %}
     <title>{{ page.title }} - {{ site.data.profile.navbar_name }}</title>
+    {% endif %}
+    <meta name="description" content="{% if page.description %}{{ page.description }}{% else %}Nicolas Cayuela, PhD student at Institut Jean Lamour (Nancy, UMR CNRS 7198). Research on elastic metamaterials, phononic crystals and graph deep learning (GNN) for inverse design.{% endif %}">
+    <link rel="canonical" href="https://nicolascayuela.github.io{{ page.url | replace: 'index.html', '' }}">
+    <meta property="og:title" content="{% if page.url == '/' %}Nicolas Cayuela - PhD Phononics & Metamaterials{% else %}{{ page.title }} - Nicolas Cayuela{% endif %}">
+    <meta property="og:description" content="{% if page.description %}{{ page.description }}{% else %}PhD student in phononics and metamaterials at Institut Jean Lamour - elastic metamaterials, phononic crystals, GNN inverse design.{% endif %}">
+    <meta property="og:url" content="https://nicolascayuela.github.io{{ page.url | replace: 'index.html', '' }}">
+    <meta property="og:type" content="website">
+
+    <!-- Structured data: consolidates the "person" entity for search engines -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Nicolas Cayuela",
+      "url": "https://nicolascayuela.github.io/",
+      "jobTitle": "PhD Student in Phononics & Metamaterials",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "Institut Jean Lamour, UMR CNRS 7198",
+        "url": "https://ijl.univ-lorraine.fr/"
+      },
+      "knowsAbout": ["Phononics", "Elastic metamaterials", "Phononic crystals",
+                     "Machine learning", "Graph neural networks", "Inverse design"],
+      "sameAs": [
+        "https://github.com/{{ site.data.profile.github }}",
+        "https://www.linkedin.com/in/{{ site.data.profile.linkedin }}"
+      ]
+    }
+    </script>
 
     <script>
         (function() {
