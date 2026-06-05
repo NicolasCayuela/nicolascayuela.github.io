@@ -28,7 +28,7 @@ BATCH = 128
 LR_MAX, LR_MIN = 2e-4, 2e-5   # cosine decay over the full run
 TSTEPS = 1000
 DOG_LABEL = 1                 # huggan/AFHQ: cat=0, dog=1, wild=2
-EMA_DECAY = 0.999
+EMA_DECAY = 0.9995              # ~50-epoch horizon, smoother late-training average
 
 torch.manual_seed(7)
 np.random.seed(7)
