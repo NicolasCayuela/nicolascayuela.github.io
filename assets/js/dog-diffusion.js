@@ -123,13 +123,13 @@
     var base = area.getAttribute("data-base");
     Promise.all([
       loadScript(ORT_URL),
-      fetch(base + "dog_diffusion.json?v=2").then(function (r) { return r.json(); })
+      fetch(base + "dog_diffusion.json?v=3").then(function (r) { return r.json(); })
     ]).then(function (rs) {
       meta = rs[1];
       IMG = meta.img;
       off.width = IMG; off.height = IMG;
       offCtx = off.getContext("2d");
-      return createSession(base + "dog_diffusion.onnx?v=2");
+      return createSession(base + "dog_diffusion.onnx?v=3");
     }).then(function (s) {
       session = s; ready = true; loading = false;
       setStatus("Ready - press Generate.", "Prêt - clique sur Générer.");
