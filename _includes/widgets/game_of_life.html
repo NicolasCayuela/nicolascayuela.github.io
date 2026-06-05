@@ -346,10 +346,6 @@
                         </div>
                         <!-- right: controls -->
                         <div class="dg-controls">
-                            <label class="dg-switch mb-3">
-                                <input id="dog-live" type="checkbox" checked>
-                                <span class="lang-en">Render on change</span><span class="lang-fr">Rendu en continu</span>
-                            </label>
                             <button id="dog-random" class="btn btn-sm btn-dark btn-block mb-2">
                                 <i class="fas fa-dice"></i> <span class="lang-en">Random Dog</span><span class="lang-fr">Chien aléatoire</span>
                             </button>
@@ -358,9 +354,6 @@
                             </button>
                             <button id="dog-avg" class="btn btn-sm btn-outline-dark btn-block mb-2">
                                 <i class="fas fa-undo"></i> <span class="lang-en">Return to Average Dog</span><span class="lang-fr">Retour au chien moyen</span>
-                            </button>
-                            <button id="dog-render" class="btn btn-sm btn-outline-secondary btn-block mb-2">
-                                <i class="fas fa-sync"></i> <span class="lang-en">Render</span><span class="lang-fr">Rendu</span>
                             </button>
                         </div>
                     </div>
@@ -513,7 +506,7 @@
 <script src="{{ '/assets/js/symmetry.js' | relative_url }}?v=8"></script>
 <script src="{{ '/assets/js/gradient-descent.js' | relative_url }}?v=13"></script>
 <script src="{{ '/assets/js/cifar.js' | relative_url }}?v=9"></script>
-<script src="{{ '/assets/js/dog-creator.js' | relative_url }}?v=5"></script>
+<script src="{{ '/assets/js/dog-creator.js' | relative_url }}?v=6"></script>
 <script src="{{ '/assets/js/dog-diffusion.js' | relative_url }}?v=6"></script>
 <script src="{{ '/assets/js/style-transfer.js' | relative_url }}?v=6"></script>
 <script src="{{ '/assets/js/word2vec.js' | relative_url }}?v=5"></script>

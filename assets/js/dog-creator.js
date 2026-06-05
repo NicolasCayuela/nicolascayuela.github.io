@@ -75,8 +75,7 @@
         inp.addEventListener("input", function () {
           coords[i] = (parseFloat(inp.value) / 100) * meta.stds[i];
           chipText(i);
-          var live = document.getElementById("dog-live");
-          if (live && live.checked) requestRender();
+          requestRender();
         });
         inp.addEventListener("dblclick", function () {     // reset one component
           inp.value = "0"; coords[i] = 0; chipText(i); requestRender();
@@ -175,7 +174,6 @@
 
   // ---- buttons ----
   function on(id, fn) { var el = document.getElementById(id); if (el) el.addEventListener("click", fn); }
-  on("dog-render", function () { histPending = true; requestRender(); });
   on("dog-avg", function () {
     if (!ready) return;
     coords.fill(0); syncSliders(); requestRender();
