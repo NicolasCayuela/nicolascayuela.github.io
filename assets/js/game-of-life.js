@@ -254,6 +254,9 @@
   function show(id, vis) { var el = document.getElementById(id); if (el) el.classList.toggle("d-none", !vis); }
   function setMode(m, btn) {
     setRunning(false);
+    if (window.__phononHide) window.__phononHide();   // stop the chain animation
+    var phBtn = document.getElementById("gol-mode-phonon");
+    if (phBtn) phBtn.classList.toggle("active", m === "phonon");
     document.getElementById("gol-mode-life").classList.toggle("active", m === "life");
     document.getElementById("gol-mode-fire").classList.toggle("active", m === "fire");
     var symBtn = document.getElementById("gol-mode-sym");
@@ -271,6 +274,7 @@
     var wvBtn = document.getElementById("gol-mode-w2v");
     if (wvBtn) wvBtn.classList.toggle("active", m === "w2v");
 
+    show("phonon-area", m === "phonon");
     show("gol-area", m === "life" || m === "fire");
     show("sym-area", m === "sym");
     show("gd-area", m === "gd");
@@ -280,6 +284,7 @@
     show("style-area", m === "style");
     show("w2v-area", m === "w2v");
 
+    if (m === "phonon") { if (window.__phononShow) window.__phononShow(); return; }
     if (m === "sym") { if (window.__symResize) window.__symResize(); return; }
     if (m === "gd") { if (window.__gdResize) window.__gdResize(); return; }
     if (m === "cifar") { if (window.__cifarResize) window.__cifarResize(); return; }
@@ -308,6 +313,7 @@
   on("gol-mode-sym", function () { setMode("sym"); });
   on("gol-mode-gd", function () { setMode("gd"); });
   on("gol-mode-cifar", function () { setMode("cifar"); });
+  on("gol-mode-phonon", function () { setMode("phonon"); });
   on("gol-mode-dog", function () { setMode("dog"); });
   on("gol-mode-ddpm", function () { setMode("ddpm"); });
   on("gol-mode-style", function () { setMode("style"); });

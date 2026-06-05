@@ -9,7 +9,10 @@
 
                 <!-- mode switch: Game of Life / Forest fire / Symmetry groups -->
                 <div class="btn-group btn-group-sm mb-3 flex-wrap" role="group">
-                    <button id="gol-mode-cifar" type="button" class="btn btn-outline-dark active">
+                    <button id="gol-mode-phonon" type="button" class="btn btn-outline-dark active">
+                        <i class="fas fa-wave-square"></i> <span class="lang-en">Phonon dispersion</span><span class="lang-fr">Dispersion phononique</span>
+                    </button>
+                    <button id="gol-mode-cifar" type="button" class="btn btn-outline-dark">
                         <i class="fas fa-image"></i> <span class="lang-en">CIFAR-100 Latent space</span><span class="lang-fr">Espace latent CIFAR-100</span>
                     </button>
                     <button id="gol-mode-w2v" type="button" class="btn btn-outline-dark">
@@ -265,8 +268,32 @@
                     </div>
                 </div>
 
+                <!-- ============ Phonon dispersion (1D diatomic chain) ============ -->
+                <div id="phonon-area">
+                    <p class="small text-muted mx-1 mb-3">
+                        <span class="lang-en">The <strong>1D diatomic chain</strong> is the textbook model of phononics: two alternating masses connected by springs. Its dispersion relation ω(q) splits into an <span style="color:#1c54e5; font-weight:600;">acoustic</span> and an <span style="color:#f57c00; font-weight:600;">optical</span> branch separated by a <strong>band gap</strong> - frequencies where no wave propagates, the founding idea of phononic crystals and metamaterials. <strong>Drag the marker</strong> on the curves to pick a mode and watch the chain vibrate accordingly; <strong>tune the mass ratio</strong> to open or close the gap (equal masses → monatomic chain, no gap). See <a href="https://en.wikipedia.org/wiki/Phonon#Dispersion_relation" target="_blank" rel="noopener">phonon dispersion</a>.</span>
+                        <span class="lang-fr">La <strong>chaîne diatomique 1D</strong> est le modèle d'école de la phononique : deux masses alternées reliées par des ressorts. Sa relation de dispersion ω(q) se sépare en une branche <span style="color:#1c54e5; font-weight:600;">acoustique</span> et une branche <span style="color:#f57c00; font-weight:600;">optique</span> séparées par une <strong>bande interdite</strong> - des fréquences où aucune onde ne se propage, l'idée fondatrice des cristaux phononiques et des métamatériaux. <strong>Déplace le marqueur</strong> sur les courbes pour choisir un mode et regarde la chaîne vibrer en conséquence ; <strong>règle le rapport de masses</strong> pour ouvrir ou fermer le gap (masses égales → chaîne monoatomique, pas de gap). Voir <a href="https://fr.wikipedia.org/wiki/Phonon" target="_blank" rel="noopener">dispersion des phonons</a>.</span>
+                    </p>
+                    <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.8rem;">
+                        <label class="small text-muted mb-0">
+                            <span class="lang-en">Mass ratio</span><span class="lang-fr">Rapport de masses</span>
+                            <input id="phonon-ratio" type="range" min="1" max="4" step="0.05" value="2" style="vertical-align:middle; width:160px;">
+                        </label>
+                        <span id="phonon-ratio-val" class="small text-muted" style="font-variant-numeric:tabular-nums;">m₁/m₂ = 2.00</span>
+                    </div>
+                    <div class="d-flex flex-wrap align-items-start" style="gap:1rem;">
+                        <div>
+                            <canvas id="phonon-disp" style="border-radius:14px; box-shadow:0 6px 22px rgba(25,40,80,.15); background:#fff; touch-action:none; cursor:crosshair;"></canvas>
+                            <div id="phonon-readout" class="small text-muted mt-2" style="font-variant-numeric:tabular-nums;">&nbsp;</div>
+                        </div>
+                    </div>
+                    <div class="mt-3" style="overflow-x:auto;">
+                        <canvas id="phonon-chain" style="border-radius:14px; box-shadow:0 6px 22px rgba(25,40,80,.15); background:#fff;"></canvas>
+                    </div>
+                </div>
+
                 <!-- ============ CIFAR-100 dataset explorer ============ -->
-                <div id="cifar-area">
+                <div id="cifar-area" class="d-none">
                     <p class="small text-muted mx-1 mb-3">
                         <span class="lang-en">A <strong>latent space</strong> is a low-dimensional map where each image is encoded to a point, so that visually similar images land close together. Here every real CIFAR-100 image is a dot, coloured by its class (100 classes), laid out in 3D. <strong>Drag to rotate</strong> the cloud, <strong>scroll to zoom</strong>, <strong>move the cursor</strong> through the space and the left panel shows the image at the nearest point. Dataset: <a href="https://www.cs.toronto.edu/~kriz/cifar.html" target="_blank" rel="noopener">CIFAR-100</a> (Krizhevsky, 2009).</span>
                         <span class="lang-fr">Un <strong>espace latent</strong> est une carte en faible dimension où chaque image est encodée en un point, de sorte que les images visuellement proches se retrouvent voisines. Ici chaque vraie image CIFAR-100 est un point, coloré selon sa classe (100 classes), disposé en 3D. <strong>Glisse pour tourner</strong> le nuage, <strong>molette pour zoomer</strong>, <strong>déplace le curseur</strong> dans l'espace et le panneau de gauche montre l'image du point le plus proche. Jeu de données : <a href="https://www.cs.toronto.edu/~kriz/cifar.html" target="_blank" rel="noopener">CIFAR-100</a> (Krizhevsky, 2009).</span>
@@ -527,7 +554,7 @@
     </div>
 </div>
 
-<script src="{{ '/assets/js/game-of-life.js' | relative_url }}?v=14"></script>
+<script src="{{ '/assets/js/game-of-life.js' | relative_url }}?v=15"></script>
 <script src="{{ '/assets/js/symmetry.js' | relative_url }}?v=8"></script>
 <script src="{{ '/assets/js/gradient-descent.js' | relative_url }}?v=13"></script>
 <script src="{{ '/assets/js/cifar.js' | relative_url }}?v=9"></script>
@@ -535,3 +562,5 @@
 <script src="{{ '/assets/js/dog-diffusion.js' | relative_url }}?v=6"></script>
 <script src="{{ '/assets/js/style-transfer.js' | relative_url }}?v=7"></script>
 <script src="{{ '/assets/js/word2vec.js' | relative_url }}?v=5"></script>
+<script src="{{ '/assets/js/phonon-chain.js' | relative_url }}?v=1"></script>
+<script>if (window.__phononShow) window.__phononShow();</script>
