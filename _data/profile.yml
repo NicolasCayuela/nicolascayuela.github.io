@@ -78,29 +78,29 @@ education_fr:
     position: '<em>Lycée Jean-Baptiste-Dumas</em><br>Classes Préparatoires aux Grandes Écoles.'
 
 experience:
-  - name: "Internship - Dynamic mechanical characterization of elementary fibres for bio-sourced composites"
-    logo: assets/images/badges/femto.svg
-    url: "https://www.femto-st.fr/fr"
-    position: '<em>FEMTO-ST, Applied Mechanics Department</em><br>Dynamic testing (laser vibrometer, high-speed camera, vacuum pump) on flax fibres: identification of damping by logarithmic decrement and of the storage (stiffness) modulus via FE in COMSOL.'
-    date: 2024
-  - name: "Internship - Multi-physics optomechanical sensor study"
-    logo: assets/images/badges/leti.png
-    url: "https://www.leti-cea.fr/"
-    position: '<em>CEA-Leti</em><br>Gas sensing with optomechanical chips and a Mach–Zehnder reference. Built an experimental bench, capping encapsulation (PMMA + tape), RF probe measurements and Comsol/RSoft simulations to analyse the optomechanical coupling and eigenmodes.'
-    date: 2025
   - name: "PhD - Sustainable architected metamaterials for elastic wave manipulation"
     logo: assets/images/badges/ijl.jpg
     url: "https://ijl.univ-lorraine.fr/"
     position: '<em>Institut Jean Lamour, UMR CNRS 7198</em><br>Design of 3D piezoelectric metamaterials from pillar-based unit cells, with a piezoelectric tensor tunable through the micro-architecture. Characterization of the elastodynamic behaviour (band structures, Willis coupling, electro-momentum coupling) and machine-learning approaches (GNN, inverse design) to speed up prediction and optimization of wave-propagation properties. Targeted applications: defect/impact detection, directional sensing, energy harvesting and non-Hermitian behaviour.'
     date: 2025 - 2028
+  - name: "Internship - Multi-physics optomechanical sensor study"
+    logo: assets/images/badges/leti.png
+    url: "https://www.leti-cea.fr/"
+    position: '<em>CEA-Leti</em><br>Gas sensing with optomechanical chips and a Mach–Zehnder reference. Built an experimental bench, capping encapsulation (PMMA + tape), RF probe measurements and Comsol/RSoft simulations to analyse the optomechanical coupling and eigenmodes.'
+    date: 2025
+  - name: "Internship - Dynamic mechanical characterization of elementary fibres for bio-sourced composites"
+    logo: assets/images/badges/femto.svg
+    url: "https://www.femto-st.fr/fr"
+    position: '<em>FEMTO-ST, Applied Mechanics Department</em><br>Dynamic testing (laser vibrometer, high-speed camera, vacuum pump) on flax fibres: identification of damping by logarithmic decrement and of the storage (stiffness) modulus via FE in COMSOL.'
+    date: 2024
 
 experience_fr:
-  - name: "Stage - Caractérisation mécanique dynamique de fibres élémentaires pour les matériaux composites biosourcés"
-    position: '<em>FEMTO-ST, département de mécanique appliquée</em><br>Essais dynamiques (vibromètre laser, caméra rapide, pompe à vide) sur des fibres de lin : identification de l''amortissement par décrément logarithmique et du module de stockage (=rigidité) par EF sur COMSOL.'
-  - name: "Stage - Étude d'un capteur multi-physique optomécanique"
-    position: '<em>CEA-Leti</em><br>Exploration de la mesure de gaz avec des puces optomécaniques et Mach–Zehnder en référence. Mise en place d''un banc expérimental, encapsulation par capots (PMMA + scotch), mesures RF par pointes et simulations Comsol/RSoft pour analyser le couplage optomécanique et les modes propres.'
   - name: "Doctorat - Métamatériaux à architecture durable pour la manipulation des ondes élastiques"
     position: '<em>Institut Jean Lamour, UMR CNRS 7198</em><br>Conception de métamatériaux piézoélectriques 3D à base de cellules unitaires à montants, avec tenseur piézoélectrique personnalisable par design de la microarchitecture. Caractérisation du comportement élastodynamique (structures de bandes, couplage de Willis, couplage électromomentum) et approches par apprentissage automatique (GNN, design inverse) pour accélérer la prédiction et l''optimisation des propriétés de propagation des ondes. Applications visées : détection de défauts/impacts, détection directionnelle, récupération d''énergie et comportement non hermitien.'
+  - name: "Stage - Étude d'un capteur multi-physique optomécanique"
+    position: '<em>CEA-Leti</em><br>Exploration de la mesure de gaz avec des puces optomécaniques et Mach–Zehnder en référence. Mise en place d''un banc expérimental, encapsulation par capots (PMMA + scotch), mesures RF par pointes et simulations Comsol/RSoft pour analyser le couplage optomécanique et les modes propres.'
+  - name: "Stage - Caractérisation mécanique dynamique de fibres élémentaires pour les matériaux composites biosourcés"
+    position: '<em>FEMTO-ST, département de mécanique appliquée</em><br>Essais dynamiques (vibromètre laser, caméra rapide, pompe à vide) sur des fibres de lin : identification de l''amortissement par décrément logarithmique et du module de stockage (=rigidité) par EF sur COMSOL.'
 
 # service:
 #   - name: "Reviewer for ..."
