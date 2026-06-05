@@ -284,18 +284,26 @@
   }
 
   // ---- chain animation ----
-  var NCELLS = 12;
+  var NCELLS = 10;
 
-  // zigzag spring between (x1, y) and (x2, y)
+  // zigzag spring between (x1, y) and (x2, y); robust under strong compression
   function drawSpring(x1, x2, y, h) {
-    var coils = 7, lead = Math.min(8, Math.abs(x2 - x1) * 0.12);
+    var len = x2 - x1;
+    if (len < 4) {                 // fully compressed: draw a plain segment
+      cctx.beginPath(); cctx.moveTo(Math.min(x1, x2), y); cctx.lineTo(Math.max(x1, x2), y); cctx.stroke();
+      return;
+    }
+    var lead = Math.min(6, len * 0.12);
+    var span = len - 2 * lead;
+    var coils = 6;
+    // coil height shrinks as the spring is compressed, grows a bit when stretched
+    var hh = h * Math.max(0.3, Math.min(1.4, span / (coils * 5)));
     cctx.beginPath();
     cctx.moveTo(x1, y);
     cctx.lineTo(x1 + lead, y);
-    var span = (x2 - x1) - 2 * lead;
     for (var c = 0; c < coils; c++) {
       var xx = x1 + lead + span * (c + 0.5) / coils;
-      cctx.lineTo(xx, y + (c % 2 === 0 ? -h : h));
+      cctx.lineTo(xx, y + (c % 2 === 0 ? -hh : hh));
     }
     cctx.lineTo(x2 - lead, y);
     cctx.lineTo(x2, y);
@@ -318,8 +326,8 @@
 
     if (mech === "bragg") {
       var BA = braggAmpRatio(q, branch);
-      var amp = cell * 0.18;
-      var r1 = 10 * Math.cbrt(m1() / 2), r2 = 10 * Math.cbrt(M2 / 2);
+      var amp = cell * 0.11;
+      var r1 = 8.5 * Math.cbrt(m1() / 2), r2 = 8.5 * Math.cbrt(M2 / 2);
       var xs = [], rs = [], eq = [];
       for (n = 0; n < NCELLS; n++) {
         var ph = q * n - w * t;
