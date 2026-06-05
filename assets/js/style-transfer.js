@@ -22,7 +22,9 @@
     return window.ort.InferenceSession.create(url, { executionProviders: ["webgpu", "wasm"] })
       .catch(function () { return window.ort.InferenceSession.create(url); });
   }
-  var SIZE = 224;                       // model input resolution
+  // models are exported with dynamic spatial axes: stylize at higher
+  // resolution when a GPU is available, fall back to 224 on plain wasm
+  var SIZE = (typeof navigator !== "undefined" && navigator.gpu) ? 384 : 224;
   var sessions = {};                    // fast style -> InferenceSession
   var adainSession = null;              // AdaIN arbitrary-style session
   var adainStyles = {};                 // painting key -> Float32Array (CHW 0-255)
@@ -52,7 +54,7 @@
     if (sessions[style]) return Promise.resolve(sessions[style]);
     var base = area.getAttribute("data-base");
     setStatus("Loading style model…", "Chargement du modèle de style…");
-    return createSession(base + style + ".onnx").then(function (s) {
+    return createSession(base + style + ".onnx?v=2").then(function (s) {
       sessions[style] = s;
       return s;
     });
@@ -62,7 +64,7 @@
     if (adainSession) return Promise.resolve(adainSession);
     var base = area.getAttribute("data-base");
     setStatus("Loading AdaIN model (~28 MB)…", "Chargement du modèle AdaIN (~28 Mo)…");
-    return createSession(base + "adain.onnx?v=2").then(function (s) {
+    return createSession(base + "adain.onnx?v=3").then(function (s) {
       adainSession = s;
       return s;
     });

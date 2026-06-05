@@ -52,12 +52,11 @@ vgg = nn.Sequential(
 
 
 def calc_mean_std(feat, eps=1e-5):
-    # ONNX-friendly version (no .var()): unbiased variance computed by hand
-    n, c, h, w = feat.shape
-    flat = feat.reshape(n, c, h * w)
-    mean = flat.mean(dim=2, keepdim=True)
-    var = ((flat - mean) ** 2).sum(dim=2, keepdim=True) / (h * w - 1) + eps
-    return mean.reshape(n, c, 1, 1), var.sqrt().reshape(n, c, 1, 1)
+    # ONNX-friendly and shape-dynamic: biased variance via mean ops only
+    # (vs unbiased in the original: difference < 0.2% at these feature sizes)
+    mean = feat.mean(dim=(2, 3), keepdim=True)
+    var = ((feat - mean) ** 2).mean(dim=(2, 3), keepdim=True) + eps
+    return mean, var.sqrt()
 
 
 class AdaINNet(nn.Module):
@@ -84,14 +83,18 @@ def main():
     net = AdaINNet(vgg, decoder).eval()
 
     dummy = (torch.zeros(1, 3, SIZE, SIZE), torch.zeros(1, 3, SIZE, SIZE), torch.ones(1))
+    dyn = {"content": {2: "h", 3: "w"}, "style": {2: "sh", 3: "sw"},
+           "output1": {2: "h", 3: "w"}}
     try:
         torch.onnx.export(net, dummy, OUT,
                           input_names=["content", "style", "alpha"],
-                          output_names=["output1"], opset_version=17, dynamo=False)
+                          output_names=["output1"], opset_version=17,
+                          dynamic_axes=dyn, dynamo=False)
     except TypeError:
         torch.onnx.export(net, dummy, OUT,
                           input_names=["content", "style", "alpha"],
-                          output_names=["output1"], opset_version=17)
+                          output_names=["output1"], opset_version=17,
+                          dynamic_axes=dyn)
     print("onnx:", OUT, os.path.getsize(OUT), "bytes")
 
     # visual check: chihuahua + Great Wave

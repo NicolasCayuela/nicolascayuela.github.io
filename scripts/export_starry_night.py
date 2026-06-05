@@ -100,12 +100,15 @@ def main():
     wrapper = Wrapper(model).eval()
 
     dummy = torch.zeros(1, 3, 224, 224)
+    dyn = {"input1": {2: "h", 3: "w"}, "output1": {2: "h", 3: "w"}}
     try:
         torch.onnx.export(wrapper, (dummy,), OUT, input_names=["input1"],
-                          output_names=["output1"], opset_version=17, dynamo=False)
+                          output_names=["output1"], opset_version=17,
+                          dynamic_axes=dyn, dynamo=False)
     except TypeError:
         torch.onnx.export(wrapper, (dummy,), OUT, input_names=["input1"],
-                          output_names=["output1"], opset_version=17)
+                          output_names=["output1"], opset_version=17,
+                          dynamic_axes=dyn)
     print("onnx:", OUT, os.path.getsize(OUT), "bytes")
 
     # quick visual check on the site's sample image
