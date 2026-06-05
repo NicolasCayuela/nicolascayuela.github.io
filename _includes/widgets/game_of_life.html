@@ -518,8 +518,8 @@
                             <canvas id="w2v-canvas" class="wv-canvas"></canvas>
                             <div id="w2v-status" class="small text-muted mt-2">&nbsp;</div>
                         </div>
-                        <div style="min-width:250px; max-width:330px;">
-                            <div class="wv-panel mb-3">
+                        <div class="d-flex flex-column align-self-stretch" style="min-width:280px; max-width:340px; flex:1 1 280px; gap:1rem;">
+                            <div class="wv-panel" style="flex:1;">
                                 <div class="wv-head"><i class="fas fa-search"></i> <span class="lang-en">Nearest neighbours</span><span class="lang-fr">Plus proches voisins</span></div>
                                 <div class="d-flex mb-1" style="gap:.3rem;">
                                     <input id="w2v-search" type="text" class="form-control form-control-sm" placeholder="dog, music, paris…" style="max-width:160px;">
@@ -531,7 +531,7 @@
                                 </div>
                                 <div id="w2v-neighbors"></div>
                             </div>
-                            <div class="wv-panel">
+                            <div class="wv-panel" style="flex:1;">
                                 <div class="wv-head"><i class="fas fa-calculator"></i> <span class="lang-en">Vector arithmetic</span><span class="lang-fr">Arithmétique vectorielle</span></div>
                                 <div class="d-flex align-items-center mb-1 flex-wrap" style="gap:.25rem;">
                                     <input id="w2v-a" type="text" class="form-control form-control-sm" style="width:76px;">
