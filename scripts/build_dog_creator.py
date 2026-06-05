@@ -27,8 +27,10 @@ OUT_MODELS = os.path.join(HERE, "..", "assets", "models")
 IMG = 64
 LATENT = 256
 PCS = 64                      # principal components exposed as sliders
-EPOCHS = 90
+EPOCHS = 200
 BATCH = 64
+LR_MAX, LR_MIN = 1e-3, 1e-4   # cosine decay
+THREADS = 6                   # leave most cores to the concurrent DDPM run
 DOG_LABEL = 1                 # huggan/AFHQ: cat=0, dog=1, wild=2
 SAMPLES_IN_JSON = 300
 
@@ -55,16 +57,22 @@ def load_dogs():
     return data.permute(0, 3, 1, 2).contiguous()     # N x 3 x 64 x 64
 
 
+def up_block(cin, cout):
+    """Upsample + conv avoids the checkerboard artifacts of ConvTranspose."""
+    return [nn.Upsample(scale_factor=2, mode="nearest"),
+            nn.Conv2d(cin, cout, 3, padding=1), nn.BatchNorm2d(cout), nn.ReLU(True)]
+
+
 class Encoder(nn.Module):
     def __init__(self):
         super().__init__()
         self.net = nn.Sequential(
-            nn.Conv2d(3, 32, 4, 2, 1), nn.BatchNorm2d(32), nn.ReLU(True),    # 32
-            nn.Conv2d(32, 64, 4, 2, 1), nn.BatchNorm2d(64), nn.ReLU(True),   # 16
-            nn.Conv2d(64, 128, 4, 2, 1), nn.BatchNorm2d(128), nn.ReLU(True), # 8
-            nn.Conv2d(128, 256, 4, 2, 1), nn.BatchNorm2d(256), nn.ReLU(True),# 4
+            nn.Conv2d(3, 48, 4, 2, 1), nn.BatchNorm2d(48), nn.ReLU(True),    # 32
+            nn.Conv2d(48, 96, 4, 2, 1), nn.BatchNorm2d(96), nn.ReLU(True),   # 16
+            nn.Conv2d(96, 192, 4, 2, 1), nn.BatchNorm2d(192), nn.ReLU(True), # 8
+            nn.Conv2d(192, 384, 4, 2, 1), nn.BatchNorm2d(384), nn.ReLU(True),# 4
             nn.Flatten(),
-            nn.Linear(256 * 4 * 4, LATENT),
+            nn.Linear(384 * 4 * 4, LATENT),
         )
 
     def forward(self, x):
@@ -74,16 +82,17 @@ class Encoder(nn.Module):
 class Decoder(nn.Module):
     def __init__(self):
         super().__init__()
-        self.fc = nn.Linear(LATENT, 256 * 4 * 4)
+        self.fc = nn.Linear(LATENT, 384 * 4 * 4)
         self.net = nn.Sequential(
-            nn.ConvTranspose2d(256, 128, 4, 2, 1), nn.BatchNorm2d(128), nn.ReLU(True),  # 8
-            nn.ConvTranspose2d(128, 64, 4, 2, 1), nn.BatchNorm2d(64), nn.ReLU(True),    # 16
-            nn.ConvTranspose2d(64, 32, 4, 2, 1), nn.BatchNorm2d(32), nn.ReLU(True),     # 32
-            nn.ConvTranspose2d(32, 3, 4, 2, 1), nn.Sigmoid(),                           # 64
+            *up_block(384, 192),                       # 8
+            *up_block(192, 96),                        # 16
+            *up_block(96, 48),                         # 32
+            nn.Upsample(scale_factor=2, mode="nearest"),
+            nn.Conv2d(48, 3, 3, padding=1), nn.Sigmoid(),  # 64
         )
 
     def forward(self, z):
-        h = self.fc(z).view(-1, 256, 4, 4)
+        h = self.fc(z).view(-1, 384, 4, 4)
         return self.net(h)
 
 
@@ -109,7 +118,7 @@ def main():
     opt = torch.optim.Adam(list(enc.parameters()) + list(dec.parameters()), lr=1e-3)
     loss_fn = nn.MSELoss()
 
-    ckpt_path = os.path.join(HERE, "dog_ae.pt")
+    ckpt_path = os.path.join(HERE, "dog_ae2.pt")
     start_epoch = 0
     if os.path.exists(ckpt_path):
         ck = torch.load(ckpt_path, map_location="cpu", weights_only=True)
@@ -117,8 +126,11 @@ def main():
         opt.load_state_dict(ck["opt"]); start_epoch = ck["epoch"]
         print("resumed at epoch", start_epoch)
 
-    torch.set_num_threads(os.cpu_count() or 4)
+    torch.set_num_threads(THREADS)
     for epoch in range(start_epoch, EPOCHS):
+        lr = LR_MIN + 0.5 * (LR_MAX - LR_MIN) * (1 + math.cos(math.pi * epoch / EPOCHS))
+        for g in opt.param_groups:
+            g["lr"] = lr
         perm = torch.randperm(n)
         tot, nb = 0.0, 0
         enc.train(); dec.train()

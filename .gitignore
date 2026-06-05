@@ -36,3 +36,5 @@ scripts/adain_test.png
 .claude/settings.local.json
 scripts/glove.6B.50d.txt
 scripts/styles_sheet.png
+scripts/dog_ddpm_preview_e*.png
+scripts/dog_ae2.pt
