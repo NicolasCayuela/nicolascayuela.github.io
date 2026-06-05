@@ -269,6 +269,23 @@
     setImageFromURL(url);
   });
 
+  // keep the thumbnail tooltips in the active language
+  function updateTooltips() {
+    var fr = document.documentElement.classList.contains("lang-active-fr");
+    var btns = document.querySelectorAll("#style-area .st-thumb");
+    for (var i = 0; i < btns.length; i++) {
+      var name = btns[i].getAttribute(fr ? "data-name-fr" : "data-name-en");
+      if (name) {
+        btns[i].title = name;
+        var img = btns[i].querySelector("img");
+        if (img) img.alt = name;
+      }
+    }
+  }
+  updateTooltips();
+  new MutationObserver(updateTooltips)
+    .observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+
   var inited = false;
   function init() {
     if (inited) return;
