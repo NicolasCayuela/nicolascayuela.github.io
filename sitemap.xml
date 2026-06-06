@@ -19,9 +19,5 @@ layout: null
     <loc>{{ site.url }}{{ site.baseurl }}/blog</loc>
     <priority>0.3</priority>
   </url>
-  {% for pub in site.publications %}
-  <url>
-    <loc>{{ site.url }}{{ pub.url }}</loc>
-  </url>
-  {% endfor %}
+  {% comment %} The publications collection has no output pages; do not list them. {% endcomment %}
 </urlset>

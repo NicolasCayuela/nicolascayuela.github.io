@@ -27,14 +27,15 @@ OUT_MODELS = os.path.join(HERE, "..", "assets", "models")
 IMG = 64
 LATENT = 256
 PCS = 64                      # principal components exposed as sliders
-EPOCHS = 150
+EPOCHS = 100
 BATCH = 64
-LR_MAX, LR_MIN = 5e-4, 5e-5   # cosine decay (warm start from the v2 weights)
+LR_MAX, LR_MIN = 2e-4, 2e-5   # cosine decay (warm start from the v3 weights)
 THREADS = os.cpu_count() or 6
 PERC_W = 0.1                  # weight of the VGG perceptual loss vs pixel MSE
+Z_NOISE = 0.05                # latent noise (fraction of batch latent std) -> smoother sliders
 DOG_LABEL = 1                 # huggan/AFHQ: cat=0, dog=1, wild=2
 SAMPLES_IN_JSON = 300
-WARM_START = "dog_ae2.pt"     # previous-arch checkpoint to initialize from
+WARM_START = "dog_ae3.pt"     # previous checkpoint to initialize from
 
 torch.manual_seed(7)
 np.random.seed(7)
@@ -99,29 +100,36 @@ class Decoder(nn.Module):
 
 
 class VGGFeats(nn.Module):
-    """Frozen slice of the AdaIN-normalised VGG (up to relu3_1) used as a
-    perceptual loss: feature-space MSE makes reconstructions much sharper
-    than pixel MSE alone. Weights: scripts/adain_vgg.pth (MIT)."""
+    """Frozen slice of the AdaIN-normalised VGG used as a multi-scale
+    perceptual loss: feature-space MSE at relu1_2 / relu2_2 / relu3_1 makes
+    reconstructions much sharper than pixel MSE alone (low layers add edge
+    and texture detail). Weights: scripts/adain_vgg.pth (MIT)."""
     def __init__(self):
         super().__init__()
         vgg = nn.Sequential(
             nn.Conv2d(3, 3, 1),
             nn.ReflectionPad2d(1), nn.Conv2d(3, 64, 3), nn.ReLU(),       # relu1_1
-            nn.ReflectionPad2d(1), nn.Conv2d(64, 64, 3), nn.ReLU(),      # relu1_2
+            nn.ReflectionPad2d(1), nn.Conv2d(64, 64, 3), nn.ReLU(),      # idx 6: relu1_2
             nn.MaxPool2d(2, 2),
             nn.ReflectionPad2d(1), nn.Conv2d(64, 128, 3), nn.ReLU(),     # relu2_1
-            nn.ReflectionPad2d(1), nn.Conv2d(128, 128, 3), nn.ReLU(),    # relu2_2
+            nn.ReflectionPad2d(1), nn.Conv2d(128, 128, 3), nn.ReLU(),    # idx 13: relu2_2
             nn.MaxPool2d(2, 2),
-            nn.ReflectionPad2d(1), nn.Conv2d(128, 256, 3), nn.ReLU(),    # relu3_1
+            nn.ReflectionPad2d(1), nn.Conv2d(128, 256, 3), nn.ReLU(),    # idx 17: relu3_1
         )
         vgg.load_state_dict(torch.load(os.path.join(HERE, "adain_vgg.pth"),
                                        map_location="cpu", weights_only=True), strict=False)
         for p in vgg.parameters():
             p.requires_grad_(False)
         self.net = vgg.eval()
+        self.taps = (7, 14, 18)                  # slice ends just past each tap ReLU
 
     def forward(self, x):                        # x in [0, 1]
-        return self.net(x)
+        feats, prev = [], 0
+        for i in self.taps:
+            x = self.net[prev:i](x)
+            feats.append(x)
+            prev = i
+        return feats
 
 
 class PCADecoder(nn.Module):
@@ -147,7 +155,7 @@ def main():
     opt = torch.optim.Adam(list(enc.parameters()) + list(dec.parameters()), lr=LR_MAX)
     loss_fn = nn.MSELoss()
 
-    ckpt_path = os.path.join(HERE, "dog_ae3.pt")
+    ckpt_path = os.path.join(HERE, "dog_ae4.pt")
     start_epoch = 0
     if os.path.exists(ckpt_path):
         ck = torch.load(ckpt_path, map_location="cpu", weights_only=True)
@@ -173,9 +181,13 @@ def main():
             flip = torch.rand(x.shape[0]) < 0.5      # horizontal-flip augmentation
             x[flip] = x[flip].flip(-1)
             opt.zero_grad()
-            out = dec(enc(x))
+            z = enc(x)
+            # denoising in latent space: decoder must map a small neighborhood
+            # of z to the same image -> smoother slider interpolation
+            z = z + Z_NOISE * z.detach().std() * torch.randn_like(z)
+            out = dec(z)
             pix = loss_fn(out, x)
-            perc = loss_fn(vgg(out), vgg(x))
+            perc = sum(loss_fn(fo, ft) for fo, ft in zip(vgg(out), vgg(x))) / 3
             loss = pix + PERC_W * perc
             loss.backward()
             opt.step()

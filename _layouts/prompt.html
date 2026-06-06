@@ -1,13 +1,25 @@
 <!DOCTYPE html>
-<html class="h-100">
+<html lang="en" class="h-100 lang-active-en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="robots" content="noindex">
     <title>{{ page.title }}</title>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="assets/css/latolatinfonts.css">
-    <link rel="stylesheet" href="assets/css/global.css">
+    <script>
+        (function() {
+            var lang = localStorage.getItem('site-lang') || 'en';
+            var html = document.documentElement;
+            html.className = html.className.replace(/lang-active-\w+/g, '').trim();
+            html.classList.add('lang-active-' + lang);
+            html.setAttribute('lang', lang === 'fr' ? 'fr' : 'en');
+        })();
+    </script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css" integrity="sha512-P5MgMn1jBN01asBgU0z60Qk4QxiXo86+wlFahKrsQf37c9cro517WzVSPPV1tDKzhku2iJ2FVgL67wG03SGnNA==" crossorigin="anonymous" />
+    <!-- absolute path: the 404 page is served at arbitrary URLs -->
+    <link rel="stylesheet" href="{{ '/assets/css/global.css' | absolute_url }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ '/assets/images/etc/favicon-32.png' | absolute_url }}">
 </head>
 <style type="text/css">
     .container {
