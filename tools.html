@@ -2,7 +2,7 @@
 layout: default
 title : Tools
 navbar_name: Tools
-description: "Free in-browser tools: background remover producing transparent-PNG (alpha channel) images. No upload, everything runs locally."
+description: "Free in-browser tools: background remover, image converter/compressor/upscaler, QR codes, PDF toolbox (merge, split, compress, OCR, sign, watermark, Markdown), science tools (plotter, units, CIF viewer, matrices, LaTeX), audio analyzer/generator/converter, text diff, JSON/YAML, file hashing. No upload, everything runs locally."
 ---
 
 <style>
@@ -86,6 +86,119 @@ description: "Free in-browser tools: background remover producing transparent-PN
     </div>
 </div>
 
+<!-- ===================== Image toolbox ===================== -->
+<div class="row mt-3">
+    <div class="col">
+        <div class="card border-0 bg-white tool-card">
+            <div class="card-body p-4">
+                <h6>
+                    <i class="fas fa-image"></i> &nbsp;
+                    <span class="lang-en">Image toolbox</span><span class="lang-fr">Boîte à outils images</span>
+                </h6>
+                <p class="bgr-privacy mb-3">
+                    <i class="fas fa-lock"></i>&nbsp;
+                    <span class="lang-en"><strong>Offline tool:</strong> your images stay on your device - everything runs locally in your browser.</span>
+                    <span class="lang-fr"><strong>Outil hors ligne :</strong> tes images restent sur ton appareil - tout tourne localement dans ton navigateur.</span>
+                </p>
+
+                <div class="btn-group btn-group-sm mb-3 flex-wrap" role="group">
+                    <button data-it-tool="convert" type="button" class="btn btn-outline-dark active">
+                        <i class="fas fa-exchange-alt"></i> <span class="lang-en">Convert / resize / crop</span><span class="lang-fr">Convertir / redimensionner / rogner</span>
+                    </button>
+                    <button data-it-tool="compress" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-compress"></i> <span class="lang-en">Compress</span><span class="lang-fr">Compresser</span>
+                    </button>
+                    <button data-it-tool="upscale" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-search-plus"></i> <span class="lang-en">AI upscale ×4</span><span class="lang-fr">Agrandir ×4 (IA)</span>
+                    </button>
+                    <button data-it-tool="exif" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-user-secret"></i> <span class="lang-en">Strip metadata</span><span class="lang-fr">Effacer les métadonnées</span>
+                    </button>
+                    <button data-it-tool="qr" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-qrcode"></i> <span class="lang-en">QR code</span><span class="lang-fr">QR code</span>
+                    </button>
+                </div>
+
+                <p id="it-hint" class="small text-muted mb-2"></p>
+
+                <div id="it-drop" style="border:2px dashed #cdd9f3; border-radius:12px; padding:1.6rem 1rem; text-align:center; color:#6a7385; cursor:pointer;">
+                    <i class="fas fa-file-image fa-2x mb-2"></i><br>
+                    <span class="lang-en">Drop an image here or click to choose (HEIC supported)</span>
+                    <span class="lang-fr">Dépose une image ici ou clique pour choisir (HEIC accepté)</span>
+                    <input id="it-file" type="file" accept="image/*,.heic,.heif" class="d-none">
+                </div>
+
+                <!-- QR input -->
+                <div id="it-qr-ui" class="d-none mt-2">
+                    <textarea id="it-qr-text" class="form-control form-control-sm" rows="2" placeholder="https://… or any text"></textarea>
+                    <div class="d-flex flex-wrap align-items-center mt-2" style="gap:1rem;">
+                        <label class="small text-muted mb-0">
+                            <span class="lang-en">Size</span><span class="lang-fr">Taille</span>
+                            <select id="it-qr-size" class="form-control form-control-sm d-inline-block ml-1" style="width:100px;">
+                                <option value="256">256 px</option>
+                                <option value="512" selected>512 px</option>
+                                <option value="1024">1024 px</option>
+                            </select>
+                        </label>
+                        <label class="small text-muted mb-0">
+                            <span class="lang-en">Error correction</span><span class="lang-fr">Correction d'erreur</span>
+                            <select id="it-qr-ecc" class="form-control form-control-sm d-inline-block ml-1" style="width:80px;">
+                                <option value="L">L</option><option value="M" selected>M</option>
+                                <option value="Q">Q</option><option value="H">H</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- options -->
+                <div class="d-flex flex-wrap align-items-center mt-2 mb-2" style="gap:1rem;">
+                    <label id="it-opt-format" class="small text-muted mb-0">
+                        Format
+                        <select id="it-format" class="form-control form-control-sm d-inline-block ml-1" style="width:90px;">
+                            <option value="png">PNG</option>
+                            <option value="jpeg" selected>JPG</option>
+                            <option value="webp">WebP</option>
+                        </select>
+                    </label>
+                    <label id="it-opt-quality" class="small text-muted mb-0">
+                        <span class="lang-en">Quality</span><span class="lang-fr">Qualité</span>
+                        <input id="it-quality" type="range" min="30" max="100" value="85" style="vertical-align:middle; width:120px;">
+                        <span id="it-quality-val">85</span>
+                    </label>
+                    <label id="it-opt-w" class="small text-muted mb-0">
+                        <span class="lang-en">Width</span><span class="lang-fr">Largeur</span>
+                        <input id="it-w" type="number" class="form-control form-control-sm d-inline-block ml-1" style="width:90px;" placeholder="auto">
+                    </label>
+                    <label id="it-opt-h" class="small text-muted mb-0">
+                        <span class="lang-en">Height</span><span class="lang-fr">Hauteur</span>
+                        <input id="it-h" type="number" class="form-control form-control-sm d-inline-block ml-1" style="width:90px;" placeholder="auto">
+                    </label>
+                    <button id="it-crop-btn" class="btn btn-sm btn-outline-dark d-none">
+                        <i class="fas fa-crop-alt"></i> <span class="lang-en">Crop: drag on the preview</span><span class="lang-fr">Rogner : glisse sur l'aperçu</span>
+                    </button>
+                </div>
+
+                <!-- preview -->
+                <div id="it-preview-wrap" class="d-none mb-2" style="max-width:480px;">
+                    <canvas id="it-preview" style="width:100%; border:1px solid #e3e8f0; border-radius:8px; touch-action:none;"></canvas>
+                    <div id="it-meta" class="small text-muted"></div>
+                </div>
+
+                <button id="it-run" class="btn btn-sm btn-dark" disabled>
+                    <i class="fas fa-cogs"></i> <span class="lang-en">Run</span><span class="lang-fr">Lancer</span>
+                </button>
+                <div id="it-status" class="small text-muted mt-2"></div>
+                <div id="it-result" class="mt-2"></div>
+
+                <p class="small text-muted mt-3 mb-0">
+                    <span class="lang-en">Upscaler: <a href="https://github.com/xinntao/Real-ESRGAN" target="_blank" rel="noopener">Real-ESRGAN</a> general-x4v3 (BSD-3) via onnxruntime-web. HEIC: heic2any. EXIF: exifr. QR: qrcode-generator.</span>
+                    <span class="lang-fr">Upscaler : <a href="https://github.com/xinntao/Real-ESRGAN" target="_blank" rel="noopener">Real-ESRGAN</a> general-x4v3 (BSD-3) via onnxruntime-web. HEIC : heic2any. EXIF : exifr. QR : qrcode-generator.</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- ===================== PDF toolbox ===================== -->
 <div class="row mt-3">
     <div class="col">
@@ -130,6 +243,18 @@ description: "Free in-browser tools: background remover producing transparent-PN
                     </button>
                     <button data-pt-tool="pdf2md" type="button" class="btn btn-outline-dark">
                         <i class="fab fa-markdown"></i> <span class="lang-en">PDF to Markdown</span><span class="lang-fr">PDF en Markdown</span>
+                    </button>
+                    <button data-pt-tool="ocr" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-glasses"></i> OCR
+                    </button>
+                    <button data-pt-tool="md2pdf" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-file-export"></i> <span class="lang-en">Markdown to PDF</span><span class="lang-fr">Markdown en PDF</span>
+                    </button>
+                    <button data-pt-tool="sign" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-signature"></i> <span class="lang-en">Sign</span><span class="lang-fr">Signer</span>
+                    </button>
+                    <button data-pt-tool="watermark" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-tint"></i> <span class="lang-en">Watermark</span><span class="lang-fr">Filigrane</span>
                     </button>
                 </div>
 
@@ -179,6 +304,74 @@ description: "Free in-browser tools: background remover producing transparent-PN
                             <option value="png">PNG</option>
                         </select>
                     </label>
+                    <label id="pt-opt-lang" class="small text-muted mb-0 d-none">
+                        <span class="lang-en">Language</span><span class="lang-fr">Langue</span>
+                        <select id="pt-lang" class="form-control form-control-sm d-inline-block ml-1" style="width:140px;">
+                            <option value="fra+eng" selected>FR + EN</option>
+                            <option value="fra">Français</option>
+                            <option value="eng">English</option>
+                        </select>
+                    </label>
+                </div>
+
+                <!-- Markdown -> PDF input -->
+                <div id="pt-md-ui" class="d-none mb-2">
+                    <textarea id="pt-md-text" class="form-control form-control-sm" rows="8"
+                              placeholder="# Title&#10;&#10;Some **markdown** text… (or drop a .md file above)"></textarea>
+                </div>
+
+                <!-- Signature UI -->
+                <div id="pt-sign-ui" class="d-none mb-2">
+                    <div class="d-flex flex-wrap align-items-start" style="gap:1rem;">
+                        <div>
+                            <div class="small text-muted mb-1">
+                                <span class="lang-en">Draw your signature (or drop a PNG below):</span>
+                                <span class="lang-fr">Dessine ta signature (ou dépose un PNG dessous) :</span>
+                            </div>
+                            <canvas id="pt-sign-pad" width="360" height="120"
+                                    style="border:1px solid #cdd9f3; border-radius:8px; background:#fff; touch-action:none;"></canvas>
+                            <div class="mt-1" style="display:flex; gap:.4rem;">
+                                <button id="pt-sign-clear" class="btn btn-sm btn-outline-dark">
+                                    <i class="fas fa-eraser"></i> <span class="lang-en">Clear</span><span class="lang-fr">Effacer</span>
+                                </button>
+                                <label class="btn btn-sm btn-outline-dark mb-0">
+                                    <i class="fas fa-upload"></i> <span class="lang-en">PNG signature</span><span class="lang-fr">Signature PNG</span>
+                                    <input id="pt-sign-file" type="file" accept="image/png" class="d-none">
+                                </label>
+                                <label class="small text-muted mb-0 align-self-center">
+                                    <span class="lang-en">Width</span><span class="lang-fr">Largeur</span>
+                                    <input id="pt-sign-size" type="range" min="60" max="300" value="150" style="vertical-align:middle; width:100px;">
+                                </label>
+                            </div>
+                        </div>
+                        <div style="flex:1; min-width:260px;">
+                            <div class="small text-muted mb-1">
+                                Page <input id="pt-sign-page" type="number" min="1" value="1" class="form-control form-control-sm d-inline-block" style="width:70px;">
+                                <span class="lang-en">- click on the preview to place the signature:</span>
+                                <span class="lang-fr">- clique sur l'aperçu pour placer la signature :</span>
+                            </div>
+                            <canvas id="pt-sign-preview" style="width:100%; max-width:420px; border:1px solid #e3e8f0; border-radius:8px; cursor:crosshair;"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Watermark UI -->
+                <div id="pt-wm-ui" class="d-none mb-2">
+                    <div class="d-flex flex-wrap align-items-center" style="gap:1rem;">
+                        <input id="pt-wm-text" type="text" class="form-control form-control-sm" style="width:220px;"
+                               placeholder="CONFIDENTIAL" value="CONFIDENTIAL">
+                        <label class="small text-muted mb-0">
+                            <span class="lang-en">Opacity</span><span class="lang-fr">Opacité</span>
+                            <input id="pt-wm-opacity" type="range" min="5" max="80" value="25" style="vertical-align:middle; width:110px;">
+                        </label>
+                        <label class="small text-muted mb-0">
+                            <span class="lang-en">Size</span><span class="lang-fr">Taille</span>
+                            <input id="pt-wm-size" type="range" min="20" max="120" value="60" style="vertical-align:middle; width:110px;">
+                        </label>
+                        <label class="small text-muted mb-0">
+                            <input id="pt-wm-diag" type="checkbox" checked> <span class="lang-en">Diagonal</span><span class="lang-fr">Diagonal</span>
+                        </label>
+                    </div>
                 </div>
 
                 <button id="pt-run" class="btn btn-sm btn-dark" disabled>
@@ -191,6 +384,306 @@ description: "Free in-browser tools: background remover producing transparent-PN
                     <span class="lang-en">Powered by <a href="https://pdf-lib.js.org/" target="_blank" rel="noopener">pdf-lib</a> (MIT) and <a href="https://mozilla.github.io/pdf.js/" target="_blank" rel="noopener">PDF.js</a> (Apache-2.0). Compression rasterizes pages to JPEG - text is no longer selectable in the output.</span>
                     <span class="lang-fr">Propulsé par <a href="https://pdf-lib.js.org/" target="_blank" rel="noopener">pdf-lib</a> (MIT) et <a href="https://mozilla.github.io/pdf.js/" target="_blank" rel="noopener">PDF.js</a> (Apache-2.0). La compression rastérise les pages en JPEG - le texte n'est plus sélectionnable dans le fichier produit.</span>
                 </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== Science & engineering ===================== -->
+<div class="row mt-3">
+    <div class="col">
+        <div class="card border-0 bg-white tool-card">
+            <div class="card-body p-4">
+                <h6>
+                    <i class="fas fa-flask"></i> &nbsp;
+                    <span class="lang-en">Science &amp; engineering</span><span class="lang-fr">Science &amp; ingénierie</span>
+                </h6>
+
+                <div class="btn-group btn-group-sm mb-3 flex-wrap" role="group">
+                    <button data-sc-tool="plot" type="button" class="btn btn-outline-dark active">
+                        <i class="fas fa-chart-line"></i> <span class="lang-en">Function plotter</span><span class="lang-fr">Traceur de fonctions</span>
+                    </button>
+                    <button data-sc-tool="units" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-ruler-combined"></i> <span class="lang-en">Unit converter</span><span class="lang-fr">Convertisseur d'unités</span>
+                    </button>
+                    <button data-sc-tool="cif" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-gem"></i> <span class="lang-en">Crystal viewer (CIF)</span><span class="lang-fr">Visualiseur de cristaux (CIF)</span>
+                    </button>
+                    <button data-sc-tool="matrix" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-th"></i> <span class="lang-en">Matrix calculator</span><span class="lang-fr">Calculatrice matricielle</span>
+                    </button>
+                    <button data-sc-tool="latex" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-square-root-alt"></i> <span class="lang-en">LaTeX equations</span><span class="lang-fr">Équations LaTeX</span>
+                    </button>
+                </div>
+
+                <!-- plotter -->
+                <div id="sc-plot-ui">
+                    <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.6rem;">
+                        <input id="sc-plot-fn" type="text" class="form-control form-control-sm" style="flex:1; min-width:200px;"
+                               value="sin(x) * exp(-x^2/10)" placeholder="sin(x), x^2 - 3, …">
+                        <label class="small text-muted mb-0">x ∈ [
+                            <input id="sc-plot-xmin" type="number" value="-10" class="form-control form-control-sm d-inline-block" style="width:70px;"> ,
+                            <input id="sc-plot-xmax" type="number" value="10" class="form-control form-control-sm d-inline-block" style="width:70px;"> ]
+                        </label>
+                        <button id="sc-plot-go" class="btn btn-sm btn-dark"><i class="fas fa-play"></i></button>
+                    </div>
+                    <p class="small text-muted mb-1">
+                        <span class="lang-en">Several curves: separate with ; - zoom/pan with the mouse.</span>
+                        <span class="lang-fr">Plusieurs courbes : sépare par ; - zoom/déplacement à la souris.</span>
+                    </p>
+                    <div id="sc-plot-out" style="overflow-x:auto;"></div>
+                </div>
+
+                <!-- units -->
+                <div id="sc-units-ui" class="d-none">
+                    <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.6rem;">
+                        <select id="sc-units-cat" class="form-control form-control-sm" style="width:170px;"></select>
+                        <input id="sc-units-val" type="number" value="1" step="any" class="form-control form-control-sm" style="width:130px;">
+                        <select id="sc-units-from" class="form-control form-control-sm" style="width:150px;"></select>
+                        <span>→</span>
+                        <select id="sc-units-to" class="form-control form-control-sm" style="width:150px;"></select>
+                    </div>
+                    <div id="sc-units-out" class="h5 mb-1"></div>
+                    <div id="sc-units-note" class="small text-muted"></div>
+                </div>
+
+                <!-- CIF viewer -->
+                <div id="sc-cif-ui" class="d-none">
+                    <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.6rem;">
+                        <label class="btn btn-sm btn-outline-dark mb-0">
+                            <i class="fas fa-upload"></i> <span class="lang-en">Open a .cif file</span><span class="lang-fr">Ouvrir un fichier .cif</span>
+                            <input id="sc-cif-file" type="file" accept=".cif" class="d-none">
+                        </label>
+                        <button id="sc-cif-sample" class="btn btn-sm btn-outline-dark">
+                            <span class="lang-en">Sample: NaCl</span><span class="lang-fr">Exemple : NaCl</span>
+                        </button>
+                        <select id="sc-cif-style" class="form-control form-control-sm" style="width:150px;">
+                            <option value="sphere">Spheres</option>
+                            <option value="ballstick" selected>Ball &amp; stick</option>
+                            <option value="line">Lines</option>
+                        </select>
+                        <label class="small text-muted mb-0"><input id="sc-cif-cell" type="checkbox" checked>
+                            <span class="lang-en">Unit cell</span><span class="lang-fr">Maille</span></label>
+                        <label class="small text-muted mb-0">
+                            <span class="lang-en">Repeat</span><span class="lang-fr">Répéter</span>
+                            <select id="sc-cif-rep" class="form-control form-control-sm d-inline-block ml-1" style="width:80px;">
+                                <option value="1" selected>1×1×1</option><option value="2">2×2×2</option><option value="3">3×3×3</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div id="sc-cif-view" style="width:100%; height:420px; position:relative; border:1px solid #e3e8f0; border-radius:8px;"></div>
+                </div>
+
+                <!-- matrix -->
+                <div id="sc-matrix-ui" class="d-none">
+                    <div class="d-flex flex-wrap" style="gap:1rem;">
+                        <div>
+                            <div class="small text-muted mb-1">A</div>
+                            <textarea id="sc-mat-a" class="form-control form-control-sm" rows="4" style="width:240px; font-family:monospace;">2 1
+1 2</textarea>
+                        </div>
+                        <div>
+                            <div class="small text-muted mb-1">B (<span class="lang-en">optional</span><span class="lang-fr">optionnel</span>)</div>
+                            <textarea id="sc-mat-b" class="form-control form-control-sm" rows="4" style="width:240px; font-family:monospace;"></textarea>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap mt-2 mb-2" style="gap:.4rem;">
+                        <button data-sc-mat="eigs" class="btn btn-sm btn-outline-dark"><span class="lang-en">Eigenvalues</span><span class="lang-fr">Valeurs propres</span></button>
+                        <button data-sc-mat="det" class="btn btn-sm btn-outline-dark">det</button>
+                        <button data-sc-mat="inv" class="btn btn-sm btn-outline-dark">A⁻¹</button>
+                        <button data-sc-mat="transpose" class="btn btn-sm btn-outline-dark">Aᵀ</button>
+                        <button data-sc-mat="mul" class="btn btn-sm btn-outline-dark">A×B</button>
+                        <button data-sc-mat="solve" class="btn btn-sm btn-outline-dark">A·x=B</button>
+                    </div>
+                    <pre id="sc-mat-out" class="small p-2" style="background:#f4f6fa; border-radius:8px; min-height:50px;"></pre>
+                </div>
+
+                <!-- LaTeX -->
+                <div id="sc-latex-ui" class="d-none">
+                    <textarea id="sc-latex-in" class="form-control form-control-sm mb-2" rows="3"
+                              style="font-family:monospace;">\omega^2 = \frac{k}{m}\,\left(1 - \cos(qa)\right)</textarea>
+                    <div id="sc-latex-out" class="p-3 mb-2" style="background:#fff; border:1px solid #e3e8f0; border-radius:8px; min-height:60px; font-size:1.3rem; overflow-x:auto;"></div>
+                    <button id="sc-latex-svg" class="btn btn-sm btn-outline-dark"><i class="fas fa-download"></i> SVG</button>
+                    <button id="sc-latex-png" class="btn btn-sm btn-outline-dark"><i class="fas fa-download"></i> PNG</button>
+                </div>
+
+                <div id="sc-status" class="small text-muted mt-2"></div>
+
+                <p class="small text-muted mt-3 mb-0">
+                    <span class="lang-en">Libraries: function-plot, math.js, 3Dmol.js, MathJax - lazy-loaded, everything runs locally.</span>
+                    <span class="lang-fr">Bibliothèques : function-plot, math.js, 3Dmol.js, MathJax - chargées à la demande, tout tourne localement.</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== Audio ===================== -->
+<div class="row mt-3">
+    <div class="col">
+        <div class="card border-0 bg-white tool-card">
+            <div class="card-body p-4">
+                <h6>
+                    <i class="fas fa-wave-square"></i> &nbsp;
+                    Audio
+                </h6>
+
+                <div class="btn-group btn-group-sm mb-3 flex-wrap" role="group">
+                    <button data-au-tool="spectrum" type="button" class="btn btn-outline-dark active">
+                        <i class="fas fa-broadcast-tower"></i> <span class="lang-en">Spectrum analyzer</span><span class="lang-fr">Analyseur de spectre</span>
+                    </button>
+                    <button data-au-tool="tone" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-music"></i> <span class="lang-en">Tone / sweep generator</span><span class="lang-fr">Générateur de tons / balayages</span>
+                    </button>
+                    <button data-au-tool="convert" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-exchange-alt"></i> <span class="lang-en">Audio converter</span><span class="lang-fr">Convertisseur audio</span>
+                    </button>
+                </div>
+
+                <!-- spectrum -->
+                <div id="au-spectrum-ui">
+                    <p class="small text-muted mb-2">
+                        <span class="lang-en">Real-time FFT of the microphone input - spectrum on top, scrolling spectrogram below. The audio is processed locally and never recorded.</span>
+                        <span class="lang-fr">FFT en temps réel du micro - spectre en haut, spectrogramme défilant en bas. L'audio est traité localement et jamais enregistré.</span>
+                    </p>
+                    <button id="au-spec-start" class="btn btn-sm btn-dark">
+                        <i class="fas fa-microphone"></i> <span class="lang-en">Start</span><span class="lang-fr">Démarrer</span>
+                    </button>
+                    <button id="au-spec-stop" class="btn btn-sm btn-outline-dark d-none">
+                        <i class="fas fa-stop"></i> Stop
+                    </button>
+                    <span id="au-spec-peak" class="small text-muted ml-2"></span>
+                    <canvas id="au-spec-canvas" class="d-none mt-2" style="width:100%; border-radius:8px; background:#0b0e14;"></canvas>
+                </div>
+
+                <!-- tone generator -->
+                <div id="au-tone-ui" class="d-none">
+                    <div class="d-flex flex-wrap align-items-center mb-2" style="gap:1rem;">
+                        <select id="au-tone-wave" class="form-control form-control-sm" style="width:110px;">
+                            <option value="sine">Sine</option><option value="square">Square</option>
+                            <option value="triangle">Triangle</option><option value="sawtooth">Saw</option>
+                        </select>
+                        <label class="small text-muted mb-0">
+                            <span class="lang-en">Frequency</span><span class="lang-fr">Fréquence</span>
+                            <input id="au-tone-freq" type="number" value="440" min="10" max="22000" class="form-control form-control-sm d-inline-block ml-1" style="width:90px;"> Hz
+                        </label>
+                        <input id="au-tone-slider" type="range" min="1" max="430" value="263" style="width:180px;">
+                        <label class="small text-muted mb-0">Vol
+                            <input id="au-tone-gain" type="range" min="0" max="100" value="30" style="vertical-align:middle; width:90px;">
+                        </label>
+                        <button id="au-tone-play" class="btn btn-sm btn-dark"><i class="fas fa-play"></i></button>
+                    </div>
+                    <div class="d-flex flex-wrap align-items-center" style="gap:1rem;">
+                        <span class="small text-muted"><span class="lang-en">Sweep:</span><span class="lang-fr">Balayage :</span></span>
+                        <input id="au-sweep-f0" type="number" value="20" class="form-control form-control-sm" style="width:80px;"> →
+                        <input id="au-sweep-f1" type="number" value="20000" class="form-control form-control-sm" style="width:80px;"> Hz,
+                        <input id="au-sweep-t" type="number" value="5" min="1" max="60" class="form-control form-control-sm" style="width:60px;"> s
+                        <select id="au-sweep-mode" class="form-control form-control-sm" style="width:90px;">
+                            <option value="log" selected>log</option><option value="lin">lin</option>
+                        </select>
+                        <button id="au-sweep-play" class="btn btn-sm btn-outline-dark"><i class="fas fa-play"></i> <span class="lang-en">Sweep</span><span class="lang-fr">Balayer</span></button>
+                    </div>
+                </div>
+
+                <!-- converter -->
+                <div id="au-convert-ui" class="d-none">
+                    <div id="au-drop" style="border:2px dashed #cdd9f3; border-radius:12px; padding:1.4rem 1rem; text-align:center; color:#6a7385; cursor:pointer;">
+                        <i class="fas fa-file-audio fa-2x mb-2"></i><br>
+                        <span class="lang-en">Drop an audio file (wav, mp3, ogg, flac, m4a…)</span>
+                        <span class="lang-fr">Dépose un fichier audio (wav, mp3, ogg, flac, m4a…)</span>
+                        <input id="au-file" type="file" accept="audio/*" class="d-none">
+                    </div>
+                    <div class="d-flex flex-wrap align-items-center mt-2" style="gap:1rem;">
+                        <label class="small text-muted mb-0">
+                            <span class="lang-en">Output</span><span class="lang-fr">Sortie</span>
+                            <select id="au-out-fmt" class="form-control form-control-sm d-inline-block ml-1" style="width:90px;">
+                                <option value="wav">WAV</option><option value="mp3" selected>MP3</option>
+                            </select>
+                        </label>
+                        <label id="au-opt-kbps" class="small text-muted mb-0">
+                            Bitrate
+                            <select id="au-kbps" class="form-control form-control-sm d-inline-block ml-1" style="width:100px;">
+                                <option value="128">128 kbps</option><option value="192" selected>192 kbps</option><option value="320">320 kbps</option>
+                            </select>
+                        </label>
+                        <button id="au-conv-run" class="btn btn-sm btn-dark" disabled>
+                            <i class="fas fa-cogs"></i> <span class="lang-en">Convert</span><span class="lang-fr">Convertir</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="au-status" class="small text-muted mt-2"></div>
+                <div id="au-result" class="mt-2"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== Text & dev ===================== -->
+<div class="row mt-3">
+    <div class="col">
+        <div class="card border-0 bg-white tool-card">
+            <div class="card-body p-4">
+                <h6>
+                    <i class="fas fa-terminal"></i> &nbsp;
+                    <span class="lang-en">Text &amp; dev</span><span class="lang-fr">Texte &amp; dev</span>
+                </h6>
+
+                <div class="btn-group btn-group-sm mb-3 flex-wrap" role="group">
+                    <button data-tx-tool="diff" type="button" class="btn btn-outline-dark active">
+                        <i class="fas fa-not-equal"></i> <span class="lang-en">Text diff</span><span class="lang-fr">Diff de textes</span>
+                    </button>
+                    <button data-tx-tool="json" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-code"></i> JSON / YAML
+                    </button>
+                    <button data-tx-tool="hash" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-fingerprint"></i> <span class="lang-en">File hash</span><span class="lang-fr">Hash de fichiers</span>
+                    </button>
+                </div>
+
+                <!-- diff -->
+                <div id="tx-diff-ui">
+                    <div class="d-flex flex-wrap" style="gap:1rem;">
+                        <textarea id="tx-diff-a" class="form-control form-control-sm" rows="6" style="flex:1; min-width:260px; font-family:monospace;" placeholder="Text A"></textarea>
+                        <textarea id="tx-diff-b" class="form-control form-control-sm" rows="6" style="flex:1; min-width:260px; font-family:monospace;" placeholder="Text B"></textarea>
+                    </div>
+                    <div class="d-flex flex-wrap align-items-center mt-2 mb-2" style="gap:1rem;">
+                        <select id="tx-diff-mode" class="form-control form-control-sm" style="width:120px;">
+                            <option value="words" selected>Words</option>
+                            <option value="lines">Lines</option>
+                            <option value="chars">Chars</option>
+                        </select>
+                        <button id="tx-diff-go" class="btn btn-sm btn-dark"><i class="fas fa-play"></i> Diff</button>
+                    </div>
+                    <div id="tx-diff-out" class="small p-2" style="background:#f8f9fb; border-radius:8px; font-family:monospace; white-space:pre-wrap; min-height:40px;"></div>
+                </div>
+
+                <!-- json/yaml -->
+                <div id="tx-json-ui" class="d-none">
+                    <textarea id="tx-json-in" class="form-control form-control-sm mb-2" rows="8" style="font-family:monospace;" placeholder='{"a": 1}'></textarea>
+                    <div class="d-flex flex-wrap mb-2" style="gap:.4rem;">
+                        <button data-tx-json="fmt" class="btn btn-sm btn-outline-dark"><span class="lang-en">Format JSON</span><span class="lang-fr">Formater JSON</span></button>
+                        <button data-tx-json="min" class="btn btn-sm btn-outline-dark"><span class="lang-en">Minify</span><span class="lang-fr">Minifier</span></button>
+                        <button data-tx-json="toyaml" class="btn btn-sm btn-outline-dark">JSON → YAML</button>
+                        <button data-tx-json="tojson" class="btn btn-sm btn-outline-dark">YAML → JSON</button>
+                        <button data-tx-json="validate" class="btn btn-sm btn-outline-dark"><span class="lang-en">Validate</span><span class="lang-fr">Valider</span></button>
+                    </div>
+                    <pre id="tx-json-out" class="small p-2" style="background:#f4f6fa; border-radius:8px; min-height:40px; white-space:pre-wrap;"></pre>
+                </div>
+
+                <!-- hash -->
+                <div id="tx-hash-ui" class="d-none">
+                    <div id="tx-hash-drop" style="border:2px dashed #cdd9f3; border-radius:12px; padding:1.4rem 1rem; text-align:center; color:#6a7385; cursor:pointer;">
+                        <i class="fas fa-file-code fa-2x mb-2"></i><br>
+                        <span class="lang-en">Drop any files to hash (SHA-256, SHA-1, SHA-512)</span>
+                        <span class="lang-fr">Dépose des fichiers à hacher (SHA-256, SHA-1, SHA-512)</span>
+                        <input id="tx-hash-file" type="file" multiple class="d-none">
+                    </div>
+                    <div id="tx-hash-out" class="small mt-2" style="font-family:monospace; word-break:break-all;"></div>
+                </div>
+
+                <div id="tx-status" class="small text-muted mt-2"></div>
             </div>
         </div>
     </div>
@@ -250,4 +743,8 @@ description: "Free in-browser tools: background remover producing transparent-PN
 </script>
 
 <script src="{{ '/assets/js/bg-remove.js' | relative_url }}?v=2"></script>
-<script src="{{ '/assets/js/pdf-tools.js' | relative_url }}?v=1"></script>
+<script src="{{ '/assets/js/pdf-tools.js' | relative_url }}?v=2"></script>
+<script src="{{ '/assets/js/image-tools.js' | relative_url }}?v=1"></script>
+<script src="{{ '/assets/js/sci-tools.js' | relative_url }}?v=1"></script>
+<script src="{{ '/assets/js/audio-tools.js' | relative_url }}?v=1"></script>
+<script src="{{ '/assets/js/text-tools.js' | relative_url }}?v=1"></script>

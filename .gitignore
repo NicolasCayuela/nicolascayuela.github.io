@@ -43,3 +43,4 @@ scripts/dog_ae3.pt
 scripts/dog_ddpm2.pt
 scripts/dog_ae4.pt
 scripts/*.log
+scripts/realesr-general-x4v3.pth

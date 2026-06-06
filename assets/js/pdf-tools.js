@@ -51,9 +51,22 @@
                        "Convertit chaque page en image ; plusieurs pages sont livrées dans un ZIP."] },
     pdf2md:   { accept: "application/pdf", multiple: false, min: 1, opts: [],
                 hint: ["Extracts the text as Markdown (headings inferred from font size) and keeps the embedded images - download is a ZIP with document.md + images/.",
-                       "Extrait le texte en Markdown (titres déduits de la taille de police) et conserve les images intégrées - téléchargement en ZIP avec document.md + images/."] }
+                       "Extrait le texte en Markdown (titres déduits de la taille de police) et conserve les images intégrées - téléchargement en ZIP avec document.md + images/."] },
+    ocr:      { accept: "application/pdf,image/*", multiple: false, min: 1, opts: ["lang"],
+                hint: ["Recognizes the text of a scanned PDF or photo (Tesseract, ~15 MB language data on first run) and downloads it as .txt.",
+                       "Reconnaît le texte d'un PDF scanné ou d'une photo (Tesseract, ~15 Mo de données de langue au premier lancement) et le télécharge en .txt."] },
+    md2pdf:   { accept: ".md,text/markdown,text/plain", multiple: false, min: 0, opts: [],
+                hint: ["Type Markdown below (or drop a .md file) and get a styled PDF.",
+                       "Tape du Markdown ci-dessous (ou dépose un fichier .md) et récupère un PDF stylé."] },
+    sign:     { accept: "application/pdf", multiple: false, min: 1, opts: [],
+                hint: ["Draw or import a signature, pick the page, click on the preview where it should go, then run.",
+                       "Dessine ou importe une signature, choisis la page, clique sur l'aperçu à l'endroit voulu, puis lance."] },
+    watermark:{ accept: "application/pdf", multiple: false, min: 1, opts: [],
+                hint: ["Stamps the text on every page with the chosen opacity and size.",
+                       "Appose le texte sur chaque page avec l'opacité et la taille choisies."] }
   };
-  var OPT_IDS = ["range", "angle", "quality", "scale", "format"];
+  var OPT_IDS = ["range", "angle", "quality", "scale", "format", "lang"];
+  var UI_PANELS = { md2pdf: "pt-md-ui", sign: "pt-sign-ui", watermark: "pt-wm-ui" };
 
   function setStatus(en, fr) {
     statusEl.innerHTML = en || fr
@@ -357,8 +370,162 @@
       "Télécharger le ZIP (.md + " + images.length + " images)");
   }
 
+  // ---- OCR (Tesseract.js) ----
+  var TESSERACT_URL = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+  async function doOcr() {
+    await loadScript(TESSERACT_URL);
+    var lang = document.getElementById("pt-lang").value;
+    setStatus("Loading OCR engine + language data…", "Chargement du moteur OCR + données de langue…");
+    var worker = await Tesseract.createWorker(lang.split("+"));
+    var text = "";
+    try {
+      if (files[0].type === "application/pdf" || /\.pdf$/i.test(files[0].name)) {
+        await needPdfJs();
+        var doc = await pdfjsLib.getDocument({ data: await files[0].arrayBuffer() }).promise;
+        for (var i = 1; i <= doc.numPages; i++) {
+          setStatus("OCR page " + i + "/" + doc.numPages + "…", "OCR page " + i + "/" + doc.numPages + "…");
+          var page = await doc.getPage(i);
+          var vp = page.getViewport({ scale: 2 });
+          var c = document.createElement("canvas");
+          c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+          await page.render({ canvasContext: c.getContext("2d"), viewport: vp }).promise;
+          var r = await worker.recognize(c);
+          text += (i > 1 ? "\n\n----- page " + i + " -----\n\n" : "") + r.data.text;
+        }
+      } else {
+        setStatus("Recognizing text…", "Reconnaissance du texte…");
+        var res = await worker.recognize(files[0]);
+        text = res.data.text;
+      }
+    } finally { await worker.terminate(); }
+    var blob = new Blob([text], { type: "text/plain" });
+    resultEl.innerHTML =
+      '<textarea class="form-control form-control-sm mb-2" rows="8" readonly>' +
+      text.replace(/&/g, "&amp;").replace(/</g, "&lt;") + "</textarea>" +
+      resultLink(blob, baseName(files[0].name) + ".txt", "Download text", "Télécharger le texte");
+  }
+
+  // ---- Markdown -> styled PDF ----
+  var MARKED_URL = "https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js";
+  var HTML2PDF_URL = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+  async function doMd2Pdf() {
+    var md = document.getElementById("pt-md-text").value;
+    if (files.length) md = await files[0].text();
+    if (!md.trim()) throw new Error("empty markdown / markdown vide");
+    await loadScript(MARKED_URL); await loadScript(HTML2PDF_URL);
+    var host = document.createElement("div");
+    host.innerHTML = marked.parse(md);
+    host.style.cssText = "font-family: Georgia, serif; font-size: 12pt; line-height: 1.55; color: #1a1a1a; padding: 14mm; max-width: 700px;";
+    host.querySelectorAll("h1,h2,h3").forEach(function (h) { h.style.fontFamily = "Helvetica, Arial, sans-serif"; });
+    host.querySelectorAll("pre").forEach(function (p) {
+      p.style.cssText = "background:#f4f6fa; border-radius:6px; padding:8px 10px; font-size:10pt; overflow-x:hidden; white-space:pre-wrap;";
+    });
+    host.querySelectorAll("img").forEach(function (im) { im.style.maxWidth = "100%"; });
+    setStatus("Rendering PDF…", "Génération du PDF…");
+    var blob = await html2pdf().set({
+      margin: 0,
+      filename: "document.pdf",
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "pt", format: "a4" },
+      pagebreak: { mode: ["avoid-all", "css"] }
+    }).from(host).output("blob");
+    resultEl.innerHTML = resultLink(blob, "document.pdf", "Download PDF", "Télécharger le PDF");
+  }
+
+  // ---- Sign PDF ----
+  var signPlaced = null;           // {nx, ny} fractional position on the preview
+  var signPageDims = null;         // {w, h} of the previewed page in PDF points
+  var padDirty = false;
+
+  async function renderSignPreview() {
+    if (!files.length) return;
+    await needPdfJs();
+    var doc = await pdfjsLib.getDocument({ data: await files[0].arrayBuffer() }).promise;
+    var pn = Math.min(Math.max(1, parseInt(document.getElementById("pt-sign-page").value, 10) || 1), doc.numPages);
+    document.getElementById("pt-sign-page").value = pn;
+    var page = await doc.getPage(pn);
+    var vp = page.getViewport({ scale: 1.2 });
+    var c = document.getElementById("pt-sign-preview");
+    c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+    await page.render({ canvasContext: c.getContext("2d"), viewport: vp }).promise;
+    var p1 = page.getViewport({ scale: 1 });
+    signPageDims = { w: p1.width, h: p1.height };
+    if (signPlaced) drawSignMarker();
+  }
+
+  function signatureCanvas() {
+    // returns the drawn pad if used, else the uploaded image canvas
+    var pad = document.getElementById("pt-sign-pad");
+    if (padDirty) return Promise.resolve(pad);
+    if (signImg) return Promise.resolve(signImg);
+    return Promise.resolve(null);
+  }
+  var signImg = null;
+
+  function drawSignMarker() {
+    var c = document.getElementById("pt-sign-preview");
+    var cx = c.getContext("2d");
+    signatureCanvas().then(function (sig) {
+      var w = parseInt(document.getElementById("pt-sign-size").value, 10) * (c.width / signPageDims.w);
+      var h = sig ? w * sig.height / sig.width : w * 0.33;
+      var x = signPlaced.nx * c.width - w / 2, y = signPlaced.ny * c.height - h / 2;
+      if (sig) cx.drawImage(sig, x, y, w, h);
+      cx.strokeStyle = "#1c54e5"; cx.setLineDash([5, 4]);
+      cx.strokeRect(x, y, w, h);
+      cx.setLineDash([]);
+    });
+  }
+
+  async function doSign() {
+    var sig = await signatureCanvas();
+    if (!sig) throw new Error("no signature drawn or imported / aucune signature dessinée ou importée");
+    if (!signPlaced) throw new Error("click on the preview to place it / clique sur l'aperçu pour la placer");
+    await needPdfLib();
+    var doc = await PDFLib.PDFDocument.load(await files[0].arrayBuffer(), { ignoreEncryption: true });
+    var pn = Math.min(Math.max(1, parseInt(document.getElementById("pt-sign-page").value, 10) || 1), doc.getPageCount());
+    var page = doc.getPage(pn - 1);
+    var png = await doc.embedPng(sig.toDataURL ? sig.toDataURL("image/png") : sig);
+    var w = parseInt(document.getElementById("pt-sign-size").value, 10);
+    var h = w * png.height / png.width;
+    var pw = page.getWidth(), ph = page.getHeight();
+    page.drawImage(png, {
+      x: signPlaced.nx * pw - w / 2,
+      y: ph - signPlaced.ny * ph - h / 2,       // PDF origin is bottom-left
+      width: w, height: h
+    });
+    var bytes = await doc.save();
+    downloadBlob(new Blob([bytes], { type: "application/pdf" }), baseName(files[0].name) + "-signed.pdf");
+  }
+
+  // ---- Watermark ----
+  async function doWatermark() {
+    var text = document.getElementById("pt-wm-text").value.trim();
+    if (!text) throw new Error("empty watermark text / texte de filigrane vide");
+    await needPdfLib();
+    var doc = await PDFLib.PDFDocument.load(await files[0].arrayBuffer(), { ignoreEncryption: true });
+    var font = await doc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+    var opacity = document.getElementById("pt-wm-opacity").value / 100;
+    var size = parseInt(document.getElementById("pt-wm-size").value, 10);
+    var diag = document.getElementById("pt-wm-diag").checked;
+    doc.getPages().forEach(function (page) {
+      var pw = page.getWidth(), ph = page.getHeight();
+      var tw = font.widthOfTextAtSize(text, size);
+      page.drawText(text, {
+        x: pw / 2 - (diag ? tw * 0.353 : tw / 2),         // cos45/2 when rotated
+        y: ph / 2 - (diag ? tw * 0.353 : size / 2),
+        size: size, font: font,
+        color: PDFLib.rgb(0.55, 0.55, 0.6),
+        opacity: opacity,
+        rotate: diag ? PDFLib.degrees(45) : PDFLib.degrees(0)
+      });
+    });
+    var bytes = await doc.save();
+    downloadBlob(new Blob([bytes], { type: "application/pdf" }), baseName(files[0].name) + "-watermarked.pdf");
+  }
+
   var RUNNERS = { merge: doMerge, split: doSplit, compress: doCompress, rotate: doRotate,
-                  delete: doDelete, img2pdf: doImg2Pdf, pdf2img: doPdf2Img, pdf2md: doPdf2Md };
+                  delete: doDelete, img2pdf: doImg2Pdf, pdf2img: doPdf2Img, pdf2md: doPdf2Md,
+                  ocr: doOcr, md2pdf: doMd2Pdf, sign: doSign, watermark: doWatermark };
 
   // ---------- UI wiring ----------
   function refresh() {
@@ -367,6 +534,9 @@
     fileInput.multiple = t.multiple;
     OPT_IDS.forEach(function (o) {
       document.getElementById("pt-opt-" + o).classList.toggle("d-none", t.opts.indexOf(o) === -1);
+    });
+    Object.keys(UI_PANELS).forEach(function (k) {
+      document.getElementById(UI_PANELS[k]).classList.toggle("d-none", tool !== k);
     });
     filesEl.innerHTML = files.map(function (f, i) {
       return '<li><i class="far fa-file"></i> ' + f.name + " (" + fmtSize(f.size) + ") " +
@@ -397,15 +567,69 @@
     var t = TOOLS[tool];
     for (var i = 0; i < list.length; i++) {
       var f = list[i];
-      var okType = t.accept === "image/*" ? f.type.indexOf("image/") === 0
-                                          : f.type === "application/pdf" || /\.pdf$/i.test(f.name);
+      var isPdf = f.type === "application/pdf" || /\.pdf$/i.test(f.name);
+      var isImg = f.type.indexOf("image/") === 0;
+      var isTxt = /\.(md|markdown|txt)$/i.test(f.name) || f.type.indexOf("text/") === 0;
+      var okType;
+      if (t.accept === "image/*") okType = isImg;
+      else if (t.accept.indexOf("image/*") !== -1) okType = isImg || isPdf;
+      else if (t.accept.indexOf(".md") !== -1) okType = isTxt;
+      else okType = isPdf;
       if (!okType) continue;
       if (!t.multiple) files = [];
       files.push(f);
     }
     resultEl.innerHTML = ""; setStatus("", "");
     refresh();
+    if (tool === "sign" && files.length) {
+      signPlaced = null;
+      renderSignPreview().catch(function () {});
+    }
   }
+
+  // ---- signature pad + preview wiring ----
+  (function () {
+    var pad = document.getElementById("pt-sign-pad");
+    var pcx = pad.getContext("2d");
+    pcx.lineWidth = 2.2; pcx.lineCap = "round"; pcx.strokeStyle = "#1a2a6c";
+    var drawing = false;
+    function pos(e) {
+      var r = pad.getBoundingClientRect();
+      return { x: (e.touches ? e.touches[0].clientX : e.clientX) - r.left,
+               y: (e.touches ? e.touches[0].clientY : e.clientY) - r.top };
+    }
+    function start(e) { drawing = true; var p = pos(e); pcx.beginPath(); pcx.moveTo(p.x, p.y); e.preventDefault(); }
+    function move(e) { if (!drawing) return; var p = pos(e); pcx.lineTo(p.x, p.y); pcx.stroke(); padDirty = true; e.preventDefault(); }
+    pad.addEventListener("mousedown", start); pad.addEventListener("touchstart", start);
+    pad.addEventListener("mousemove", move); pad.addEventListener("touchmove", move);
+    window.addEventListener("mouseup", function () { drawing = false; });
+    pad.addEventListener("touchend", function () { drawing = false; });
+    document.getElementById("pt-sign-clear").addEventListener("click", function () {
+      pcx.clearRect(0, 0, pad.width, pad.height); padDirty = false; signImg = null;
+    });
+    document.getElementById("pt-sign-file").addEventListener("change", function () {
+      var f = this.files[0];
+      if (!f) return;
+      createImageBitmap(f).then(function (bmp) {
+        var c = document.createElement("canvas");
+        c.width = bmp.width; c.height = bmp.height;
+        c.getContext("2d").drawImage(bmp, 0, 0);
+        signImg = c; padDirty = false;
+        pcx.clearRect(0, 0, pad.width, pad.height);
+        var sc = Math.min(pad.width / c.width, pad.height / c.height);
+        pcx.drawImage(c, 0, 0, c.width * sc, c.height * sc);
+      });
+    });
+    document.getElementById("pt-sign-page").addEventListener("change", function () {
+      signPlaced = null;
+      renderSignPreview().catch(function () {});
+    });
+    document.getElementById("pt-sign-preview").addEventListener("click", function (e) {
+      var r = this.getBoundingClientRect();
+      signPlaced = { nx: (e.clientX - r.left) / r.width, ny: (e.clientY - r.top) / r.height };
+      renderSignPreview().catch(function () {});
+    });
+  })();
 
   drop.addEventListener("click", function () { fileInput.click(); });
   fileInput.addEventListener("change", function () { addFiles(fileInput.files); fileInput.value = ""; });
