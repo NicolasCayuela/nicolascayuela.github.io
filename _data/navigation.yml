@@ -14,6 +14,3 @@ pages:
 - name: Blog
   name_fr: Blog
   url: blog
-- name: Tools
-  name_fr: Outils
-  url: tools
