@@ -100,20 +100,10 @@ description: "Free in-browser tools: background remover, image converter/compres
                 <div class="tg-name"><span class="lang-en">PDF to images</span><span class="lang-fr">PDF en images</span></div>
                 <p class="tg-desc"><span class="lang-en">Every page as JPG or PNG (ZIP for multi-page).</span><span class="lang-fr">Chaque page en JPG ou PNG (ZIP si plusieurs pages).</span></p>
             </div>
-            <div class="tg-card tg-pdf" data-tg="pt:pdf2md" data-icon="fab fa-markdown">
-                <div class="tg-icon"><i class="fab fa-markdown"></i></div>
-                <div class="tg-name"><span class="lang-en">PDF to Markdown</span><span class="lang-fr">PDF en Markdown</span></div>
-                <p class="tg-desc"><span class="lang-en">Text + embedded images, ready for your notes.</span><span class="lang-fr">Texte + images intégrées, prêt pour tes notes.</span></p>
-            </div>
             <div class="tg-card tg-pdf" data-tg="pt:ocr" data-icon="fas fa-glasses">
                 <div class="tg-icon"><i class="fas fa-glasses"></i></div>
                 <div class="tg-name">OCR</div>
                 <p class="tg-desc"><span class="lang-en">Read the text of scanned PDFs and photos (FR/EN).</span><span class="lang-fr">Lis le texte des PDF scannés et photos (FR/EN).</span></p>
-            </div>
-            <div class="tg-card tg-pdf" data-tg="pt:md2pdf" data-icon="fas fa-file-export">
-                <div class="tg-icon"><i class="fas fa-file-export"></i></div>
-                <div class="tg-name"><span class="lang-en">Markdown to PDF</span><span class="lang-fr">Markdown en PDF</span></div>
-                <p class="tg-desc"><span class="lang-en">Turn Markdown into a clean, styled PDF.</span><span class="lang-fr">Transforme du Markdown en PDF propre et stylé.</span></p>
             </div>
             <div class="tg-card tg-pdf" data-tg="pt:sign" data-icon="fas fa-signature">
                 <div class="tg-icon"><i class="fas fa-signature"></i></div>
@@ -387,14 +377,8 @@ description: "Free in-browser tools: background remover, image converter/compres
                     <button data-pt-tool="pdf2img" type="button" class="btn btn-outline-dark">
                         <i class="fas fa-file-image"></i> <span class="lang-en">PDF to images</span><span class="lang-fr">PDF en images</span>
                     </button>
-                    <button data-pt-tool="pdf2md" type="button" class="btn btn-outline-dark">
-                        <i class="fab fa-markdown"></i> <span class="lang-en">PDF to Markdown</span><span class="lang-fr">PDF en Markdown</span>
-                    </button>
                     <button data-pt-tool="ocr" type="button" class="btn btn-outline-dark">
                         <i class="fas fa-glasses"></i> OCR
-                    </button>
-                    <button data-pt-tool="md2pdf" type="button" class="btn btn-outline-dark">
-                        <i class="fas fa-file-export"></i> <span class="lang-en">Markdown to PDF</span><span class="lang-fr">Markdown en PDF</span>
                     </button>
                     <button data-pt-tool="sign" type="button" class="btn btn-outline-dark">
                         <i class="fas fa-signature"></i> <span class="lang-en">Sign</span><span class="lang-fr">Signer</span>
@@ -458,12 +442,6 @@ description: "Free in-browser tools: background remover, image converter/compres
                             <option value="eng">English</option>
                         </select>
                     </label>
-                </div>
-
-                <!-- Markdown -> PDF input -->
-                <div id="pt-md-ui" class="d-none mb-2">
-                    <textarea id="pt-md-text" class="form-control form-control-sm" rows="8"
-                              placeholder="# Title&#10;&#10;Some **markdown** text… (or drop a .md file above)"></textarea>
                 </div>
 
                 <!-- Signature UI -->
@@ -536,7 +514,7 @@ description: "Free in-browser tools: background remover, image converter/compres
 </div>
 
 <script src="{{ '/assets/js/bg-remove.js' | relative_url }}?v=2"></script>
-<script src="{{ '/assets/js/pdf-tools.js' | relative_url }}?v=2"></script>
+<script src="{{ '/assets/js/pdf-tools.js' | relative_url }}?v=3"></script>
 <script src="{{ '/assets/js/image-tools.js' | relative_url }}?v=1"></script>
 
 <!-- grid <-> focused-tool navigation -->

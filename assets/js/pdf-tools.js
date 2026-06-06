@@ -49,15 +49,9 @@
     pdf2img:  { accept: "application/pdf", multiple: false, min: 1, opts: ["format", "scale"],
                 hint: ["Renders every page as an image; several pages are packaged in a ZIP.",
                        "Convertit chaque page en image ; plusieurs pages sont livrées dans un ZIP."] },
-    pdf2md:   { accept: "application/pdf", multiple: false, min: 1, opts: [],
-                hint: ["Extracts the text as Markdown (headings inferred from font size) and keeps the embedded images - download is a ZIP with document.md + images/.",
-                       "Extrait le texte en Markdown (titres déduits de la taille de police) et conserve les images intégrées - téléchargement en ZIP avec document.md + images/."] },
     ocr:      { accept: "application/pdf,image/*", multiple: false, min: 1, opts: ["lang"],
                 hint: ["Recognizes the text of a scanned PDF or photo (Tesseract, ~15 MB language data on first run) and downloads it as .txt.",
                        "Reconnaît le texte d'un PDF scanné ou d'une photo (Tesseract, ~15 Mo de données de langue au premier lancement) et le télécharge en .txt."] },
-    md2pdf:   { accept: ".md,text/markdown,text/plain", multiple: false, min: 0, opts: [],
-                hint: ["Type Markdown below (or drop a .md file) and get a styled PDF.",
-                       "Tape du Markdown ci-dessous (ou dépose un fichier .md) et récupère un PDF stylé."] },
     sign:     { accept: "application/pdf", multiple: false, min: 1, opts: [],
                 hint: ["Draw or import a signature, pick the page, click on the preview where it should go, then run.",
                        "Dessine ou importe une signature, choisis la page, clique sur l'aperçu à l'endroit voulu, puis lance."] },
@@ -66,7 +60,7 @@
                        "Appose le texte sur chaque page avec l'opacité et la taille choisies."] }
   };
   var OPT_IDS = ["range", "angle", "quality", "scale", "format", "lang"];
-  var UI_PANELS = { md2pdf: "pt-md-ui", sign: "pt-sign-ui", watermark: "pt-wm-ui" };
+  var UI_PANELS = { sign: "pt-sign-ui", watermark: "pt-wm-ui" };
 
   function setStatus(en, fr) {
     statusEl.innerHTML = en || fr
@@ -258,118 +252,6 @@
     resultEl.innerHTML = resultLink(zblob, base + "-images.zip", "Download ZIP (" + blobs.length + " pages)", "Télécharger le ZIP (" + blobs.length + " pages)");
   }
 
-  // ---- PDF -> Markdown with image preservation ----
-  function imageToPngBlob(img) {
-    // img comes from PDF.js' object store: either {bitmap} or raw {data,width,height,kind}
-    var c = document.createElement("canvas");
-    c.width = img.width; c.height = img.height;
-    var cx = c.getContext("2d");
-    if (img.bitmap) {
-      cx.drawImage(img.bitmap, 0, 0);
-    } else if (img.data) {
-      var id = cx.createImageData(img.width, img.height);
-      var n = img.width * img.height, d = img.data, o = id.data;
-      if (d.length === n * 4) { o.set(d); }
-      else if (d.length === n * 3) {
-        for (var p = 0; p < n; p++) { o[p*4] = d[p*3]; o[p*4+1] = d[p*3+1]; o[p*4+2] = d[p*3+2]; o[p*4+3] = 255; }
-      } else if (d.length === n) {                     // 8-bit grayscale
-        for (var g = 0; g < n; g++) { o[g*4] = o[g*4+1] = o[g*4+2] = d[g]; o[g*4+3] = 255; }
-      } else { return Promise.resolve(null); }         // unsupported (1bpp masks…)
-      cx.putImageData(id, 0, 0);
-    } else { return Promise.resolve(null); }
-    return new Promise(function (res) { c.toBlob(res, "image/png"); });
-  }
-
-  async function doPdf2Md() {
-    await needPdfJs(); await needZip();
-    var doc = await pdfjsLib.getDocument({ data: await files[0].arrayBuffer() }).promise;
-    var md = [], images = [], seenObj = {};
-
-    for (var i = 1; i <= doc.numPages; i++) {
-      setStatus("Converting page " + i + "/" + doc.numPages + "…", "Conversion page " + i + "/" + doc.numPages + "…");
-      var page = await doc.getPage(i);
-
-      // -- text: rebuild lines, infer headings from the font-size distribution --
-      var tc = await page.getTextContent();
-      var items = tc.items.filter(function (it) { return it.str && it.str.trim(); })
-        .map(function (it) {
-          return { str: it.str, x: it.transform[4], y: it.transform[5],
-                   size: Math.hypot(it.transform[2], it.transform[3]) };
-        });
-      items.sort(function (a, b) { return b.y - a.y || a.x - b.x; });
-
-      var lines = [];
-      items.forEach(function (it) {
-        var L = lines[lines.length - 1];
-        if (L && Math.abs(L.y - it.y) < Math.max(L.size, it.size) * 0.5) {
-          L.str += (it.x - L.endX > it.size * 0.25 ? " " : "") + it.str;
-          L.endX = it.x + it.str.length * it.size * 0.5;
-          L.size = Math.max(L.size, it.size);
-        } else {
-          lines.push({ str: it.str, y: it.y, size: it.size,
-                       endX: it.x + it.str.length * it.size * 0.5 });
-        }
-      });
-
-      var sizes = lines.map(function (l) { return l.size; }).sort(function (a, b) { return a - b; });
-      var med = sizes.length ? sizes[Math.floor(sizes.length / 2)] : 12;
-
-      var prev = null;
-      lines.forEach(function (l) {
-        var txt = l.str.trim();
-        if (!txt) return;
-        var pre = "";
-        if (l.size >= med * 1.7) pre = "# ";
-        else if (l.size >= med * 1.35) pre = "## ";
-        else if (l.size >= med * 1.15) pre = "### ";
-        if (prev !== null && (prev.y - l.y) > prev.size * 1.7) md.push("");   // paragraph gap
-        if (pre && md.length && md[md.length - 1] !== "") md.push("");
-        md.push(pre + txt);
-        if (pre) md.push("");
-        prev = l;
-      });
-
-      // -- images: pull every painted XObject out of the operator list --
-      try {
-        var ops = await page.getOperatorList();
-        for (var k = 0; k < ops.fnArray.length; k++) {
-          if (ops.fnArray[k] !== pdfjsLib.OPS.paintImageXObject) continue;
-          var objId = ops.argsArray[k][0];
-          if (seenObj[objId]) continue;
-          seenObj[objId] = true;
-          var img = null;
-          try { img = page.objs.get(objId); }
-          catch (e) { try { img = page.commonObjs.get(objId); } catch (e2) {} }
-          if (!img || img.width < 8 || img.height < 8) continue;
-          var blob = await imageToPngBlob(img);
-          if (!blob) continue;
-          var name = "p" + i + "-img" + (images.length + 1) + ".png";
-          images.push({ name: name, blob: blob });
-          md.push("");
-          md.push("![" + name + "](images/" + name + ")");
-          md.push("");
-        }
-      } catch (e) { /* image extraction is best-effort */ }
-
-      md.push("");
-    }
-
-    var mdText = md.join("\n").replace(/\n{3,}/g, "\n\n").trim() + "\n";
-    var base = baseName(files[0].name);
-    if (!images.length) {
-      downloadBlob(new Blob([mdText], { type: "text/markdown" }), base + ".md");
-      return;
-    }
-    var zip = new JSZip();
-    zip.file("document.md", mdText);
-    var dir = zip.folder("images");
-    images.forEach(function (im) { dir.file(im.name, im.blob); });
-    var zblob = await zip.generateAsync({ type: "blob" });
-    resultEl.innerHTML = resultLink(zblob, base + "-markdown.zip",
-      "Download ZIP (.md + " + images.length + " images)",
-      "Télécharger le ZIP (.md + " + images.length + " images)");
-  }
-
   // ---- OCR (Tesseract.js) ----
   var TESSERACT_URL = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
   async function doOcr() {
@@ -403,33 +285,6 @@
       '<textarea class="form-control form-control-sm mb-2" rows="8" readonly>' +
       text.replace(/&/g, "&amp;").replace(/</g, "&lt;") + "</textarea>" +
       resultLink(blob, baseName(files[0].name) + ".txt", "Download text", "Télécharger le texte");
-  }
-
-  // ---- Markdown -> styled PDF ----
-  var MARKED_URL = "https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js";
-  var HTML2PDF_URL = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
-  async function doMd2Pdf() {
-    var md = document.getElementById("pt-md-text").value;
-    if (files.length) md = await files[0].text();
-    if (!md.trim()) throw new Error("empty markdown / markdown vide");
-    await loadScript(MARKED_URL); await loadScript(HTML2PDF_URL);
-    var host = document.createElement("div");
-    host.innerHTML = marked.parse(md);
-    host.style.cssText = "font-family: Georgia, serif; font-size: 12pt; line-height: 1.55; color: #1a1a1a; padding: 14mm; max-width: 700px;";
-    host.querySelectorAll("h1,h2,h3").forEach(function (h) { h.style.fontFamily = "Helvetica, Arial, sans-serif"; });
-    host.querySelectorAll("pre").forEach(function (p) {
-      p.style.cssText = "background:#f4f6fa; border-radius:6px; padding:8px 10px; font-size:10pt; overflow-x:hidden; white-space:pre-wrap;";
-    });
-    host.querySelectorAll("img").forEach(function (im) { im.style.maxWidth = "100%"; });
-    setStatus("Rendering PDF…", "Génération du PDF…");
-    var blob = await html2pdf().set({
-      margin: 0,
-      filename: "document.pdf",
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: "pt", format: "a4" },
-      pagebreak: { mode: ["avoid-all", "css"] }
-    }).from(host).output("blob");
-    resultEl.innerHTML = resultLink(blob, "document.pdf", "Download PDF", "Télécharger le PDF");
   }
 
   // ---- Sign PDF ----
@@ -524,8 +379,8 @@
   }
 
   var RUNNERS = { merge: doMerge, split: doSplit, compress: doCompress, rotate: doRotate,
-                  delete: doDelete, img2pdf: doImg2Pdf, pdf2img: doPdf2Img, pdf2md: doPdf2Md,
-                  ocr: doOcr, md2pdf: doMd2Pdf, sign: doSign, watermark: doWatermark };
+                  delete: doDelete, img2pdf: doImg2Pdf, pdf2img: doPdf2Img,
+                  ocr: doOcr, sign: doSign, watermark: doWatermark };
 
   // ---------- UI wiring ----------
   function refresh() {
