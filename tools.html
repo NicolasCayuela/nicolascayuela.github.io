@@ -1,0 +1,89 @@
+---
+layout: default
+title : Tools
+navbar_name: Tools
+description: "Free in-browser tools: background remover producing transparent-PNG (alpha channel) images. No upload, everything runs locally."
+---
+
+<style>
+    .tool-card { border-radius: 14px; box-shadow: 0 4px 16px rgba(25,40,80,.08); }
+    #bgr-drop { border: 2px dashed #cdd9f3; border-radius: 12px; padding: 2.2rem 1rem; text-align: center;
+        color: #6a7385; cursor: pointer; transition: background .12s, border-color .12s; }
+    #bgr-drop.dragover, #bgr-drop:hover { background: #f3f7ff; border-color: #1c54e5; }
+    .bgr-stage { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; }
+    .bgr-panel { flex: 1 1 300px; max-width: 460px; min-width: 260px; }
+    .bgr-panel h6 { font-size: .85rem; color: #566075; }
+    .bgr-canvas-wrap { border-radius: 10px; overflow: hidden; border: 1px solid #e3e8f0;
+        /* checkerboard so the transparency is visible */
+        background: repeating-conic-gradient(#e9edf3 0% 25%, #ffffff 0% 50%) 0 0 / 20px 20px; }
+    .bgr-canvas-wrap canvas, .bgr-canvas-wrap img { display: block; width: 100%; height: auto; }
+    .bgr-privacy { font-size: .82rem; color: #14633d; background: #e8f7ee; border: 1px solid #bfe8d0;
+        border-radius: 10px; padding: .55rem .8rem; display: inline-block; }
+</style>
+
+<div class="row mt-3">
+    <div class="col">
+        <div class="card border-0 bg-white tool-card">
+            <div class="card-body p-4">
+                <h6>
+                    <i class="fas fa-cut"></i> &nbsp;
+                    <span class="lang-en">Background remover</span><span class="lang-fr">Suppression de fond</span>
+                </h6>
+                <p class="small text-muted mb-2">
+                    <span class="lang-en">Drop an image and get a transparent PNG (alpha channel). A small U²-Net segmentation network (4.5&nbsp;MB ONNX) runs entirely in your browser.</span>
+                    <span class="lang-fr">Dépose une image et récupère un PNG transparent (canal alpha). Un petit réseau de segmentation U²-Net (ONNX de 4,5&nbsp;Mo) tourne entièrement dans ton navigateur.</span>
+                </p>
+                <p class="bgr-privacy mb-3">
+                    <i class="fas fa-lock"></i>&nbsp;
+                    <span class="lang-en"><strong>This is an offline tool:</strong> your data stays on your device and is never sent to any server. Processing happens 100% locally in your browser; once the model is loaded it even works without an internet connection.</span>
+                    <span class="lang-fr"><strong>Outil hors ligne :</strong> tes données restent sur ton appareil et ne sont jamais envoyées à un serveur. Le traitement est 100&nbsp;% local dans ton navigateur ; une fois le modèle chargé, ça marche même sans connexion internet.</span>
+                </p>
+
+                <div id="bgr-drop">
+                    <i class="fas fa-file-image fa-2x mb-2"></i><br>
+                    <span class="lang-en">Drop an image here, paste, or click to choose a file</span>
+                    <span class="lang-fr">Dépose une image ici, colle, ou clique pour choisir un fichier</span>
+                    <input id="bgr-file" type="file" accept="image/*" class="d-none">
+                </div>
+                <div id="bgr-status" class="small text-muted mt-2"></div>
+
+                <div id="bgr-result" class="d-none">
+                    <div class="bgr-stage mt-3">
+                        <div class="bgr-panel">
+                            <h6><span class="lang-en">Original</span><span class="lang-fr">Originale</span></h6>
+                            <div class="bgr-canvas-wrap"><img id="bgr-orig" alt="original image"></div>
+                        </div>
+                        <div class="bgr-panel">
+                            <h6><span class="lang-en">Result (alpha channel)</span><span class="lang-fr">Résultat (canal alpha)</span></h6>
+                            <div class="bgr-canvas-wrap"><canvas id="bgr-out"></canvas></div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap align-items-center mt-3" style="gap:1rem;">
+                        <label class="small text-muted mb-0">
+                            <span class="lang-en">Edge hardness</span><span class="lang-fr">Dureté des bords</span>
+                            <input id="bgr-hard" type="range" min="0" max="100" value="35" style="vertical-align:middle; width:130px;">
+                        </label>
+                        <label class="small text-muted mb-0">
+                            <span class="lang-en">Threshold</span><span class="lang-fr">Seuil</span>
+                            <input id="bgr-thresh" type="range" min="0" max="100" value="50" style="vertical-align:middle; width:130px;">
+                        </label>
+                        <button id="bgr-download" class="btn btn-sm btn-dark">
+                            <i class="fas fa-download"></i> <span class="lang-en">Download PNG</span><span class="lang-fr">Télécharger le PNG</span>
+                        </button>
+                        <button id="bgr-reset" class="btn btn-sm btn-outline-dark">
+                            <i class="fas fa-redo"></i> <span class="lang-en">Another image</span><span class="lang-fr">Autre image</span>
+                        </button>
+                    </div>
+                </div>
+
+                <p class="small text-muted mt-3 mb-0">
+                    <span class="lang-en">Model: <a href="https://github.com/xuebinqin/U-2-Net" target="_blank" rel="noopener">U²-Net (small)</a>, Qin et al., Pattern Recognition 2020 - via <a href="https://github.com/danielgatis/rembg" target="_blank" rel="noopener">rembg</a>. Inference: onnxruntime-web.</span>
+                    <span class="lang-fr">Modèle : <a href="https://github.com/xuebinqin/U-2-Net" target="_blank" rel="noopener">U²-Net (small)</a>, Qin et al., Pattern Recognition 2020 - via <a href="https://github.com/danielgatis/rembg" target="_blank" rel="noopener">rembg</a>. Inférence : onnxruntime-web.</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ '/assets/js/bg-remove.js' | relative_url }}?v=1"></script>
