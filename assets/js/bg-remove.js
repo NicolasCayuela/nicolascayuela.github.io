@@ -46,11 +46,11 @@
     if (session) return Promise.resolve(session);
     if (!ortLoading) {
       setStatus("Loading model (4.5 MB)…", "Chargement du modèle (4,5 Mo)…");
+      // wasm only: the WebGPU EP rejects u2netp (MaxPool with ceil_mode),
+      // and the model is small enough that wasm inference is fast anyway
       ortLoading = loadScript(ORT_URL)
         .then(function () {
-          return window.ort.InferenceSession
-            .create(MODEL_URL, { executionProviders: ["webgpu", "wasm"] })
-            .catch(function () { return window.ort.InferenceSession.create(MODEL_URL); });
+          return window.ort.InferenceSession.create(MODEL_URL, { executionProviders: ["wasm"] });
         })
         .then(function (s) { session = s; return s; });
     }

@@ -86,4 +86,115 @@ description: "Free in-browser tools: background remover producing transparent-PN
     </div>
 </div>
 
-<script src="{{ '/assets/js/bg-remove.js' | relative_url }}?v=1"></script>
+<!-- ===================== PDF toolbox ===================== -->
+<div class="row mt-3">
+    <div class="col">
+        <div class="card border-0 bg-white tool-card">
+            <div class="card-body p-4">
+                <h6>
+                    <i class="fas fa-file-pdf"></i> &nbsp;
+                    <span class="lang-en">PDF toolbox</span><span class="lang-fr">Boîte à outils PDF</span>
+                </h6>
+                <p class="small text-muted mb-2">
+                    <span class="lang-en">Merge, split, compress, rotate, delete pages, convert images to PDF and PDF to images.</span>
+                    <span class="lang-fr">Fusionner, diviser, compresser, pivoter, supprimer des pages, convertir des images en PDF et un PDF en images.</span>
+                </p>
+                <p class="bgr-privacy mb-3">
+                    <i class="fas fa-lock"></i>&nbsp;
+                    <span class="lang-en"><strong>Offline tool:</strong> your files stay on your device and are never sent to any server - everything runs locally in your browser.</span>
+                    <span class="lang-fr"><strong>Outil hors ligne :</strong> tes fichiers restent sur ton appareil et ne sont jamais envoyés à un serveur - tout tourne localement dans ton navigateur.</span>
+                </p>
+
+                <!-- tool selector -->
+                <div class="btn-group btn-group-sm mb-3 flex-wrap" role="group">
+                    <button data-pt-tool="merge" type="button" class="btn btn-outline-dark active">
+                        <i class="fas fa-object-group"></i> <span class="lang-en">Merge</span><span class="lang-fr">Fusionner</span>
+                    </button>
+                    <button data-pt-tool="split" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-cut"></i> <span class="lang-en">Split / extract</span><span class="lang-fr">Diviser / extraire</span>
+                    </button>
+                    <button data-pt-tool="compress" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-compress-arrows-alt"></i> <span class="lang-en">Compress</span><span class="lang-fr">Compresser</span>
+                    </button>
+                    <button data-pt-tool="rotate" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-sync-alt"></i> <span class="lang-en">Rotate</span><span class="lang-fr">Pivoter</span>
+                    </button>
+                    <button data-pt-tool="delete" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-trash-alt"></i> <span class="lang-en">Delete pages</span><span class="lang-fr">Supprimer des pages</span>
+                    </button>
+                    <button data-pt-tool="img2pdf" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-images"></i> <span class="lang-en">Images to PDF</span><span class="lang-fr">Images en PDF</span>
+                    </button>
+                    <button data-pt-tool="pdf2img" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-file-image"></i> <span class="lang-en">PDF to images</span><span class="lang-fr">PDF en images</span>
+                    </button>
+                    <button data-pt-tool="pdf2md" type="button" class="btn btn-outline-dark">
+                        <i class="fab fa-markdown"></i> <span class="lang-en">PDF to Markdown</span><span class="lang-fr">PDF en Markdown</span>
+                    </button>
+                </div>
+
+                <!-- per-tool hint -->
+                <p id="pt-hint" class="small text-muted mb-2"></p>
+
+                <!-- drop zone -->
+                <div id="pt-drop" style="border:2px dashed #cdd9f3; border-radius:12px; padding:1.6rem 1rem; text-align:center; color:#6a7385; cursor:pointer;">
+                    <i class="fas fa-file-upload fa-2x mb-2"></i><br>
+                    <span class="lang-en">Drop files here or click to choose</span>
+                    <span class="lang-fr">Dépose les fichiers ici ou clique pour choisir</span>
+                    <input id="pt-file" type="file" class="d-none">
+                </div>
+                <ul id="pt-files" class="list-unstyled small mt-2 mb-2"></ul>
+
+                <!-- per-tool options -->
+                <div id="pt-opts" class="d-flex flex-wrap align-items-center mb-2" style="gap:1rem;">
+                    <label id="pt-opt-range" class="small text-muted mb-0 d-none">
+                        <span class="lang-en">Pages (e.g. 1-3,5)</span><span class="lang-fr">Pages (ex. 1-3,5)</span>
+                        <input id="pt-range" type="text" class="form-control form-control-sm d-inline-block ml-1" style="width:130px;" placeholder="1-3,5">
+                    </label>
+                    <label id="pt-opt-angle" class="small text-muted mb-0 d-none">
+                        <span class="lang-en">Angle</span><span class="lang-fr">Angle</span>
+                        <select id="pt-angle" class="form-control form-control-sm d-inline-block ml-1" style="width:90px;">
+                            <option value="90">90°</option>
+                            <option value="180">180°</option>
+                            <option value="270">-90°</option>
+                        </select>
+                    </label>
+                    <label id="pt-opt-quality" class="small text-muted mb-0 d-none">
+                        <span class="lang-en">Quality</span><span class="lang-fr">Qualité</span>
+                        <input id="pt-quality" type="range" min="30" max="95" value="70" style="vertical-align:middle; width:120px;">
+                    </label>
+                    <label id="pt-opt-scale" class="small text-muted mb-0 d-none">
+                        <span class="lang-en">Resolution</span><span class="lang-fr">Résolution</span>
+                        <select id="pt-scale" class="form-control form-control-sm d-inline-block ml-1" style="width:110px;">
+                            <option value="1">72 dpi</option>
+                            <option value="1.5" selected>108 dpi</option>
+                            <option value="2">144 dpi</option>
+                            <option value="3">216 dpi</option>
+                        </select>
+                    </label>
+                    <label id="pt-opt-format" class="small text-muted mb-0 d-none">
+                        Format
+                        <select id="pt-format" class="form-control form-control-sm d-inline-block ml-1" style="width:90px;">
+                            <option value="jpeg">JPG</option>
+                            <option value="png">PNG</option>
+                        </select>
+                    </label>
+                </div>
+
+                <button id="pt-run" class="btn btn-sm btn-dark" disabled>
+                    <i class="fas fa-cogs"></i> <span class="lang-en">Run</span><span class="lang-fr">Lancer</span>
+                </button>
+                <div id="pt-status" class="small text-muted mt-2"></div>
+                <div id="pt-result" class="mt-2"></div>
+
+                <p class="small text-muted mt-3 mb-0">
+                    <span class="lang-en">Powered by <a href="https://pdf-lib.js.org/" target="_blank" rel="noopener">pdf-lib</a> (MIT) and <a href="https://mozilla.github.io/pdf.js/" target="_blank" rel="noopener">PDF.js</a> (Apache-2.0). Compression rasterizes pages to JPEG - text is no longer selectable in the output.</span>
+                    <span class="lang-fr">Propulsé par <a href="https://pdf-lib.js.org/" target="_blank" rel="noopener">pdf-lib</a> (MIT) et <a href="https://mozilla.github.io/pdf.js/" target="_blank" rel="noopener">PDF.js</a> (Apache-2.0). La compression rastérise les pages en JPEG - le texte n'est plus sélectionnable dans le fichier produit.</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ '/assets/js/bg-remove.js' | relative_url }}?v=2"></script>
+<script src="{{ '/assets/js/pdf-tools.js' | relative_url }}?v=1"></script>
