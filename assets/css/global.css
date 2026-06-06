@@ -6,6 +6,13 @@ body {
     color: #000;
 }
 
+/* the fixed navbar is shorter on small screens */
+@media (max-width: 575.98px) {
+    body {
+        padding-top: 4rem;
+    }
+}
+
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
     font-weight: 700;
