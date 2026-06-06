@@ -68,6 +68,14 @@ description: "Free in-browser tools: background remover, image converter/compres
     .pt-thumb.sel::after { content: "\2713"; position: absolute; top: 4px; right: 6px; width: 20px; height: 20px;
         background: #1c54e5; color: #fff; border-radius: 50%; font-size: .75rem; display: flex;
         align-items: center; justify-content: center; }
+    .pt-thumb.pt-mix { cursor: grab; }
+    .pt-thumb.pt-mix:hover { border-color: #9bb4e8; }
+    .pt-thumb.dragging { opacity: .35; }
+    .pt-thumb .pt-x { position: absolute; top: 2px; right: 4px; width: 18px; height: 18px; line-height: 16px;
+        text-align: center; background: rgba(31,41,64,.65); color: #fff; border-radius: 50%;
+        font-size: .8rem; cursor: pointer; opacity: 0; transition: opacity .1s; }
+    .pt-thumb:hover .pt-x { opacity: 1; }
+    .pt-thumb .pt-x:hover { background: #d63438; }
     #pt-files li { background: #fff; border: 1px solid #e8ecf3; border-radius: 8px; padding: .35rem .6rem; margin-bottom: .3rem;
         display: flex; align-items: center; gap: .5rem; }
     #pt-files li .pt-handle { margin-left: auto; display: flex; gap: .35rem; }
@@ -533,7 +541,7 @@ description: "Free in-browser tools: background remover, image converter/compres
 </div>
 
 <script src="{{ '/assets/js/bg-remove.js' | relative_url }}?v=2"></script>
-<script src="{{ '/assets/js/pdf-tools.js' | relative_url }}?v=4"></script>
+<script src="{{ '/assets/js/pdf-tools.js' | relative_url }}?v=5"></script>
 <script src="{{ '/assets/js/image-tools.js' | relative_url }}?v=2"></script>
 
 <!-- grid <-> focused-tool navigation -->

@@ -43,14 +43,94 @@
     document.getElementById("pt-range").value = parts.join(",");
   }
 
+  // ---- merge: one grid with the pages of every document, drag to interleave ----
+  var DOC_COLORS = ["#1c54e5", "#d63438", "#0ca678", "#7048e8", "#e8590c", "#0b7285"];
+  var mergeOverflow = [];        // per file: pages beyond the thumbnail cap
+
+  function renderMergeThumbs(token) {
+    mergeOverflow = [];
+    if (!files.length) return;
+    needPdfJs().then(async function () {
+      var CAP = 100;             // thumbnails per document
+      for (var fi = 0; fi < files.length; fi++) {
+        if (token !== thumbsToken) return;
+        var doc = await pdfjsLib.getDocument({ data: await files[fi].arrayBuffer() }).promise;
+        var maxp = Math.min(doc.numPages, CAP);
+        mergeOverflow[fi] = doc.numPages - maxp;
+        for (var pn = 1; pn <= maxp; pn++) {
+          if (token !== thumbsToken) return;
+          var page = await doc.getPage(pn);
+          var vp = page.getViewport({ scale: 1 });
+          var v2 = page.getViewport({ scale: 130 / vp.width });
+          var c = document.createElement("canvas");
+          c.width = Math.round(v2.width); c.height = Math.round(v2.height);
+          await page.render({ canvasContext: c.getContext("2d"), viewport: v2 }).promise;
+          if (token !== thumbsToken) return;
+          var d = document.createElement("div");
+          d.className = "pt-thumb pt-mix";
+          d.draggable = true;
+          d.setAttribute("data-f", fi);
+          d.setAttribute("data-p", pn - 1);
+          d.appendChild(c);
+          var num = document.createElement("span");
+          num.className = "pt-pnum";
+          num.textContent = files.length > 1 ? (fi + 1) + "." + pn : "" + pn;
+          num.style.background = DOC_COLORS[fi % DOC_COLORS.length];
+          d.appendChild(num);
+          var x = document.createElement("span");
+          x.className = "pt-x";
+          x.innerHTML = "&times;";
+          x.title = "exclude / exclure";
+          x.addEventListener("click", function (e) {
+            e.stopPropagation();
+            this.parentNode.remove();
+          });
+          d.appendChild(x);
+          thumbsEl.appendChild(d);
+        }
+        if (mergeOverflow[fi] > 0) {
+          var note = document.createElement("div");
+          note.className = "small text-muted";
+          note.textContent = files[fi].name + ": +" + mergeOverflow[fi];
+          thumbsEl.appendChild(note);
+        }
+      }
+    }).catch(function () {});
+  }
+
+  // drag-to-reorder, attached once
+  var dragEl = null;
+  thumbsEl.addEventListener("dragstart", function (e) {
+    var t = e.target.closest(".pt-mix");
+    if (!t) return;
+    dragEl = t;
+    t.classList.add("dragging");
+    e.dataTransfer.effectAllowed = "move";
+    try { e.dataTransfer.setData("text/plain", ""); } catch (err) {}   // firefox needs data
+  });
+  thumbsEl.addEventListener("dragend", function () {
+    if (dragEl) dragEl.classList.remove("dragging");
+    dragEl = null;
+  });
+  thumbsEl.addEventListener("dragover", function (e) {
+    if (!dragEl) return;
+    e.preventDefault();
+    var t = e.target.closest(".pt-mix");
+    if (!t || t === dragEl) return;
+    var r = t.getBoundingClientRect();
+    var before = (e.clientX - r.left) < r.width / 2;
+    thumbsEl.insertBefore(dragEl, before ? t : t.nextSibling);
+  });
+
   function renderThumbs() {
     var t = TOOLS[tool];
     thumbsEl.innerHTML = "";
     selPages = [];
+    var token = ++thumbsToken;
+    if (t.mix) { renderMergeThumbs(token); return; }
     var f = files[0];
     var isPdf = f && (f.type === "application/pdf" || /\.pdf$/i.test(f.name));
     if (!t.thumbs || !isPdf) return;
-    var token = ++thumbsToken;
     needPdfJs().then(function () {
       return f.arrayBuffer();
     }).then(function (buf) {
@@ -105,9 +185,9 @@
 
   // ---------- tool registry ----------
   var TOOLS = {
-    merge:    { accept: "application/pdf", multiple: true,  min: 2, opts: [],
-                hint: ["Select at least two PDFs and order them with the arrows - they are merged in list order.",
-                       "Sélectionne au moins deux PDF et ordonne-les avec les flèches - ils sont fusionnés dans l'ordre de la liste."] },
+    merge:    { accept: "application/pdf", multiple: true,  min: 2, opts: [], mix: true,
+                hint: ["Add your PDFs, then drag the page thumbnails to reorder and even interleave pages from different documents. Click × on a page to leave it out.",
+                       "Ajoute tes PDF, puis glisse les vignettes pour réordonner et même entrelacer les pages de différents documents. Clique × sur une page pour l'exclure."] },
     split:    { accept: "application/pdf", multiple: false, min: 1, opts: ["range"], thumbs: true, select: true,
                 hint: ["Click the pages to keep (or type a range), then apply.",
                        "Clique sur les pages à garder (ou tape une plage), puis applique."] },
@@ -203,11 +283,36 @@
   async function doMerge() {
     await needPdfLib();
     var out = await PDFLib.PDFDocument.create();
+    // page order = current order of the thumbnails (drag & drop, exclusions)
+    var order = [];
+    thumbsEl.querySelectorAll(".pt-mix").forEach(function (d) {
+      order.push({ f: parseInt(d.getAttribute("data-f"), 10), p: parseInt(d.getAttribute("data-p"), 10) });
+    });
+    var srcs = [];
     for (var i = 0; i < files.length; i++) {
-      setStatus("Merging " + (i + 1) + "/" + files.length + "…", "Fusion " + (i + 1) + "/" + files.length + "…");
-      var src = await PDFLib.PDFDocument.load(await files[i].arrayBuffer(), { ignoreEncryption: true });
-      var pages = await out.copyPages(src, src.getPageIndices());
-      pages.forEach(function (p) { out.addPage(p); });
+      setStatus("Reading " + (i + 1) + "/" + files.length + "…", "Lecture " + (i + 1) + "/" + files.length + "…");
+      srcs.push(await PDFLib.PDFDocument.load(await files[i].arrayBuffer(), { ignoreEncryption: true }));
+    }
+    if (order.length) {
+      for (var k = 0; k < order.length; k++) {
+        if (k % 10 === 0) setStatus("Assembling page " + (k + 1) + "/" + order.length + "…",
+                                    "Assemblage page " + (k + 1) + "/" + order.length + "…");
+        var pg = await out.copyPages(srcs[order[k].f], [order[k].p]);
+        out.addPage(pg[0]);
+      }
+      // pages beyond the thumbnail cap keep their original order, appended at the end
+      for (var fi = 0; fi < srcs.length; fi++) {
+        var extra = mergeOverflow[fi] || 0;
+        if (!extra) continue;
+        var total = srcs[fi].getPageCount();
+        var idx = [];
+        for (var pn = total - extra; pn < total; pn++) idx.push(pn);
+        (await out.copyPages(srcs[fi], idx)).forEach(function (p) { out.addPage(p); });
+      }
+    } else {
+      for (var j = 0; j < srcs.length; j++) {
+        (await out.copyPages(srcs[j], srcs[j].getPageIndices())).forEach(function (p) { out.addPage(p); });
+      }
     }
     var bytes = await out.save();
     downloadBlob(new Blob([bytes], { type: "application/pdf" }), "merged.pdf");
