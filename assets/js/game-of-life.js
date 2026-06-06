@@ -272,6 +272,8 @@
     if (wvBtn) wvBtn.classList.toggle("active", m === "w2v");
     var cadBtn = document.getElementById("gol-mode-cad");
     if (cadBtn) cadBtn.classList.toggle("active", m === "cad");
+    var grsBtn = document.getElementById("gol-mode-grs");
+    if (grsBtn) grsBtn.classList.toggle("active", m === "grs");
 
     show("gol-area", m === "life" || m === "fire");
     show("sym-area", m === "sym");
@@ -282,9 +284,10 @@
     show("style-area", m === "style");
     show("w2v-area", m === "w2v");
     show("cad-area", m === "cad");
+    show("grs-area", m === "grs");
 
-    if (m === "cad") {            // load the heavy WASM app only on first open
-      var fr = document.getElementById("cad-frame");
+    if (m === "cad" || m === "grs") {   // load the heavy embeds only on first open
+      var fr = document.getElementById(m + "-frame");
       if (fr && !fr.src) fr.src = fr.getAttribute("data-src");
       return;
     }
@@ -321,8 +324,13 @@
   on("gol-mode-style", function () { setMode("style"); });
   on("gol-mode-w2v", function () { setMode("w2v"); });
   on("gol-mode-cad", function () { setMode("cad"); });
+  on("gol-mode-grs", function () { setMode("grs"); });
   on("cad-fullscreen", function () {
     var wrap = document.getElementById("cad-wrap");
+    if (wrap && wrap.requestFullscreen) wrap.requestFullscreen();
+  });
+  on("grs-fullscreen", function () {
+    var wrap = document.getElementById("grs-wrap");
     if (wrap && wrap.requestFullscreen) wrap.requestFullscreen();
   });
 
