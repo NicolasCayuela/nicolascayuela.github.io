@@ -11,7 +11,7 @@ import torch
 from PIL import Image
 import numpy as np
 
-from build_dog_diffusion import UNet, TSTEPS, IMG, HERE, OUT_MODELS, CKPT_NAME
+from build_dog_diffusion import UNet, TSTEPS, IMG, HERE, OUT_MODELS, CKPT_NAME, onnx_to_fp16
 
 CKPT = os.path.join(HERE, CKPT_NAME)
 
@@ -58,7 +58,8 @@ def main(mode):
     except TypeError:
         torch.onnx.export(ema, dummy, onnx_path, input_names=["x", "t"],
                           output_names=["eps"], opset_version=17)
-    print("onnx:", onnx_path, os.path.getsize(onnx_path), "bytes", flush=True)
+    onnx_to_fp16(onnx_path)
+    print("onnx (fp16):", onnx_path, os.path.getsize(onnx_path), "bytes", flush=True)
     with open(os.path.join(OUT_MODELS, "dog_diffusion.json"), "w") as f:
         json.dump({"img": IMG, "tsteps": TSTEPS,
                    "acp": [round(float(v), 6) for v in acp]}, f)

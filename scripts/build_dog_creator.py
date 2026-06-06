@@ -235,7 +235,9 @@ def main():
     except TypeError:
         torch.onnx.export(wrapper, dummy, onnx_path, input_names=["p"],
                           output_names=["img"], opset_version=17)
-    print("onnx:", onnx_path, os.path.getsize(onnx_path), "bytes")
+    from build_dog_diffusion import onnx_to_fp16
+    onnx_to_fp16(onnx_path)
+    print("onnx (fp16):", onnx_path, os.path.getsize(onnx_path), "bytes")
 
     # ---- JSON: stds + sample dataset projections ----
     pick = torch.randperm(n)[:SAMPLES_IN_JSON]

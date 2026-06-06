@@ -36,6 +36,16 @@ torch.manual_seed(7)
 np.random.seed(7)
 
 
+def onnx_to_fp16(onnx_path):
+    """Convert ONNX weights to fp16 (I/O stays fp32 via keep_io_types) - halves
+    the browser download; onnxruntime-web feeds float32 tensors as before."""
+    import onnx
+    from onnxconverter_common import float16
+    m = onnx.load(onnx_path)
+    m = float16.convert_float_to_float16(m, keep_io_types=True)
+    onnx.save(m, onnx_path)
+
+
 def load_dogs():
     imgs = []
     for shard in sorted(os.listdir(CACHE)):
@@ -233,7 +243,8 @@ def main():
     except TypeError:
         torch.onnx.export(ema, dummy, onnx_path, input_names=["x", "t"],
                           output_names=["eps"], opset_version=17)
-    print("onnx:", onnx_path, os.path.getsize(onnx_path), "bytes", flush=True)
+    onnx_to_fp16(onnx_path)
+    print("onnx (fp16):", onnx_path, os.path.getsize(onnx_path), "bytes", flush=True)
 
     with open(os.path.join(OUT_MODELS, "dog_diffusion.json"), "w") as f:
         json.dump({"img": IMG, "tsteps": TSTEPS,
