@@ -19,13 +19,171 @@ description: "Free in-browser tools: background remover, image converter/compres
     .bgr-canvas-wrap canvas, .bgr-canvas-wrap img { display: block; width: 100%; height: auto; }
     .bgr-privacy { font-size: .82rem; color: #14633d; background: #e8f7ee; border: 1px solid #bfe8d0;
         border-radius: 10px; padding: .55rem .8rem; display: inline-block; }
+
+    /* ===== iLovePDF-style tool grid ===== */
+    .tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: .9rem; }
+    .tg-card { background: #fff; border-radius: 14px; padding: 1.15rem 1rem 1rem; cursor: pointer;
+        box-shadow: 0 3px 12px rgba(25,40,80,.07); border: 1px solid transparent;
+        transition: transform .12s, box-shadow .12s, border-color .12s; }
+    .tg-card:hover { transform: translateY(-4px); box-shadow: 0 10px 26px rgba(25,40,80,.15); border-color: #e3e8f0; }
+    .tg-icon { width: 44px; height: 44px; border-radius: 11px; display: flex; align-items: center;
+        justify-content: center; font-size: 1.25rem; color: #fff; margin-bottom: .55rem; }
+    .tg-pdf   .tg-icon { background: linear-gradient(135deg, #f0565c, #d63438); }
+    .tg-img   .tg-icon { background: linear-gradient(135deg, #3b76f0, #1c44c9); }
+    .tg-ai    .tg-icon { background: linear-gradient(135deg, #8b5cf6, #6028d9); }
+    .tg-misc  .tg-icon { background: linear-gradient(135deg, #12b886, #087f5b); }
+    .tg-name { font-weight: 700; font-size: .92rem; margin-bottom: .2rem; color: #1f2940; }
+    .tg-desc { font-size: .76rem; color: #6a7385; line-height: 1.35; margin: 0; }
+    .tg-section { font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+        color: #8a93a6; margin: 1.4rem 0 .6rem; }
+    .tg-section:first-child { margin-top: 0; }
+
+    /* focused tool view */
+    .tool-modes { display: none !important; }       /* navigation happens through the grid */
+    .ws-head { display: flex; align-items: center; gap: .8rem; margin-bottom: .4rem; }
+    .ws-head .tg-icon { margin-bottom: 0; flex: 0 0 44px; }
+    .ws-title { font-weight: 800; font-size: 1.25rem; color: #1f2940; margin: 0; }
+    .ws-sub { font-size: .82rem; color: #6a7385; margin: 0; }
+    .ws-back { border: 0; background: #eef2f8; color: #33415e; border-radius: 18px;
+        padding: .3rem .9rem; font-size: .8rem; font-weight: 600; cursor: pointer; }
+    .ws-back:hover { background: #e0e7f2; }
+    /* big friendly drop zones in the focused view */
+    #bgr-drop, #pt-drop, #it-drop { padding: 3rem 1rem; font-size: 1.02rem; background: #fbfcff; }
 </style>
 
-<div class="row mt-3">
+<!-- ===================== tool grid (landing) ===================== -->
+<div id="tool-grid" class="row mt-3">
+    <div class="col">
+        <h5 class="mt-2 mb-1" style="font-weight:800;">
+            <span class="lang-en">Every tool you need, right in your browser</span>
+            <span class="lang-fr">Tous les outils dont tu as besoin, dans ton navigateur</span>
+        </h5>
+        <p class="small text-muted mb-3">
+            <span class="lang-en">100% free and offline: your files never leave your device - no upload, no server, no account.</span>
+            <span class="lang-fr">100&nbsp;% gratuit et hors ligne : tes fichiers ne quittent jamais ton appareil - pas d'envoi, pas de serveur, pas de compte.</span>
+        </p>
+
+        <div class="tg-section"><span class="lang-en">PDF</span><span class="lang-fr">PDF</span></div>
+        <div class="tool-grid">
+            <div class="tg-card tg-pdf" data-tg="pt:merge" data-icon="fas fa-object-group">
+                <div class="tg-icon"><i class="fas fa-object-group"></i></div>
+                <div class="tg-name"><span class="lang-en">Merge PDF</span><span class="lang-fr">Fusionner PDF</span></div>
+                <p class="tg-desc"><span class="lang-en">Combine several PDFs into one, in the order you choose.</span><span class="lang-fr">Combine plusieurs PDF en un seul, dans l'ordre que tu choisis.</span></p>
+            </div>
+            <div class="tg-card tg-pdf" data-tg="pt:split" data-icon="fas fa-cut">
+                <div class="tg-icon"><i class="fas fa-cut"></i></div>
+                <div class="tg-name"><span class="lang-en">Split PDF</span><span class="lang-fr">Diviser PDF</span></div>
+                <p class="tg-desc"><span class="lang-en">Extract the pages you need into a new PDF.</span><span class="lang-fr">Extrais les pages voulues dans un nouveau PDF.</span></p>
+            </div>
+            <div class="tg-card tg-pdf" data-tg="pt:compress" data-icon="fas fa-compress-arrows-alt">
+                <div class="tg-icon"><i class="fas fa-compress-arrows-alt"></i></div>
+                <div class="tg-name"><span class="lang-en">Compress PDF</span><span class="lang-fr">Compresser PDF</span></div>
+                <p class="tg-desc"><span class="lang-en">Shrink the file size with adjustable quality.</span><span class="lang-fr">Réduis la taille du fichier avec une qualité réglable.</span></p>
+            </div>
+            <div class="tg-card tg-pdf" data-tg="pt:rotate" data-icon="fas fa-sync-alt">
+                <div class="tg-icon"><i class="fas fa-sync-alt"></i></div>
+                <div class="tg-name"><span class="lang-en">Rotate PDF</span><span class="lang-fr">Pivoter PDF</span></div>
+                <p class="tg-desc"><span class="lang-en">Rotate all pages or just a range.</span><span class="lang-fr">Pivote toutes les pages ou seulement une plage.</span></p>
+            </div>
+            <div class="tg-card tg-pdf" data-tg="pt:delete" data-icon="fas fa-trash-alt">
+                <div class="tg-icon"><i class="fas fa-trash-alt"></i></div>
+                <div class="tg-name"><span class="lang-en">Delete pages</span><span class="lang-fr">Supprimer des pages</span></div>
+                <p class="tg-desc"><span class="lang-en">Remove unwanted pages and keep the rest.</span><span class="lang-fr">Retire les pages indésirables et garde le reste.</span></p>
+            </div>
+            <div class="tg-card tg-pdf" data-tg="pt:img2pdf" data-icon="fas fa-images">
+                <div class="tg-icon"><i class="fas fa-images"></i></div>
+                <div class="tg-name"><span class="lang-en">Images to PDF</span><span class="lang-fr">Images en PDF</span></div>
+                <p class="tg-desc"><span class="lang-en">One page per image, in list order.</span><span class="lang-fr">Une page par image, dans l'ordre de la liste.</span></p>
+            </div>
+            <div class="tg-card tg-pdf" data-tg="pt:pdf2img" data-icon="fas fa-file-image">
+                <div class="tg-icon"><i class="fas fa-file-image"></i></div>
+                <div class="tg-name"><span class="lang-en">PDF to images</span><span class="lang-fr">PDF en images</span></div>
+                <p class="tg-desc"><span class="lang-en">Every page as JPG or PNG (ZIP for multi-page).</span><span class="lang-fr">Chaque page en JPG ou PNG (ZIP si plusieurs pages).</span></p>
+            </div>
+            <div class="tg-card tg-pdf" data-tg="pt:pdf2md" data-icon="fab fa-markdown">
+                <div class="tg-icon"><i class="fab fa-markdown"></i></div>
+                <div class="tg-name"><span class="lang-en">PDF to Markdown</span><span class="lang-fr">PDF en Markdown</span></div>
+                <p class="tg-desc"><span class="lang-en">Text + embedded images, ready for your notes.</span><span class="lang-fr">Texte + images intégrées, prêt pour tes notes.</span></p>
+            </div>
+            <div class="tg-card tg-pdf" data-tg="pt:ocr" data-icon="fas fa-glasses">
+                <div class="tg-icon"><i class="fas fa-glasses"></i></div>
+                <div class="tg-name">OCR</div>
+                <p class="tg-desc"><span class="lang-en">Read the text of scanned PDFs and photos (FR/EN).</span><span class="lang-fr">Lis le texte des PDF scannés et photos (FR/EN).</span></p>
+            </div>
+            <div class="tg-card tg-pdf" data-tg="pt:md2pdf" data-icon="fas fa-file-export">
+                <div class="tg-icon"><i class="fas fa-file-export"></i></div>
+                <div class="tg-name"><span class="lang-en">Markdown to PDF</span><span class="lang-fr">Markdown en PDF</span></div>
+                <p class="tg-desc"><span class="lang-en">Turn Markdown into a clean, styled PDF.</span><span class="lang-fr">Transforme du Markdown en PDF propre et stylé.</span></p>
+            </div>
+            <div class="tg-card tg-pdf" data-tg="pt:sign" data-icon="fas fa-signature">
+                <div class="tg-icon"><i class="fas fa-signature"></i></div>
+                <div class="tg-name"><span class="lang-en">Sign PDF</span><span class="lang-fr">Signer PDF</span></div>
+                <p class="tg-desc"><span class="lang-en">Draw or import a signature and place it with a click.</span><span class="lang-fr">Dessine ou importe une signature et place-la d'un clic.</span></p>
+            </div>
+            <div class="tg-card tg-pdf" data-tg="pt:watermark" data-icon="fas fa-tint">
+                <div class="tg-icon"><i class="fas fa-tint"></i></div>
+                <div class="tg-name"><span class="lang-en">Watermark</span><span class="lang-fr">Filigrane</span></div>
+                <p class="tg-desc"><span class="lang-en">Stamp text on every page (opacity, size, diagonal).</span><span class="lang-fr">Appose un texte sur chaque page (opacité, taille, diagonale).</span></p>
+            </div>
+        </div>
+
+        <div class="tg-section">Images</div>
+        <div class="tool-grid">
+            <div class="tg-card tg-ai" data-tg="bgr:" data-icon="fas fa-cut">
+                <div class="tg-icon"><i class="fas fa-cut"></i></div>
+                <div class="tg-name"><span class="lang-en">Remove background</span><span class="lang-fr">Supprimer le fond</span></div>
+                <p class="tg-desc"><span class="lang-en">AI cut-out to a transparent PNG (alpha channel).</span><span class="lang-fr">Détourage IA vers un PNG transparent (canal alpha).</span></p>
+            </div>
+            <div class="tg-card tg-ai" data-tg="it:upscale" data-icon="fas fa-search-plus">
+                <div class="tg-icon"><i class="fas fa-search-plus"></i></div>
+                <div class="tg-name"><span class="lang-en">AI upscale ×4</span><span class="lang-fr">Agrandir ×4 (IA)</span></div>
+                <p class="tg-desc"><span class="lang-en">Real-ESRGAN super-resolution, right in the browser.</span><span class="lang-fr">Super-résolution Real-ESRGAN, directement dans le navigateur.</span></p>
+            </div>
+            <div class="tg-card tg-img" data-tg="it:convert" data-icon="fas fa-exchange-alt">
+                <div class="tg-icon"><i class="fas fa-exchange-alt"></i></div>
+                <div class="tg-name"><span class="lang-en">Convert image</span><span class="lang-fr">Convertir une image</span></div>
+                <p class="tg-desc"><span class="lang-en">HEIC/WebP/PNG/JPG + resize and crop.</span><span class="lang-fr">HEIC/WebP/PNG/JPG + redimensionnement et rognage.</span></p>
+            </div>
+            <div class="tg-card tg-img" data-tg="it:compress" data-icon="fas fa-compress">
+                <div class="tg-icon"><i class="fas fa-compress"></i></div>
+                <div class="tg-name"><span class="lang-en">Compress image</span><span class="lang-fr">Compresser une image</span></div>
+                <p class="tg-desc"><span class="lang-en">Adjustable quality with before/after size.</span><span class="lang-fr">Qualité réglable avec taille avant/après.</span></p>
+            </div>
+            <div class="tg-card tg-img" data-tg="it:exif" data-icon="fas fa-user-secret">
+                <div class="tg-icon"><i class="fas fa-user-secret"></i></div>
+                <div class="tg-name"><span class="lang-en">Strip metadata</span><span class="lang-fr">Effacer les métadonnées</span></div>
+                <p class="tg-desc"><span class="lang-en">See and remove EXIF (camera, date, GPS…).</span><span class="lang-fr">Vois et supprime les EXIF (appareil, date, GPS…).</span></p>
+            </div>
+            <div class="tg-card tg-misc" data-tg="it:qr" data-icon="fas fa-qrcode">
+                <div class="tg-icon"><i class="fas fa-qrcode"></i></div>
+                <div class="tg-name">QR code</div>
+                <p class="tg-desc"><span class="lang-en">Generate a QR code locally - nothing sent anywhere.</span><span class="lang-fr">Génère un QR code localement - rien n'est envoyé.</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- focused-view header -->
+<div id="ws-header" class="row mt-3 d-none">
+    <div class="col">
+        <button id="ws-back" class="ws-back mb-2">
+            <i class="fas fa-arrow-left"></i> <span class="lang-en">All tools</span><span class="lang-fr">Tous les outils</span>
+        </button>
+        <div class="ws-head">
+            <div id="ws-icon" class="tg-icon"></div>
+            <div>
+                <h4 class="ws-title" id="ws-title"></h4>
+                <p class="ws-sub" id="ws-sub"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="ws-bgr" class="row mt-3 d-none">
     <div class="col">
         <div class="card border-0 bg-white tool-card">
             <div class="card-body p-4">
-                <h6>
+                <h6 class="d-none">
                     <i class="fas fa-cut"></i> &nbsp;
                     <span class="lang-en">Background remover</span><span class="lang-fr">Suppression de fond</span>
                 </h6>
@@ -87,21 +245,17 @@ description: "Free in-browser tools: background remover, image converter/compres
 </div>
 
 <!-- ===================== Image toolbox ===================== -->
-<div class="row mt-3">
+<div id="ws-it" class="row mt-3 d-none">
     <div class="col">
         <div class="card border-0 bg-white tool-card">
             <div class="card-body p-4">
-                <h6>
-                    <i class="fas fa-image"></i> &nbsp;
-                    <span class="lang-en">Image toolbox</span><span class="lang-fr">Boîte à outils images</span>
-                </h6>
                 <p class="bgr-privacy mb-3">
                     <i class="fas fa-lock"></i>&nbsp;
                     <span class="lang-en"><strong>Offline tool:</strong> your images stay on your device - everything runs locally in your browser.</span>
                     <span class="lang-fr"><strong>Outil hors ligne :</strong> tes images restent sur ton appareil - tout tourne localement dans ton navigateur.</span>
                 </p>
 
-                <div class="btn-group btn-group-sm mb-3 flex-wrap" role="group">
+                <div class="btn-group btn-group-sm mb-3 flex-wrap tool-modes" role="group">
                     <button data-it-tool="convert" type="button" class="btn btn-outline-dark active">
                         <i class="fas fa-exchange-alt"></i> <span class="lang-en">Convert / resize / crop</span><span class="lang-fr">Convertir / redimensionner / rogner</span>
                     </button>
@@ -200,18 +354,10 @@ description: "Free in-browser tools: background remover, image converter/compres
 </div>
 
 <!-- ===================== PDF toolbox ===================== -->
-<div class="row mt-3">
+<div id="ws-pt" class="row mt-3 d-none">
     <div class="col">
         <div class="card border-0 bg-white tool-card">
             <div class="card-body p-4">
-                <h6>
-                    <i class="fas fa-file-pdf"></i> &nbsp;
-                    <span class="lang-en">PDF toolbox</span><span class="lang-fr">Boîte à outils PDF</span>
-                </h6>
-                <p class="small text-muted mb-2">
-                    <span class="lang-en">Merge, split, compress, rotate, delete pages, convert images to PDF and PDF to images.</span>
-                    <span class="lang-fr">Fusionner, diviser, compresser, pivoter, supprimer des pages, convertir des images en PDF et un PDF en images.</span>
-                </p>
                 <p class="bgr-privacy mb-3">
                     <i class="fas fa-lock"></i>&nbsp;
                     <span class="lang-en"><strong>Offline tool:</strong> your files stay on your device and are never sent to any server - everything runs locally in your browser.</span>
@@ -219,7 +365,7 @@ description: "Free in-browser tools: background remover, image converter/compres
                 </p>
 
                 <!-- tool selector -->
-                <div class="btn-group btn-group-sm mb-3 flex-wrap" role="group">
+                <div class="btn-group btn-group-sm mb-3 flex-wrap tool-modes" role="group">
                     <button data-pt-tool="merge" type="button" class="btn btn-outline-dark active">
                         <i class="fas fa-object-group"></i> <span class="lang-en">Merge</span><span class="lang-fr">Fusionner</span>
                     </button>
@@ -392,3 +538,57 @@ description: "Free in-browser tools: background remover, image converter/compres
 <script src="{{ '/assets/js/bg-remove.js' | relative_url }}?v=2"></script>
 <script src="{{ '/assets/js/pdf-tools.js' | relative_url }}?v=2"></script>
 <script src="{{ '/assets/js/image-tools.js' | relative_url }}?v=1"></script>
+
+<!-- grid <-> focused-tool navigation -->
+<script>
+(function () {
+    "use strict";
+    var WS = { bgr: "ws-bgr", it: "ws-it", pt: "ws-pt" };
+
+    function show(id, vis) { document.getElementById(id).classList.toggle("d-none", !vis); }
+
+    function openTool(card, pushHash) {
+        var tg = card.getAttribute("data-tg").split(":");      // [module, tool]
+        var mod = tg[0], tool = tg[1];
+        // header: clone icon + texts from the grid card
+        var icon = document.getElementById("ws-icon");
+        icon.className = "tg-icon";
+        icon.style.background = getComputedStyle(card.querySelector(".tg-icon")).background;
+        icon.innerHTML = '<i class="' + card.getAttribute("data-icon") + '"></i>';
+        document.getElementById("ws-title").innerHTML = card.querySelector(".tg-name").innerHTML;
+        document.getElementById("ws-sub").innerHTML = card.querySelector(".tg-desc").innerHTML;
+        // toggle views
+        show("tool-grid", false);
+        show("ws-header", true);
+        Object.keys(WS).forEach(function (k) { show(WS[k], k === mod); });
+        // select the mode inside the module (buttons are hidden but functional)
+        if (tool) {
+            var btn = document.querySelector("[data-" + mod + "-tool=\"" + tool + "\"]");
+            if (btn) btn.click();
+        }
+        if (pushHash !== false) {
+            history.replaceState(null, "", "#" + (tool || mod));
+        }
+        window.scrollTo({ top: 0 });
+    }
+
+    function backToGrid() {
+        show("tool-grid", true);
+        show("ws-header", false);
+        Object.keys(WS).forEach(function (k) { show(WS[k], false); });
+        history.replaceState(null, "", location.pathname + location.search);
+    }
+
+    document.querySelectorAll(".tg-card").forEach(function (c) {
+        c.addEventListener("click", function () { openTool(c); });
+    });
+    document.getElementById("ws-back").addEventListener("click", backToGrid);
+
+    // deep link: /tools#merge, /tools#upscale, /tools#bgr…
+    var h = location.hash.replace("#", "");
+    if (h) {
+        var card = document.querySelector('[data-tg="pt:' + h + '"], [data-tg="it:' + h + '"], [data-tg="' + h + ':"]');
+        if (card) openTool(card, false);
+    }
+})();
+</script>
