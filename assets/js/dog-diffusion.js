@@ -1,5 +1,5 @@
 /*
- * Dog Diffusion: a small DDPM (epsilon-prediction UNet, 32x32) trained in
+ * Dog Diffusion: a DDPM (epsilon-prediction UNet) trained in
  * PyTorch on AFHQ dog faces. The UNet runs in the browser with onnxruntime-web
  * and a DDIM sampler; the canvas shows the image denoising step by step.
  */
@@ -123,13 +123,13 @@
     var base = area.getAttribute("data-base");
     Promise.all([
       loadScript(ORT_URL),
-      fetch(base + "dog_diffusion.json?v=3").then(function (r) { return r.json(); })
+      fetch(base + "dog_diffusion.json?v=4").then(function (r) { return r.json(); })
     ]).then(function (rs) {
       meta = rs[1];
       IMG = meta.img;
       off.width = IMG; off.height = IMG;
       offCtx = off.getContext("2d");
-      return createSession(base + "dog_diffusion.onnx?v=3");
+      return createSession(base + "dog_diffusion.onnx?v=4");
     }).then(function (s) {
       session = s; ready = true; loading = false;
       setStatus("Ready - press Generate.", "Prêt - clique sur Générer.");

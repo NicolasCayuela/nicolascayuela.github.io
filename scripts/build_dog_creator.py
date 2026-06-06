@@ -2,8 +2,8 @@
 """
 Dog Creator pipeline (PyTorch):
 1. Load AFHQ dog faces from the locally downloaded parquet shards (scripts/afhq_cache).
-2. Train a convolutional autoencoder on 64x64 RGB dog faces.
-3. Run PCA on the latent codes -> 256-dimensional slider space.
+2. Train a convolutional autoencoder on 128x128 RGB dog faces.
+3. Run PCA on the latent codes -> 512-dimensional slider space.
 4. Export a single ONNX graph (PCA coords -> decoded image) for onnxruntime-web,
    plus a JSON with per-component stds and sample dataset projections.
 
@@ -24,18 +24,18 @@ from PIL import Image
 HERE = os.path.dirname(os.path.abspath(__file__))
 CACHE = os.path.join(HERE, "afhq_cache")
 OUT_MODELS = os.path.join(HERE, "..", "assets", "models")
-IMG = 64
-LATENT = 256
+IMG = 128
+LATENT = 512
 PCS = 64                      # principal components exposed as sliders
-EPOCHS = 100
+EPOCHS = 150
 BATCH = 64
-LR_MAX, LR_MIN = 2e-4, 2e-5   # cosine decay (warm start from the v3 weights)
+LR_MAX, LR_MIN = 2e-4, 2e-5   # cosine decay
 THREADS = os.cpu_count() or 6
 PERC_W = 0.1                  # weight of the VGG perceptual loss vs pixel MSE
 Z_NOISE = 0.05                # latent noise (fraction of batch latent std) -> smoother sliders
 DOG_LABEL = 1                 # huggan/AFHQ: cat=0, dog=1, wild=2
 SAMPLES_IN_JSON = 300
-WARM_START = "dog_ae3.pt"     # previous checkpoint to initialize from
+WARM_START = None             # v5 arch is new (128px, latent 512) - no warm start
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 torch.manual_seed(7)
@@ -57,26 +57,34 @@ def load_dogs():
             im = Image.open(io.BytesIO(rec["bytes"])).convert("RGB").resize((IMG, IMG), Image.LANCZOS)
             imgs.append(np.asarray(im, dtype=np.uint8))
         print(f"{shard}: total dogs so far {len(imgs)}")
-    data = torch.from_numpy(np.stack(imgs))          # N x 64 x 64 x 3 uint8
-    return data.permute(0, 3, 1, 2).contiguous()     # N x 3 x 64 x 64
+    data = torch.from_numpy(np.stack(imgs))          # N x IMG x IMG x 3 uint8
+    return data.permute(0, 3, 1, 2).contiguous()     # N x 3 x IMG x IMG
+
+
+def down_block(cin, cout):
+    """Strided conv + an extra 3x3 conv per scale for depth."""
+    return [nn.Conv2d(cin, cout, 4, 2, 1), nn.BatchNorm2d(cout), nn.ReLU(True),
+            nn.Conv2d(cout, cout, 3, padding=1), nn.BatchNorm2d(cout), nn.ReLU(True)]
 
 
 def up_block(cin, cout):
-    """Upsample + conv avoids the checkerboard artifacts of ConvTranspose."""
+    """Upsample + double conv avoids the checkerboard artifacts of ConvTranspose."""
     return [nn.Upsample(scale_factor=2, mode="nearest"),
-            nn.Conv2d(cin, cout, 3, padding=1), nn.BatchNorm2d(cout), nn.ReLU(True)]
+            nn.Conv2d(cin, cout, 3, padding=1), nn.BatchNorm2d(cout), nn.ReLU(True),
+            nn.Conv2d(cout, cout, 3, padding=1), nn.BatchNorm2d(cout), nn.ReLU(True)]
 
 
 class Encoder(nn.Module):
     def __init__(self):
         super().__init__()
         self.net = nn.Sequential(
-            nn.Conv2d(3, 48, 4, 2, 1), nn.BatchNorm2d(48), nn.ReLU(True),    # 32
-            nn.Conv2d(48, 96, 4, 2, 1), nn.BatchNorm2d(96), nn.ReLU(True),   # 16
-            nn.Conv2d(96, 192, 4, 2, 1), nn.BatchNorm2d(192), nn.ReLU(True), # 8
-            nn.Conv2d(192, 384, 4, 2, 1), nn.BatchNorm2d(384), nn.ReLU(True),# 4
+            *down_block(3, 64),                        # 64
+            *down_block(64, 128),                      # 32
+            *down_block(128, 256),                     # 16
+            *down_block(256, 512),                     # 8
+            *down_block(512, 512),                     # 4
             nn.Flatten(),
-            nn.Linear(384 * 4 * 4, LATENT),
+            nn.Linear(512 * 4 * 4, LATENT),
         )
 
     def forward(self, x):
@@ -86,17 +94,19 @@ class Encoder(nn.Module):
 class Decoder(nn.Module):
     def __init__(self):
         super().__init__()
-        self.fc = nn.Linear(LATENT, 384 * 4 * 4)
+        self.fc = nn.Linear(LATENT, 512 * 4 * 4)
         self.net = nn.Sequential(
-            *up_block(384, 192),                       # 8
-            *up_block(192, 96),                        # 16
-            *up_block(96, 48),                         # 32
+            *up_block(512, 512),                       # 8
+            *up_block(512, 256),                       # 16
+            *up_block(256, 128),                       # 32
+            *up_block(128, 64),                        # 64
             nn.Upsample(scale_factor=2, mode="nearest"),
-            nn.Conv2d(48, 3, 3, padding=1), nn.Sigmoid(),  # 64
+            nn.Conv2d(64, 32, 3, padding=1), nn.BatchNorm2d(32), nn.ReLU(True),
+            nn.Conv2d(32, 3, 3, padding=1), nn.Sigmoid(),  # 128
         )
 
     def forward(self, z):
-        h = self.fc(z).view(-1, 384, 4, 4)
+        h = self.fc(z).view(-1, 512, 4, 4)
         return self.net(h)
 
 
@@ -157,14 +167,14 @@ def main():
     opt = torch.optim.Adam(list(enc.parameters()) + list(dec.parameters()), lr=LR_MAX)
     loss_fn = nn.MSELoss()
 
-    ckpt_path = os.path.join(HERE, "dog_ae4.pt")
+    ckpt_path = os.path.join(HERE, "dog_ae5.pt")
     start_epoch = 0
     if os.path.exists(ckpt_path):
         ck = torch.load(ckpt_path, map_location="cpu", weights_only=True)
         enc.load_state_dict(ck["enc"]); dec.load_state_dict(ck["dec"])
         opt.load_state_dict(ck["opt"]); start_epoch = ck["epoch"]
         print("resumed at epoch", start_epoch)
-    elif os.path.exists(os.path.join(HERE, WARM_START)):
+    elif WARM_START and os.path.exists(os.path.join(HERE, WARM_START)):
         ck = torch.load(os.path.join(HERE, WARM_START), map_location="cpu", weights_only=True)
         enc.load_state_dict(ck["enc"]); dec.load_state_dict(ck["dec"])
         print("warm start from", WARM_START)
@@ -213,7 +223,7 @@ def main():
     stds = (S / math.sqrt(n - 1))                        # per-component std
     proj = Zc @ Vh.T                                     # N x LATENT, PCA coords
 
-    # ---- ONNX export: p (1xPCS) -> image (1x3x64x64); only the top PCS
+    # ---- ONNX export: p (1xPCS) -> image (1x3xIMGxIMG); only the top PCS
     # components are exposed, the rest stay at the mean (CPU for a clean graph) ----
     os.makedirs(OUT_MODELS, exist_ok=True)
     wrapper = PCADecoder(dec, mean, Vh[:PCS]).eval().cpu()
@@ -232,6 +242,7 @@ def main():
     samples = proj[pick, :PCS]
     js = {
         "latent": PCS,
+        "img": IMG,
         "stds": [round(float(v), 4) for v in stds[:PCS]],
         "samples": [[round(float(v), 2) for v in row] for row in samples],
     }

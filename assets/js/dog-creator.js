@@ -22,7 +22,8 @@
   var session = null, meta = null, loading = false, ready = false;
   var coords = null;                         // current PCA coordinates
   var sliders = [];
-  var off = document.createElement("canvas"); off.width = 64; off.height = 64;
+  var S = 64;                                // image size (from the JSON)
+  var off = document.createElement("canvas"); off.width = S; off.height = S;
   var offCtx = off.getContext("2d");
   var statusEl = document.getElementById("dog-status");
 
@@ -126,9 +127,9 @@
     rendering = true;
     var input = new window.ort.Tensor("float32", coords.slice(), [1, N]);
     session.run({ p: input }).then(function (out) {
-      var d = out.img.data;                  // 1x3x64x64, [0,1]
-      var img = offCtx.createImageData(64, 64);
-      var plane = 64 * 64;
+      var d = out.img.data;                  // 1x3xSxS, [0,1]
+      var img = offCtx.createImageData(S, S);
+      var plane = S * S;
       for (var k = 0; k < plane; k++) {
         img.data[4 * k] = Math.round(255 * d[k]);
         img.data[4 * k + 1] = Math.round(255 * d[plane + k]);
@@ -157,16 +158,18 @@
     if (loading || ready) return;
     loading = true;
     setProgress(true);
-    setStatus("Loading model (~10 MB)…", "Chargement du modèle (~10 Mo)…");
+    setStatus("Loading model…", "Chargement du modèle…");
     var base = area.getAttribute("data-base");
     Promise.all([
       loadScript(ORT_URL),
-      fetch(base + "dog_data.json?v=5").then(function (r) { return r.json(); })
+      fetch(base + "dog_data.json?v=6").then(function (r) { return r.json(); })
     ]).then(function (rs) {
       meta = rs[1];
       N = meta.latent || meta.stds.length;
+      S = meta.img || 64;
+      off.width = S; off.height = S;
       coords = new Float32Array(N);
-      return createSession(base + "dog_decoder.onnx?v=5");
+      return createSession(base + "dog_decoder.onnx?v=6");
     }).then(function (s) {
       session = s; ready = true; loading = false;
       setProgress(false);

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Dog Diffusion pipeline (PyTorch):
-Train a small DDPM (epsilon-prediction UNet, 32x32) on AFHQ dog faces from the
+Train a DDPM (epsilon-prediction UNet, 64x64) on AFHQ dog faces from the
 locally downloaded parquet shards, keep an EMA copy of the weights, then export
 the UNet to ONNX for in-browser DDIM sampling with onnxruntime-web.
 
@@ -22,14 +22,14 @@ from PIL import Image
 HERE = os.path.dirname(os.path.abspath(__file__))
 CACHE = os.path.join(HERE, "afhq_cache")
 OUT_MODELS = os.path.join(HERE, "..", "assets", "models")
-IMG = 32
-EPOCHS = 800
+IMG = 64
+EPOCHS = 1000
 BATCH = 128
-LR_MAX, LR_MIN = 2e-4, 2e-5   # cosine decay over the full run
-CKPT_NAME = "dog_ddpm2.pt"    # v2: wider UNet with attention
+LR_MAX, LR_MIN = 1e-4, 1e-5   # cosine decay over the full run
+CKPT_NAME = "dog_ddpm3.pt"    # v3: 64x64, much wider UNet, multi-head attention
 TSTEPS = 1000
 DOG_LABEL = 1                 # huggan/AFHQ: cat=0, dog=1, wild=2
-EMA_DECAY = 0.9995              # ~50-epoch horizon, smoother late-training average
+EMA_DECAY = 0.9999            # ~10k-step horizon, smoother late-training average
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 torch.manual_seed(7)
@@ -55,7 +55,7 @@ def load_dogs():
 
 
 # ---- model ----
-TDIM = 128
+TDIM = 256
 
 def time_embedding(t):
     """Sinusoidal embedding; t is a float tensor of shape (B,)."""
@@ -84,51 +84,63 @@ class ResBlock(nn.Module):
 
 
 class SelfAttention(nn.Module):
-    """Single-head self-attention over spatial positions (used at 8x8)."""
-    def __init__(self, c):
+    """Multi-head self-attention over spatial positions (used at 16x16 / 8x8)."""
+    def __init__(self, c, heads=4):
         super().__init__()
+        self.heads = heads
         self.norm = nn.GroupNorm(8, c)
         self.qkv = nn.Conv2d(c, 3 * c, 1)
         self.proj = nn.Conv2d(c, c, 1)
-        self.scale = c ** -0.5
+        self.scale = (c // heads) ** -0.5
 
     def forward(self, x):
         n, c, h, w = x.shape
-        qkv = self.qkv(self.norm(x)).reshape(n, 3, c, h * w)
-        q, k, v = qkv[:, 0], qkv[:, 1], qkv[:, 2]          # n, c, hw
-        attn = torch.softmax(q.transpose(1, 2) @ k * self.scale, dim=-1)  # n, hw, hw
-        out = (v @ attn.transpose(1, 2)).reshape(n, c, h, w)
+        hd, dh = self.heads, c // self.heads
+        qkv = self.qkv(self.norm(x)).reshape(n, 3, hd, dh, h * w)
+        q, k, v = qkv[:, 0], qkv[:, 1], qkv[:, 2]          # n, hd, dh, hw
+        attn = torch.softmax(q.transpose(-2, -1) @ k * self.scale, dim=-1)  # n, hd, hw, hw
+        out = (v @ attn.transpose(-2, -1)).reshape(n, c, h, w)
         return x + self.proj(out)
 
 
 class UNet(nn.Module):
-    """v2: wider (48/96/192), two ResBlocks per level, attention at 8x8."""
+    """v3: 64x64, channels 64/128/256/384, two ResBlocks per level,
+    multi-head attention at 16x16 (down and up) and 8x8 (mid)."""
     def __init__(self):
         super().__init__()
         self.mlp = nn.Sequential(nn.Linear(TDIM, TDIM), nn.SiLU(), nn.Linear(TDIM, TDIM))
-        self.stem = nn.Conv2d(3, 48, 3, padding=1)
-        self.d1a = ResBlock(48, 48); self.d1b = ResBlock(48, 48)
-        self.down1 = nn.Conv2d(48, 96, 4, 2, 1)            # 16
-        self.d2a = ResBlock(96, 96); self.d2b = ResBlock(96, 96)
-        self.down2 = nn.Conv2d(96, 192, 4, 2, 1)           # 8
-        self.mid1 = ResBlock(192, 192)
-        self.attn = SelfAttention(192)
-        self.mid2 = ResBlock(192, 192)
-        self.up1 = nn.ConvTranspose2d(192, 96, 4, 2, 1)    # 16
-        self.u1a = ResBlock(192, 96); self.u1b = ResBlock(96, 96)
-        self.up2 = nn.ConvTranspose2d(96, 48, 4, 2, 1)     # 32
-        self.u2a = ResBlock(96, 48); self.u2b = ResBlock(48, 48)
-        self.out_norm = nn.GroupNorm(8, 48)
-        self.out_conv = nn.Conv2d(48, 3, 3, padding=1)
+        self.stem = nn.Conv2d(3, 64, 3, padding=1)
+        self.d1a = ResBlock(64, 64);   self.d1b = ResBlock(64, 64)
+        self.down1 = nn.Conv2d(64, 128, 4, 2, 1)           # 32
+        self.d2a = ResBlock(128, 128); self.d2b = ResBlock(128, 128)
+        self.down2 = nn.Conv2d(128, 256, 4, 2, 1)          # 16
+        self.d3a = ResBlock(256, 256); self.d3b = ResBlock(256, 256)
+        self.attn_d = SelfAttention(256)
+        self.down3 = nn.Conv2d(256, 384, 4, 2, 1)          # 8
+        self.mid1 = ResBlock(384, 384)
+        self.attn_m = SelfAttention(384)
+        self.mid2 = ResBlock(384, 384)
+        self.up3 = nn.ConvTranspose2d(384, 256, 4, 2, 1)   # 16
+        self.u3a = ResBlock(512, 256)
+        self.attn_u = SelfAttention(256)
+        self.u3b = ResBlock(256, 256)
+        self.up2 = nn.ConvTranspose2d(256, 128, 4, 2, 1)   # 32
+        self.u2a = ResBlock(256, 128); self.u2b = ResBlock(128, 128)
+        self.up1 = nn.ConvTranspose2d(128, 64, 4, 2, 1)    # 64
+        self.u1a = ResBlock(128, 64);  self.u1b = ResBlock(64, 64)
+        self.out_norm = nn.GroupNorm(8, 64)
+        self.out_conv = nn.Conv2d(64, 3, 3, padding=1)
         self.act = nn.SiLU()
 
     def forward(self, x, t):
         emb = self.mlp(time_embedding(t))
-        h1 = self.d1b(self.d1a(self.stem(x), emb), emb)            # 48ch, 32px
-        h2 = self.d2b(self.d2a(self.down1(h1), emb), emb)          # 96ch, 16px
-        m = self.mid2(self.attn(self.mid1(self.down2(h2), emb)), emb)
-        u = self.u1b(self.u1a(torch.cat([self.up1(m), h2], 1), emb), emb)
-        u = self.u2b(self.u2a(torch.cat([self.up2(u), h1], 1), emb), emb)
+        h1 = self.d1b(self.d1a(self.stem(x), emb), emb)                  # 64ch, 64px
+        h2 = self.d2b(self.d2a(self.down1(h1), emb), emb)                # 128ch, 32px
+        h3 = self.attn_d(self.d3b(self.d3a(self.down2(h2), emb), emb))   # 256ch, 16px
+        m = self.mid2(self.attn_m(self.mid1(self.down3(h3), emb)), emb)  # 384ch, 8px
+        u = self.u3b(self.attn_u(self.u3a(torch.cat([self.up3(m), h3], 1), emb)), emb)
+        u = self.u2b(self.u2a(torch.cat([self.up2(u), h2], 1), emb), emb)
+        u = self.u1b(self.u1a(torch.cat([self.up1(u), h1], 1), emb), emb)
         return self.out_conv(self.act(self.out_norm(u)))
 
 
@@ -145,6 +157,7 @@ def main():
     sqrt_1macp = (1 - acp).sqrt()
 
     model = UNet().to(DEVICE)
+    print(f"params: {sum(p.numel() for p in model.parameters()) / 1e6:.1f}M", flush=True)
     ema = UNet().to(DEVICE)
     ema.load_state_dict(model.state_dict())
     for p in ema.parameters():
@@ -175,8 +188,9 @@ def main():
             t = torch.randint(0, TSTEPS, (x0.shape[0],), device=DEVICE)
             eps = torch.randn_like(x0)
             xt = sqrt_acp[t, None, None, None] * x0 + sqrt_1macp[t, None, None, None] * eps
-            pred = model(xt, t.float())
-            loss = nn.functional.mse_loss(pred, eps)
+            with torch.autocast("cuda", dtype=torch.bfloat16, enabled=DEVICE.type == "cuda"):
+                pred = model(xt, t.float())
+                loss = nn.functional.mse_loss(pred, eps)
             opt.zero_grad(); loss.backward(); opt.step()
             with torch.no_grad():
                 for pe, pm in zip(ema.parameters(), model.parameters()):
