@@ -196,5 +196,58 @@ description: "Free in-browser tools: background remover producing transparent-PN
     </div>
 </div>
 
+<!-- ===================== 3D CAD (Chili3D) ===================== -->
+<div class="row mt-3">
+    <div class="col">
+        <div class="card border-0 bg-white tool-card">
+            <div class="card-body p-4">
+                <h6>
+                    <i class="fas fa-cube"></i> &nbsp;
+                    <span class="lang-en">3D CAD</span><span class="lang-fr">CAO 3D</span>
+                </h6>
+                <p class="small text-muted mb-2">
+                    <span class="lang-en">A full parametric 3D CAD running in the browser (WebAssembly build of the OpenCascade kernel). Sketch, extrude, fillet, boolean - then export STEP/IGES.</span>
+                    <span class="lang-fr">Une CAO 3D paramétrique complète dans le navigateur (noyau OpenCascade compilé en WebAssembly). Esquisse, extrusion, congés, booléens - puis export STEP/IGES.</span>
+                </p>
+                <div class="d-flex flex-wrap mb-2" style="gap:.4rem;">
+                    <button id="cad-fullscreen" class="btn btn-sm btn-outline-dark">
+                        <i class="fas fa-expand"></i> <span class="lang-en">Fullscreen</span><span class="lang-fr">Plein écran</span>
+                    </button>
+                    <a class="btn btn-sm btn-outline-dark" href="https://chili3d.com/" target="_blank" rel="noopener">
+                        <i class="fas fa-external-link-alt"></i> <span class="lang-en">Open in a new tab</span><span class="lang-fr">Ouvrir dans un nouvel onglet</span>
+                    </a>
+                </div>
+                <div id="cad-wrap" style="width:100%; height:72vh; min-height:480px; border-radius:8px; overflow:hidden; background:#1e1e1e; display:flex; align-items:center; justify-content:center;">
+                    <button id="cad-load" class="btn btn-outline-light">
+                        <i class="fas fa-play"></i> <span class="lang-en">Load the CAD (~30 MB)</span><span class="lang-fr">Charger la CAO (~30 Mo)</span>
+                    </button>
+                    <iframe id="cad-frame" data-src="https://chili3d.com/" title="Chili3D - 3D CAD"
+                            style="width:100%; height:100%; border:0; display:none;" allowfullscreen></iframe>
+                </div>
+                <p class="small text-muted mt-2 mb-0">
+                    <span class="lang-en">Powered by <a href="https://github.com/xiangechen/chili3d" target="_blank" rel="noopener">Chili3D</a> (AGPL-3.0) by Xiange Chen - embedded from chili3d.com.</span>
+                    <span class="lang-fr">Propulsé par <a href="https://github.com/xiangechen/chili3d" target="_blank" rel="noopener">Chili3D</a> (AGPL-3.0) de Xiange Chen - intégré depuis chili3d.com.</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var load = document.getElementById("cad-load");
+        var frame = document.getElementById("cad-frame");
+        load.addEventListener("click", function () {
+            frame.src = frame.getAttribute("data-src");
+            frame.style.display = "block";
+            load.style.display = "none";
+        });
+        document.getElementById("cad-fullscreen").addEventListener("click", function () {
+            var wrap = document.getElementById("cad-wrap");
+            if (wrap && wrap.requestFullscreen) wrap.requestFullscreen();
+        });
+    })();
+</script>
+
 <script src="{{ '/assets/js/bg-remove.js' | relative_url }}?v=2"></script>
 <script src="{{ '/assets/js/pdf-tools.js' | relative_url }}?v=1"></script>

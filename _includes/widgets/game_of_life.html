@@ -36,12 +36,6 @@
                     <button id="gol-mode-sym" type="button" class="btn btn-outline-dark">
                         <i class="fas fa-draw-polygon"></i> <span class="lang-en">Symmetry groups</span><span class="lang-fr">Groupes de symétrie</span>
                     </button>
-                    <button id="gol-mode-cad" type="button" class="btn btn-outline-dark">
-                        <i class="fas fa-cube"></i> <span class="lang-en">3D CAD</span><span class="lang-fr">CAO 3D</span>
-                    </button>
-                    <button id="gol-mode-grs" type="button" class="btn btn-outline-dark">
-                        <i class="fas fa-globe"></i> <span class="lang-en">Research map</span><span class="lang-fr">Carte de la recherche</span>
-                    </button>
                 </div>
 
                 <!-- ============ Game of Life / Forest fire ============ -->
@@ -558,60 +552,12 @@
                     </div>
                 </div>
 
-                <!-- ============ 3D CAD (Chili3D) ============ -->
-                <div id="cad-area" class="d-none">
-                    <p class="small text-muted mb-2">
-                        <span class="lang-en">A full parametric 3D CAD running in the browser (WebAssembly build of the OpenCascade kernel). Sketch, extrude, fillet, boolean - then export STEP/IGES.</span>
-                        <span class="lang-fr">Une CAO 3D paramétrique complète dans le navigateur (noyau OpenCascade compilé en WebAssembly). Esquisse, extrusion, congés, booléens - puis export STEP/IGES.</span>
-                    </p>
-                    <div class="d-flex flex-wrap mb-2" style="gap:.4rem;">
-                        <button id="cad-fullscreen" class="btn btn-sm btn-outline-dark">
-                            <i class="fas fa-expand"></i> <span class="lang-en">Fullscreen</span><span class="lang-fr">Plein écran</span>
-                        </button>
-                        <a class="btn btn-sm btn-outline-dark" href="https://chili3d.com/" target="_blank" rel="noopener">
-                            <i class="fas fa-external-link-alt"></i> <span class="lang-en">Open in a new tab</span><span class="lang-fr">Ouvrir dans un nouvel onglet</span>
-                        </a>
-                    </div>
-                    <div id="cad-wrap" style="width:100%; height:72vh; min-height:480px; border-radius:8px; overflow:hidden; background:#1e1e1e;">
-                        <iframe id="cad-frame" data-src="https://chili3d.com/" title="Chili3D - 3D CAD"
-                                style="width:100%; height:100%; border:0;" loading="lazy" allowfullscreen></iframe>
-                    </div>
-                    <p class="small text-muted mt-2 mb-0">
-                        <span class="lang-en">Powered by <a href="https://github.com/xiangechen/chili3d" target="_blank" rel="noopener">Chili3D</a> (AGPL-3.0) by Xiange Chen - embedded from chili3d.com.</span>
-                        <span class="lang-fr">Propulsé par <a href="https://github.com/xiangechen/chili3d" target="_blank" rel="noopener">Chili3D</a> (AGPL-3.0) de Xiange Chen - intégré depuis chili3d.com.</span>
-                    </p>
-                </div>
-
-                <!-- ============ Research map (The Global Research Space) ============ -->
-                <div id="grs-area" class="d-none">
-                    <p class="small text-muted mb-2">
-                        <span class="lang-en">An interactive map of 10&nbsp;million+ recent papers (OpenAlex data, UMAP projection of semantic embeddings): every dot is a publication, neighbourhoods are research topics. Zoom, search, explore.</span>
-                        <span class="lang-fr">Une carte interactive de plus de 10&nbsp;millions d'articles récents (données OpenAlex, projection UMAP d'embeddings sémantiques)&nbsp;: chaque point est une publication, les quartiers sont des thématiques. Zoome, cherche, explore.</span>
-                    </p>
-                    <div class="d-flex flex-wrap mb-2" style="gap:.4rem;">
-                        <button id="grs-fullscreen" class="btn btn-sm btn-outline-dark">
-                            <i class="fas fa-expand"></i> <span class="lang-en">Fullscreen</span><span class="lang-fr">Plein écran</span>
-                        </button>
-                        <a class="btn btn-sm btn-outline-dark" href="https://globalresearchspace.com/space#2.5/0/0" target="_blank" rel="noopener">
-                            <i class="fas fa-external-link-alt"></i> <span class="lang-en">Open in a new tab</span><span class="lang-fr">Ouvrir dans un nouvel onglet</span>
-                        </a>
-                    </div>
-                    <div id="grs-wrap" style="width:100%; height:72vh; min-height:480px; border-radius:8px; overflow:hidden; background:#0b0e14;">
-                        <iframe id="grs-frame" data-src="https://globalresearchspace.com/space#2.5/0/0" title="The Global Research Space"
-                                style="width:100%; height:100%; border:0;" loading="lazy" allowfullscreen></iframe>
-                    </div>
-                    <p class="small text-muted mt-2 mb-0">
-                        <span class="lang-en">Powered by <a href="https://globalresearchspace.com/" target="_blank" rel="noopener">The Global Research Space</a> - embedded from globalresearchspace.com.</span>
-                        <span class="lang-fr">Propulsé par <a href="https://globalresearchspace.com/" target="_blank" rel="noopener">The Global Research Space</a> - intégré depuis globalresearchspace.com.</span>
-                    </p>
-                </div>
-
             </div>
         </div>
     </div>
 </div>
 
-<script src="{{ '/assets/js/game-of-life.js' | relative_url }}?v=17"></script>
+<script src="{{ '/assets/js/game-of-life.js' | relative_url }}?v=18"></script>
 <script src="{{ '/assets/js/symmetry.js' | relative_url }}?v=8"></script>
 <script src="{{ '/assets/js/gradient-descent.js' | relative_url }}?v=13"></script>
 <script src="{{ '/assets/js/cifar.js' | relative_url }}?v=9"></script>

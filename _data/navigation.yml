@@ -5,6 +5,9 @@ pages:
 - name: Publications
   name_fr: Publications
   url: publications
+- name: Research map
+  name_fr: Carte de la recherche
+  url: research-map
 - name: Playground
   name_fr: Terrain de jeu
   url: playground

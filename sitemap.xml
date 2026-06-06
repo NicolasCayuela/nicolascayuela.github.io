@@ -12,6 +12,10 @@ layout: null
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>{{ site.url }}{{ site.baseurl }}/research-map</loc>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>{{ site.url }}{{ site.baseurl }}/playground</loc>
     <priority>0.5</priority>
   </url>
