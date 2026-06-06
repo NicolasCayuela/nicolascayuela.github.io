@@ -9,11 +9,8 @@
   var drop = document.getElementById("it-drop");
   if (!drop) return;
 
-  var ORT_URL = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.min.js";
   var HEIC_URL = "https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js";
-  var EXIFR_URL = "https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/full.umd.js";
   var QR_URL = "https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js";
-  var ESRGAN_URL = "assets/models/realesrgan_x4.onnx?v=1";
 
   var fileInput = document.getElementById("it-file");
   var statusEl = document.getElementById("it-status");
@@ -38,12 +35,6 @@
     compress: { needsFile: true, opts: ["format", "quality"],
                 hint: ["Re-encodes the image at the chosen quality and shows the size before/after.",
                        "Réencode l'image à la qualité choisie et montre la taille avant/après."] },
-    upscale:  { needsFile: true, opts: [],
-                hint: ["4x super-resolution with Real-ESRGAN (4.9 MB model, tiled inference). Inputs larger than 1024 px are downscaled first.",
-                       "Super-résolution 4x avec Real-ESRGAN (modèle de 4,9 Mo, inférence par tuiles). Les images de plus de 1024 px sont d'abord réduites."] },
-    exif:     { needsFile: true, opts: ["format", "quality"],
-                hint: ["Shows the metadata found (camera, date, GPS…) and produces a clean copy without any of it.",
-                       "Affiche les métadonnées trouvées (appareil, date, GPS…) et produit une copie propre sans aucune d'elles."] },
     qr:       { needsFile: false, opts: [],
                 hint: ["Generates a QR code locally - nothing is sent anywhere.",
                        "Génère un QR code localement - rien n'est envoyé nulle part."] }
@@ -180,97 +171,6 @@
       "(" + fmtSize(srcFile.size) + " → " + fmtSize(blob.size) + ", " + pct + "%)");
   }
 
-  var esrgan = null;
-  async function doUpscale() {
-    await loadScript(ORT_URL);
-    if (!esrgan) {
-      setStatus("Loading the upscaler (4.9 MB)…", "Chargement de l'upscaler (4,9 Mo)…");
-      esrgan = await window.ort.InferenceSession.create(ESRGAN_URL, { executionProviders: ["wasm"] });
-    }
-    // cap the input so 4x output stays reasonable
-    var MAX = 1024;
-    var src = img;
-    if (Math.max(img.width, img.height) > MAX) {
-      var sc = MAX / Math.max(img.width, img.height);
-      var d = document.createElement("canvas");
-      d.width = Math.round(img.width * sc); d.height = Math.round(img.height * sc);
-      d.getContext("2d").drawImage(img, 0, 0, d.width, d.height);
-      src = d;
-    }
-    var W = src.width, H = src.height;
-    var out = document.createElement("canvas");
-    out.width = W * 4; out.height = H * 4;
-    var octx = out.getContext("2d");
-
-    var TILE = 128, PAD = 8;
-    var sctx = src.getContext("2d");
-    var nTiles = Math.ceil(W / TILE) * Math.ceil(H / TILE), done = 0;
-    for (var ty = 0; ty < H; ty += TILE) {
-      for (var tx = 0; tx < W; tx += TILE) {
-        var x0 = Math.max(0, tx - PAD), y0 = Math.max(0, ty - PAD);
-        var x1 = Math.min(W, tx + TILE + PAD), y1 = Math.min(H, ty + TILE + PAD);
-        var tw = x1 - x0, th = y1 - y0;
-        var px = sctx.getImageData(x0, y0, tw, th).data;
-        var n = tw * th;
-        var data = new Float32Array(3 * n);
-        for (var p = 0; p < n; p++) {
-          data[p] = px[p * 4] / 255;
-          data[n + p] = px[p * 4 + 1] / 255;
-          data[2 * n + p] = px[p * 4 + 2] / 255;
-        }
-        var feeds = {}; feeds[esrgan.inputNames[0]] = new ort.Tensor("float32", data, [1, 3, th, tw]);
-        var res = await esrgan.run(feeds);
-        var o = res[esrgan.outputNames[0]].data;        // 1x3x(4th)x(4tw)
-        var OW = tw * 4, OH = th * 4, on = OW * OH;
-        var oid = octx.createImageData(OW, OH);
-        for (var op = 0; op < on; op++) {
-          oid.data[op * 4]     = Math.max(0, Math.min(255, Math.round(o[op] * 255)));
-          oid.data[op * 4 + 1] = Math.max(0, Math.min(255, Math.round(o[on + op] * 255)));
-          oid.data[op * 4 + 2] = Math.max(0, Math.min(255, Math.round(o[2 * on + op] * 255)));
-          oid.data[op * 4 + 3] = 255;
-        }
-        // paste only the un-padded core of the tile
-        var cx0 = (tx - x0) * 4, cy0 = (ty - y0) * 4;
-        var cw = Math.min(TILE, W - tx) * 4, ch = Math.min(TILE, H - ty) * 4;
-        var tmp = document.createElement("canvas");
-        tmp.width = OW; tmp.height = OH;
-        tmp.getContext("2d").putImageData(oid, 0, 0);
-        octx.drawImage(tmp, cx0, cy0, cw, ch, tx * 4, ty * 4, cw, ch);
-        done++;
-        setStatus("Upscaling… tile " + done + "/" + nTiles, "Agrandissement… tuile " + done + "/" + nTiles);
-        await new Promise(function (r) { setTimeout(r, 0); });   // let the UI breathe
-      }
-    }
-    var blob = await canvasBlob(out, "image/png");
-    resultEl.innerHTML = resultLink(blob, baseName(srcFile.name) + "-x4.png",
-      "- " + out.width + " × " + out.height, "- " + out.width + " × " + out.height);
-  }
-
-  async function doExif() {
-    await loadScript(EXIFR_URL);
-    var tags = null;
-    try { tags = await window.exifr.parse(srcFile, { gps: true, tiff: true, exif: true }); } catch (e) {}
-    var rows = [];
-    if (tags) {
-      var interesting = { Make: 1, Model: 1, DateTimeOriginal: 1, CreateDate: 1, Software: 1,
-                          latitude: 1, longitude: 1, GPSAltitude: 1, LensModel: 1, ISO: 1,
-                          FNumber: 1, ExposureTime: 1, FocalLength: 1 };
-      Object.keys(tags).forEach(function (k) {
-        if (interesting[k] && tags[k] != null) rows.push("<tr><td class='pr-3'>" + k + "</td><td>" + tags[k] + "</td></tr>");
-      });
-    }
-    var fmt = document.getElementById("it-format").value;
-    var q = document.getElementById("it-quality").value / 100;
-    var blob = await canvasBlob(img, "image/" + fmt, fmt === "png" ? undefined : q);
-    var ext = fmt === "jpeg" ? "jpg" : fmt;
-    resultEl.innerHTML =
-      (rows.length
-        ? '<div class="small mb-2"><strong><span class="lang-en">Metadata found (will be removed):</span><span class="lang-fr">Métadonnées trouvées (elles seront supprimées) :</span></strong>' +
-          '<table class="small text-muted">' + rows.join("") + "</table></div>"
-        : '<div class="small text-muted mb-2"><span class="lang-en">No notable metadata found - the clean copy is still guaranteed metadata-free.</span><span class="lang-fr">Pas de métadonnées notables - la copie propre reste garantie sans métadonnées.</span></div>') +
-      resultLink(blob, baseName(srcFile.name) + "-clean." + ext, "(no metadata)", "(sans métadonnées)");
-  }
-
   async function doQr() {
     await loadScript(QR_URL);
     var text = document.getElementById("it-qr-text").value.trim();
@@ -299,7 +199,7 @@
       resultLink(blob, "qrcode.png");
   }
 
-  var RUNNERS = { convert: doConvert, compress: doCompress, upscale: doUpscale, exif: doExif, qr: doQr };
+  var RUNNERS = { convert: doConvert, compress: doCompress, qr: doQr };
 
   function baseName(name) { return name.replace(/\.[^.]+$/, ""); }
 

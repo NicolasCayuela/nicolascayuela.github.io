@@ -25,37 +25,114 @@
 
   var files = [];          // current selection, in order
   var tool = "merge";
+  var thumbsEl = document.getElementById("pt-thumbs");
+  var selPages = [];       // 0-based indices selected by clicking thumbnails
+  var thumbsToken = 0;     // cancels an in-flight render when the file changes
+
+  // ---- page thumbnails (Acrobat-style organize view) ----
+  function selectionToRange() {
+    // compress sorted indices into a "1-3,5" string for the range field
+    var s = selPages.slice().sort(function (a, b) { return a - b; });
+    var parts = [], i = 0;
+    while (i < s.length) {
+      var j = i;
+      while (j + 1 < s.length && s[j + 1] === s[j] + 1) j++;
+      parts.push(j > i ? (s[i] + 1) + "-" + (s[j] + 1) : "" + (s[i] + 1));
+      i = j + 1;
+    }
+    document.getElementById("pt-range").value = parts.join(",");
+  }
+
+  function renderThumbs() {
+    var t = TOOLS[tool];
+    thumbsEl.innerHTML = "";
+    selPages = [];
+    var f = files[0];
+    var isPdf = f && (f.type === "application/pdf" || /\.pdf$/i.test(f.name));
+    if (!t.thumbs || !isPdf) return;
+    var token = ++thumbsToken;
+    needPdfJs().then(function () {
+      return f.arrayBuffer();
+    }).then(function (buf) {
+      return pdfjsLib.getDocument({ data: buf }).promise;
+    }).then(function (doc) {
+      if (token !== thumbsToken) return;
+      var MAXP = Math.min(doc.numPages, 120);
+      var chain = Promise.resolve();
+      for (var i = 1; i <= MAXP; i++) (function (pn) {
+        chain = chain.then(function () {
+          if (token !== thumbsToken) return;
+          return doc.getPage(pn).then(function (page) {
+            if (token !== thumbsToken) return;
+            var vp = page.getViewport({ scale: 1 });
+            var scale = 130 / vp.width;
+            var v2 = page.getViewport({ scale: scale });
+            var c = document.createElement("canvas");
+            c.width = Math.round(v2.width); c.height = Math.round(v2.height);
+            return page.render({ canvasContext: c.getContext("2d"), viewport: v2 }).promise.then(function () {
+              if (token !== thumbsToken) return;
+              var d = document.createElement("div");
+              d.className = "pt-thumb" + (t.select ? " selectable" : "");
+              d.appendChild(c);
+              var num = document.createElement("span");
+              num.className = "pt-pnum"; num.textContent = pn;
+              d.appendChild(num);
+              if (t.select) {
+                d.addEventListener("click", function () {
+                  var k = selPages.indexOf(pn - 1);
+                  if (k === -1) selPages.push(pn - 1); else selPages.splice(k, 1);
+                  d.classList.toggle("sel", k === -1);
+                  selectionToRange();
+                });
+              }
+              thumbsEl.appendChild(d);
+            });
+          });
+        });
+      })(i);
+      if (doc.numPages > MAXP) {
+        chain = chain.then(function () {
+          if (token !== thumbsToken) return;
+          var note = document.createElement("div");
+          note.className = "small text-muted";
+          note.textContent = "… +" + (doc.numPages - MAXP);
+          thumbsEl.appendChild(note);
+        });
+      }
+      return chain;
+    }).catch(function () { /* thumbnails are best-effort */ });
+  }
 
   // ---------- tool registry ----------
   var TOOLS = {
     merge:    { accept: "application/pdf", multiple: true,  min: 2, opts: [],
-                hint: ["Select at least two PDFs - they are merged in the order of the list.",
-                       "Sélectionne au moins deux PDF - ils sont fusionnés dans l'ordre de la liste."] },
-    split:    { accept: "application/pdf", multiple: false, min: 1, opts: ["range"],
-                hint: ["Extract the given pages into a new PDF.",
-                       "Extrait les pages indiquées dans un nouveau PDF."] },
-    compress: { accept: "application/pdf", multiple: false, min: 1, opts: ["quality", "scale"],
+                hint: ["Select at least two PDFs and order them with the arrows - they are merged in list order.",
+                       "Sélectionne au moins deux PDF et ordonne-les avec les flèches - ils sont fusionnés dans l'ordre de la liste."] },
+    split:    { accept: "application/pdf", multiple: false, min: 1, opts: ["range"], thumbs: true, select: true,
+                hint: ["Click the pages to keep (or type a range), then apply.",
+                       "Clique sur les pages à garder (ou tape une plage), puis applique."] },
+    compress: { accept: "application/pdf", multiple: false, min: 1, opts: ["quality", "scale"], thumbs: true,
                 hint: ["Rasterizes each page to JPEG - big size reduction, text no longer selectable.",
                        "Rastérise chaque page en JPEG - forte réduction de taille, texte non sélectionnable."] },
-    rotate:   { accept: "application/pdf", multiple: false, min: 1, opts: ["angle", "range"],
-                hint: ["Rotate all pages, or only the pages listed in the range field.",
-                       "Pivote toutes les pages, ou seulement celles indiquées dans le champ pages."] },
-    delete:   { accept: "application/pdf", multiple: false, min: 1, opts: ["range"],
-                hint: ["Remove the given pages and download the rest.",
-                       "Supprime les pages indiquées et télécharge le reste."] },
+    rotate:   { accept: "application/pdf", multiple: false, min: 1, opts: ["angle", "range"], thumbs: true, select: true,
+                hint: ["Click the pages to rotate (none selected = all pages), choose the angle, apply.",
+                       "Clique sur les pages à pivoter (aucune sélection = toutes), choisis l'angle, applique."] },
+    delete:   { accept: "application/pdf", multiple: false, min: 1, opts: ["range"], thumbs: true, select: true,
+                hint: ["Click the pages to delete, then apply.",
+                       "Clique sur les pages à supprimer, puis applique."] },
     img2pdf:  { accept: "image/*", multiple: true, min: 1, opts: [],
                 hint: ["Each image becomes one PDF page (in list order).",
                        "Chaque image devient une page du PDF (dans l'ordre de la liste)."] },
-    pdf2img:  { accept: "application/pdf", multiple: false, min: 1, opts: ["format", "scale"],
+    pdf2img:  { accept: "application/pdf", multiple: false, min: 1, opts: ["format", "scale"], thumbs: true,
                 hint: ["Renders every page as an image; several pages are packaged in a ZIP.",
                        "Convertit chaque page en image ; plusieurs pages sont livrées dans un ZIP."] },
-    ocr:      { accept: "application/pdf,image/*", multiple: false, min: 1, opts: ["lang"],
+    ocr:      { accept: "application/pdf,image/*", multiple: false, min: 1, opts: ["lang"], thumbs: true,
                 hint: ["Recognizes the text of a scanned PDF or photo (Tesseract, ~15 MB language data on first run) and downloads it as .txt.",
                        "Reconnaît le texte d'un PDF scanné ou d'une photo (Tesseract, ~15 Mo de données de langue au premier lancement) et le télécharge en .txt."] },
     sign:     { accept: "application/pdf", multiple: false, min: 1, opts: [],
-                hint: ["Draw or import a signature, pick the page, click on the preview where it should go, then run.",
-                       "Dessine ou importe une signature, choisis la page, clique sur l'aperçu à l'endroit voulu, puis lance."] },
-    watermark:{ accept: "application/pdf", multiple: false, min: 1, opts: [],
+                hint: ["Draw or import a signature, pick the page, click on the preview where it should go, then apply.",
+                       "Dessine ou importe une signature, choisis la page, clique sur l'aperçu à l'endroit voulu, puis applique."] },
+    watermark:{ accept: "application/pdf", multiple: false, min: 1, opts: [], thumbs: true,
                 hint: ["Stamps the text on every page with the chosen opacity and size.",
                        "Appose le texte sur chaque page avec l'opacité et la taille choisies."] }
   };
@@ -394,8 +471,13 @@
       document.getElementById(UI_PANELS[k]).classList.toggle("d-none", tool !== k);
     });
     filesEl.innerHTML = files.map(function (f, i) {
-      return '<li><i class="far fa-file"></i> ' + f.name + " (" + fmtSize(f.size) + ") " +
-             '<a href="#" data-pt-rm="' + i + '" class="text-danger ml-1"><i class="fas fa-times"></i></a></li>';
+      var arrows = (t.multiple && files.length > 1)
+        ? (i > 0 ? '<a href="#" data-pt-up="' + i + '" title="up"><i class="fas fa-arrow-up"></i></a>' : "") +
+          (i < files.length - 1 ? '<a href="#" data-pt-down="' + i + '" title="down"><i class="fas fa-arrow-down"></i></a>' : "")
+        : "";
+      return '<li><i class="far fa-file-pdf"></i> ' + f.name + ' <span class="text-muted">(' + fmtSize(f.size) + ')</span>' +
+             '<span class="pt-handle">' + arrows +
+             '<a href="#" data-pt-rm="' + i + '" class="text-danger"><i class="fas fa-times"></i></a></span></li>';
     }).join("");
     runBtn.disabled = files.length < t.min;
     setHint();
@@ -406,15 +488,26 @@
       tool = b.getAttribute("data-pt-tool");
       document.querySelectorAll("[data-pt-tool]").forEach(function (x) { x.classList.toggle("active", x === b); });
       files = []; resultEl.innerHTML = ""; setStatus("", "");
+      document.getElementById("pt-range").value = "";
       refresh();
+      renderThumbs();
     });
   });
 
   filesEl.addEventListener("click", function (e) {
     var rm = e.target.closest("[data-pt-rm]");
-    if (!rm) return;
+    var up = e.target.closest("[data-pt-up]");
+    var down = e.target.closest("[data-pt-down]");
+    if (!rm && !up && !down) return;
     e.preventDefault();
-    files.splice(parseInt(rm.getAttribute("data-pt-rm"), 10), 1);
+    if (rm) {
+      files.splice(parseInt(rm.getAttribute("data-pt-rm"), 10), 1);
+      renderThumbs();
+    } else {
+      var i = parseInt((up || down).getAttribute(up ? "data-pt-up" : "data-pt-down"), 10);
+      var j = up ? i - 1 : i + 1;
+      var tmp = files[i]; files[i] = files[j]; files[j] = tmp;
+    }
     refresh();
   });
 
@@ -436,6 +529,7 @@
     }
     resultEl.innerHTML = ""; setStatus("", "");
     refresh();
+    renderThumbs();
     if (tool === "sign" && files.length) {
       signPlaced = null;
       renderSignPreview().catch(function () {});

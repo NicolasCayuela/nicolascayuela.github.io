@@ -49,6 +49,30 @@ description: "Free in-browser tools: background remover, image converter/compres
     .ws-back:hover { background: #e0e7f2; }
     /* big friendly drop zones in the focused view */
     #bgr-drop, #pt-drop, #it-drop { padding: 3rem 1rem; font-size: 1.02rem; background: #fbfcff; }
+
+    /* ===== Acrobat-style PDF workspace ===== */
+    .pt-rail { background: #f7f8fb; border: 1px solid #e8ecf3; border-radius: 12px; padding: 1rem; align-self: flex-start; }
+    .pt-apply { background: #d63438; color: #fff; font-weight: 700; width: 100%; border-radius: 8px;
+        padding: .55rem; }
+    .pt-apply:hover:not(:disabled) { background: #b8262a; color: #fff; }
+    .pt-apply:disabled { background: #e9b3b5; color: #fff; }
+    .pt-thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: .7rem; margin-top: .8rem; }
+    .pt-thumb { position: relative; border: 2px solid #e3e8f0; border-radius: 8px; cursor: default;
+        background: #fff; padding: 4px; transition: border-color .1s, box-shadow .1s; }
+    .pt-thumb canvas { width: 100%; height: auto; display: block; border-radius: 4px; }
+    .pt-thumb .pt-pnum { position: absolute; bottom: 4px; right: 6px; font-size: .68rem; font-weight: 700;
+        color: #fff; background: rgba(31,41,64,.75); border-radius: 8px; padding: 0 .45rem; }
+    .pt-thumb.selectable { cursor: pointer; }
+    .pt-thumb.selectable:hover { border-color: #9bb4e8; }
+    .pt-thumb.sel { border-color: #1c54e5; box-shadow: 0 0 0 2px rgba(28,84,229,.25); }
+    .pt-thumb.sel::after { content: "\2713"; position: absolute; top: 4px; right: 6px; width: 20px; height: 20px;
+        background: #1c54e5; color: #fff; border-radius: 50%; font-size: .75rem; display: flex;
+        align-items: center; justify-content: center; }
+    #pt-files li { background: #fff; border: 1px solid #e8ecf3; border-radius: 8px; padding: .35rem .6rem; margin-bottom: .3rem;
+        display: flex; align-items: center; gap: .5rem; }
+    #pt-files li .pt-handle { margin-left: auto; display: flex; gap: .35rem; }
+    #pt-files li a { color: #6a7385; }
+    #pt-files li a:hover { color: #1c54e5; text-decoration: none; }
 </style>
 
 <!-- ===================== tool grid (landing) ===================== -->
@@ -124,11 +148,6 @@ description: "Free in-browser tools: background remover, image converter/compres
                 <div class="tg-name"><span class="lang-en">Remove background</span><span class="lang-fr">Supprimer le fond</span></div>
                 <p class="tg-desc"><span class="lang-en">AI cut-out to a transparent PNG (alpha channel).</span><span class="lang-fr">Détourage IA vers un PNG transparent (canal alpha).</span></p>
             </div>
-            <div class="tg-card tg-ai" data-tg="it:upscale" data-icon="fas fa-search-plus">
-                <div class="tg-icon"><i class="fas fa-search-plus"></i></div>
-                <div class="tg-name"><span class="lang-en">AI upscale ×4</span><span class="lang-fr">Agrandir ×4 (IA)</span></div>
-                <p class="tg-desc"><span class="lang-en">Real-ESRGAN super-resolution, right in the browser.</span><span class="lang-fr">Super-résolution Real-ESRGAN, directement dans le navigateur.</span></p>
-            </div>
             <div class="tg-card tg-img" data-tg="it:convert" data-icon="fas fa-exchange-alt">
                 <div class="tg-icon"><i class="fas fa-exchange-alt"></i></div>
                 <div class="tg-name"><span class="lang-en">Convert image</span><span class="lang-fr">Convertir une image</span></div>
@@ -138,11 +157,6 @@ description: "Free in-browser tools: background remover, image converter/compres
                 <div class="tg-icon"><i class="fas fa-compress"></i></div>
                 <div class="tg-name"><span class="lang-en">Compress image</span><span class="lang-fr">Compresser une image</span></div>
                 <p class="tg-desc"><span class="lang-en">Adjustable quality with before/after size.</span><span class="lang-fr">Qualité réglable avec taille avant/après.</span></p>
-            </div>
-            <div class="tg-card tg-img" data-tg="it:exif" data-icon="fas fa-user-secret">
-                <div class="tg-icon"><i class="fas fa-user-secret"></i></div>
-                <div class="tg-name"><span class="lang-en">Strip metadata</span><span class="lang-fr">Effacer les métadonnées</span></div>
-                <p class="tg-desc"><span class="lang-en">See and remove EXIF (camera, date, GPS…).</span><span class="lang-fr">Vois et supprime les EXIF (appareil, date, GPS…).</span></p>
             </div>
             <div class="tg-card tg-misc" data-tg="it:qr" data-icon="fas fa-qrcode">
                 <div class="tg-icon"><i class="fas fa-qrcode"></i></div>
@@ -252,12 +266,6 @@ description: "Free in-browser tools: background remover, image converter/compres
                     <button data-it-tool="compress" type="button" class="btn btn-outline-dark">
                         <i class="fas fa-compress"></i> <span class="lang-en">Compress</span><span class="lang-fr">Compresser</span>
                     </button>
-                    <button data-it-tool="upscale" type="button" class="btn btn-outline-dark">
-                        <i class="fas fa-search-plus"></i> <span class="lang-en">AI upscale ×4</span><span class="lang-fr">Agrandir ×4 (IA)</span>
-                    </button>
-                    <button data-it-tool="exif" type="button" class="btn btn-outline-dark">
-                        <i class="fas fa-user-secret"></i> <span class="lang-en">Strip metadata</span><span class="lang-fr">Effacer les métadonnées</span>
-                    </button>
                     <button data-it-tool="qr" type="button" class="btn btn-outline-dark">
                         <i class="fas fa-qrcode"></i> <span class="lang-en">QR code</span><span class="lang-fr">QR code</span>
                     </button>
@@ -335,8 +343,8 @@ description: "Free in-browser tools: background remover, image converter/compres
                 <div id="it-result" class="mt-2"></div>
 
                 <p class="small text-muted mt-3 mb-0">
-                    <span class="lang-en">Upscaler: <a href="https://github.com/xinntao/Real-ESRGAN" target="_blank" rel="noopener">Real-ESRGAN</a> general-x4v3 (BSD-3) via onnxruntime-web. HEIC: heic2any. EXIF: exifr. QR: qrcode-generator.</span>
-                    <span class="lang-fr">Upscaler : <a href="https://github.com/xinntao/Real-ESRGAN" target="_blank" rel="noopener">Real-ESRGAN</a> general-x4v3 (BSD-3) via onnxruntime-web. HEIC : heic2any. EXIF : exifr. QR : qrcode-generator.</span>
+                    <span class="lang-en">HEIC: heic2any. QR: qrcode-generator.</span>
+                    <span class="lang-fr">HEIC : heic2any. QR : qrcode-generator.</span>
                 </p>
             </div>
         </div>
@@ -388,8 +396,9 @@ description: "Free in-browser tools: background remover, image converter/compres
                     </button>
                 </div>
 
-                <!-- per-tool hint -->
-                <p id="pt-hint" class="small text-muted mb-2"></p>
+                <!-- Acrobat-style stage: document area on the left, options rail on the right -->
+                <div class="d-flex flex-wrap" style="gap:1.1rem;">
+                <div style="flex:1 1 380px; min-width:300px;">
 
                 <!-- drop zone -->
                 <div id="pt-drop" style="border:2px dashed #cdd9f3; border-radius:12px; padding:1.6rem 1rem; text-align:center; color:#6a7385; cursor:pointer;">
@@ -400,8 +409,51 @@ description: "Free in-browser tools: background remover, image converter/compres
                 </div>
                 <ul id="pt-files" class="list-unstyled small mt-2 mb-2"></ul>
 
+                <!-- page thumbnails (Acrobat "organize pages" view) -->
+                <div id="pt-thumbs" class="pt-thumbs"></div>
+
+                <!-- Signature UI -->
+                <div id="pt-sign-ui" class="d-none mb-2">
+                    <div class="d-flex flex-wrap align-items-start" style="gap:1rem;">
+                        <div>
+                            <div class="small text-muted mb-1">
+                                <span class="lang-en">Draw your signature (or drop a PNG below):</span>
+                                <span class="lang-fr">Dessine ta signature (ou dépose un PNG dessous) :</span>
+                            </div>
+                            <canvas id="pt-sign-pad" width="360" height="120"
+                                    style="border:1px solid #cdd9f3; border-radius:8px; background:#fff; touch-action:none;"></canvas>
+                            <div class="mt-1" style="display:flex; gap:.4rem;">
+                                <button id="pt-sign-clear" class="btn btn-sm btn-outline-dark">
+                                    <i class="fas fa-eraser"></i> <span class="lang-en">Clear</span><span class="lang-fr">Effacer</span>
+                                </button>
+                                <label class="btn btn-sm btn-outline-dark mb-0">
+                                    <i class="fas fa-upload"></i> <span class="lang-en">PNG signature</span><span class="lang-fr">Signature PNG</span>
+                                    <input id="pt-sign-file" type="file" accept="image/png" class="d-none">
+                                </label>
+                                <label class="small text-muted mb-0 align-self-center">
+                                    <span class="lang-en">Width</span><span class="lang-fr">Largeur</span>
+                                    <input id="pt-sign-size" type="range" min="60" max="300" value="150" style="vertical-align:middle; width:100px;">
+                                </label>
+                            </div>
+                        </div>
+                        <div style="flex:1; min-width:260px;">
+                            <div class="small text-muted mb-1">
+                                Page <input id="pt-sign-page" type="number" min="1" value="1" class="form-control form-control-sm d-inline-block" style="width:70px;">
+                                <span class="lang-en">- click on the preview to place the signature:</span>
+                                <span class="lang-fr">- clique sur l'aperçu pour placer la signature :</span>
+                            </div>
+                            <canvas id="pt-sign-preview" style="width:100%; max-width:420px; border:1px solid #e3e8f0; border-radius:8px; cursor:crosshair;"></canvas>
+                        </div>
+                    </div>
+                </div>
+                </div>
+
+                <!-- right options rail -->
+                <div class="pt-rail" style="flex:0 0 270px; min-width:240px;">
+                <p id="pt-hint" class="small text-muted mb-3"></p>
+
                 <!-- per-tool options -->
-                <div id="pt-opts" class="d-flex flex-wrap align-items-center mb-2" style="gap:1rem;">
+                <div id="pt-opts" class="d-flex flex-column mb-2" style="gap:.8rem;">
                     <label id="pt-opt-range" class="small text-muted mb-0 d-none">
                         <span class="lang-en">Pages (e.g. 1-3,5)</span><span class="lang-fr">Pages (ex. 1-3,5)</span>
                         <input id="pt-range" type="text" class="form-control form-control-sm d-inline-block ml-1" style="width:130px;" placeholder="1-3,5">
@@ -444,45 +496,10 @@ description: "Free in-browser tools: background remover, image converter/compres
                     </label>
                 </div>
 
-                <!-- Signature UI -->
-                <div id="pt-sign-ui" class="d-none mb-2">
-                    <div class="d-flex flex-wrap align-items-start" style="gap:1rem;">
-                        <div>
-                            <div class="small text-muted mb-1">
-                                <span class="lang-en">Draw your signature (or drop a PNG below):</span>
-                                <span class="lang-fr">Dessine ta signature (ou dépose un PNG dessous) :</span>
-                            </div>
-                            <canvas id="pt-sign-pad" width="360" height="120"
-                                    style="border:1px solid #cdd9f3; border-radius:8px; background:#fff; touch-action:none;"></canvas>
-                            <div class="mt-1" style="display:flex; gap:.4rem;">
-                                <button id="pt-sign-clear" class="btn btn-sm btn-outline-dark">
-                                    <i class="fas fa-eraser"></i> <span class="lang-en">Clear</span><span class="lang-fr">Effacer</span>
-                                </button>
-                                <label class="btn btn-sm btn-outline-dark mb-0">
-                                    <i class="fas fa-upload"></i> <span class="lang-en">PNG signature</span><span class="lang-fr">Signature PNG</span>
-                                    <input id="pt-sign-file" type="file" accept="image/png" class="d-none">
-                                </label>
-                                <label class="small text-muted mb-0 align-self-center">
-                                    <span class="lang-en">Width</span><span class="lang-fr">Largeur</span>
-                                    <input id="pt-sign-size" type="range" min="60" max="300" value="150" style="vertical-align:middle; width:100px;">
-                                </label>
-                            </div>
-                        </div>
-                        <div style="flex:1; min-width:260px;">
-                            <div class="small text-muted mb-1">
-                                Page <input id="pt-sign-page" type="number" min="1" value="1" class="form-control form-control-sm d-inline-block" style="width:70px;">
-                                <span class="lang-en">- click on the preview to place the signature:</span>
-                                <span class="lang-fr">- clique sur l'aperçu pour placer la signature :</span>
-                            </div>
-                            <canvas id="pt-sign-preview" style="width:100%; max-width:420px; border:1px solid #e3e8f0; border-radius:8px; cursor:crosshair;"></canvas>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Watermark UI -->
                 <div id="pt-wm-ui" class="d-none mb-2">
-                    <div class="d-flex flex-wrap align-items-center" style="gap:1rem;">
-                        <input id="pt-wm-text" type="text" class="form-control form-control-sm" style="width:220px;"
+                    <div class="d-flex flex-column" style="gap:.8rem;">
+                        <input id="pt-wm-text" type="text" class="form-control form-control-sm"
                                placeholder="CONFIDENTIAL" value="CONFIDENTIAL">
                         <label class="small text-muted mb-0">
                             <span class="lang-en">Opacity</span><span class="lang-fr">Opacité</span>
@@ -498,11 +515,13 @@ description: "Free in-browser tools: background remover, image converter/compres
                     </div>
                 </div>
 
-                <button id="pt-run" class="btn btn-sm btn-dark" disabled>
-                    <i class="fas fa-cogs"></i> <span class="lang-en">Run</span><span class="lang-fr">Lancer</span>
+                <button id="pt-run" class="btn pt-apply" disabled>
+                    <span class="lang-en">Apply</span><span class="lang-fr">Appliquer</span> <i class="fas fa-arrow-right ml-1"></i>
                 </button>
                 <div id="pt-status" class="small text-muted mt-2"></div>
                 <div id="pt-result" class="mt-2"></div>
+                </div><!-- /rail -->
+                </div><!-- /stage -->
 
                 <p class="small text-muted mt-3 mb-0">
                     <span class="lang-en">Powered by <a href="https://pdf-lib.js.org/" target="_blank" rel="noopener">pdf-lib</a> (MIT) and <a href="https://mozilla.github.io/pdf.js/" target="_blank" rel="noopener">PDF.js</a> (Apache-2.0). Compression rasterizes pages to JPEG - text is no longer selectable in the output.</span>
@@ -514,8 +533,8 @@ description: "Free in-browser tools: background remover, image converter/compres
 </div>
 
 <script src="{{ '/assets/js/bg-remove.js' | relative_url }}?v=2"></script>
-<script src="{{ '/assets/js/pdf-tools.js' | relative_url }}?v=3"></script>
-<script src="{{ '/assets/js/image-tools.js' | relative_url }}?v=1"></script>
+<script src="{{ '/assets/js/pdf-tools.js' | relative_url }}?v=4"></script>
+<script src="{{ '/assets/js/image-tools.js' | relative_url }}?v=2"></script>
 
 <!-- grid <-> focused-tool navigation -->
 <script>
