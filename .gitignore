@@ -44,3 +44,6 @@ scripts/dog_ddpm2.pt
 scripts/dog_ae4.pt
 scripts/*.log
 scripts/realesr-general-x4v3.pth
+
+# Local ROCm training virtualenv
+.venv-rocm/

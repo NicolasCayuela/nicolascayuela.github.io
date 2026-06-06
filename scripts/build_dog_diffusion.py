@@ -30,6 +30,7 @@ CKPT_NAME = "dog_ddpm2.pt"    # v2: wider UNet with attention
 TSTEPS = 1000
 DOG_LABEL = 1                 # huggan/AFHQ: cat=0, dog=1, wild=2
 EMA_DECAY = 0.9995              # ~50-epoch horizon, smoother late-training average
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 torch.manual_seed(7)
 np.random.seed(7)
@@ -59,7 +60,7 @@ TDIM = 128
 def time_embedding(t):
     """Sinusoidal embedding; t is a float tensor of shape (B,)."""
     half = TDIM // 2
-    freqs = torch.exp(-math.log(10000.0) * torch.arange(half, dtype=torch.float32) / half)
+    freqs = torch.exp(-math.log(10000.0) * torch.arange(half, dtype=torch.float32, device=t.device) / half)
     args = t[:, None] * freqs[None, :]
     return torch.cat([torch.sin(args), torch.cos(args)], dim=1)
 
@@ -132,18 +133,19 @@ class UNet(nn.Module):
 
 
 def main():
-    data = load_dogs()
+    print("device:", DEVICE, flush=True)
+    data = load_dogs().to(DEVICE)        # ~15 MB uint8, fits in VRAM
     n = data.shape[0]
     print("dogs:", n, flush=True)
 
-    betas = torch.linspace(1e-4, 0.02, TSTEPS)
+    betas = torch.linspace(1e-4, 0.02, TSTEPS, device=DEVICE)
     alphas = 1.0 - betas
     acp = torch.cumprod(alphas, dim=0)               # alphas_cumprod
     sqrt_acp = acp.sqrt()
     sqrt_1macp = (1 - acp).sqrt()
 
-    model = UNet()
-    ema = UNet()
+    model = UNet().to(DEVICE)
+    ema = UNet().to(DEVICE)
     ema.load_state_dict(model.state_dict())
     for p in ema.parameters():
         p.requires_grad_(False)
@@ -163,14 +165,14 @@ def main():
         lr = LR_MIN + 0.5 * (LR_MAX - LR_MIN) * (1 + math.cos(math.pi * epoch / EPOCHS))
         for g in opt.param_groups:
             g["lr"] = lr
-        perm = torch.randperm(n)
+        perm = torch.randperm(n, device=DEVICE)
         tot, nb = 0.0, 0
         for b in range(0, n, BATCH):
             idx = perm[b:b + BATCH]
             x0 = data[idx].float() / 127.5 - 1.0     # [-1, 1]
-            flip = torch.rand(x0.shape[0]) < 0.5     # horizontal-flip augmentation
+            flip = torch.rand(x0.shape[0], device=DEVICE) < 0.5  # horizontal-flip augmentation
             x0[flip] = x0[flip].flip(-1)
-            t = torch.randint(0, TSTEPS, (x0.shape[0],))
+            t = torch.randint(0, TSTEPS, (x0.shape[0],), device=DEVICE)
             eps = torch.randn_like(x0)
             xt = sqrt_acp[t, None, None, None] * x0 + sqrt_1macp[t, None, None, None] * eps
             pred = model(xt, t.float())
@@ -191,13 +193,14 @@ def main():
     K = 50
     seq = torch.linspace(0, TSTEPS - 1, K).long().flip(0)
     with torch.no_grad():
-        x = torch.randn(8, 3, IMG, IMG)
+        x = torch.randn(8, 3, IMG, IMG, device=DEVICE)
         for i, ti in enumerate(seq):
             a = acp[ti]
-            a_prev = acp[seq[i + 1]] if i + 1 < K else torch.tensor(1.0)
-            epsm = ema(x, torch.full((8,), float(ti)))
+            a_prev = acp[seq[i + 1]] if i + 1 < K else torch.tensor(1.0, device=DEVICE)
+            epsm = ema(x, torch.full((8,), float(ti), device=DEVICE))
             x0 = ((x - (1 - a).sqrt() * epsm) / a.sqrt()).clamp(-1, 1)
             x = a_prev.sqrt() * x0 + (1 - a_prev).sqrt() * epsm
+    x = x.cpu()
     grid = Image.new("RGB", (8 * IMG, IMG))
     for i in range(8):
         arr = ((x[i].permute(1, 2, 0).numpy() + 1) * 127.5).clip(0, 255).astype(np.uint8)
@@ -205,7 +208,8 @@ def main():
     grid.save(os.path.join(HERE, "dog_ddpm_preview.png"))
     print("preview:", os.path.join(HERE, "dog_ddpm_preview.png"), flush=True)
 
-    # ---- ONNX export (EMA weights) ----
+    # ---- ONNX export (EMA weights, on CPU for a clean graph) ----
+    ema = ema.cpu()
     os.makedirs(OUT_MODELS, exist_ok=True)
     onnx_path = os.path.join(OUT_MODELS, "dog_diffusion.onnx")
     dummy = (torch.zeros(1, 3, IMG, IMG), torch.zeros(1))

@@ -36,6 +36,7 @@ Z_NOISE = 0.05                # latent noise (fraction of batch latent std) -> s
 DOG_LABEL = 1                 # huggan/AFHQ: cat=0, dog=1, wild=2
 SAMPLES_IN_JSON = 300
 WARM_START = "dog_ae3.pt"     # previous checkpoint to initialize from
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 torch.manual_seed(7)
 np.random.seed(7)
@@ -146,12 +147,13 @@ class PCADecoder(nn.Module):
 
 
 def main():
-    data = load_dogs()
+    print("device:", DEVICE, flush=True)
+    data = load_dogs().to(DEVICE)        # ~60 MB uint8, fits in VRAM
     n = data.shape[0]
     print("dogs:", n)
 
-    enc, dec = Encoder(), Decoder()
-    vgg = VGGFeats()
+    enc, dec = Encoder().to(DEVICE), Decoder().to(DEVICE)
+    vgg = VGGFeats().to(DEVICE)
     opt = torch.optim.Adam(list(enc.parameters()) + list(dec.parameters()), lr=LR_MAX)
     loss_fn = nn.MSELoss()
 
@@ -172,13 +174,13 @@ def main():
         lr = LR_MIN + 0.5 * (LR_MAX - LR_MIN) * (1 + math.cos(math.pi * epoch / EPOCHS))
         for g in opt.param_groups:
             g["lr"] = lr
-        perm = torch.randperm(n)
+        perm = torch.randperm(n, device=DEVICE)
         tot, nb = 0.0, 0
         enc.train(); dec.train()
         for b in range(0, n, BATCH):
             idx = perm[b:b + BATCH]
             x = data[idx].float() / 255.0
-            flip = torch.rand(x.shape[0]) < 0.5      # horizontal-flip augmentation
+            flip = torch.rand(x.shape[0], device=DEVICE) < 0.5  # horizontal-flip augmentation
             x[flip] = x[flip].flip(-1)
             opt.zero_grad()
             z = enc(x)
@@ -212,9 +214,9 @@ def main():
     proj = Zc @ Vh.T                                     # N x LATENT, PCA coords
 
     # ---- ONNX export: p (1xPCS) -> image (1x3x64x64); only the top PCS
-    # components are exposed, the rest stay at the mean ----
+    # components are exposed, the rest stay at the mean (CPU for a clean graph) ----
     os.makedirs(OUT_MODELS, exist_ok=True)
-    wrapper = PCADecoder(dec, mean, Vh[:PCS]).eval()
+    wrapper = PCADecoder(dec, mean, Vh[:PCS]).eval().cpu()
     dummy = torch.zeros(1, PCS)
     onnx_path = os.path.join(OUT_MODELS, "dog_decoder.onnx")
     try:
@@ -238,8 +240,10 @@ def main():
     print("json:", os.path.join(OUT_MODELS, "dog_data.json"))
 
     # ---- preview grid: original vs reconstruction vs mean-dog ----
+    # (dec/wrapper were moved to CPU for the ONNX export; do the preview on CPU)
+    enc = enc.cpu()
     with torch.no_grad():
-        x = data[:8].float() / 255.0
+        x = data[:8].float().cpu() / 255.0
         rec = dec(enc(x))
         avg = wrapper(torch.zeros(1, PCS))
     grid = Image.new("RGB", (8 * IMG, 3 * IMG))
