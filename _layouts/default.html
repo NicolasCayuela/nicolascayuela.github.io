@@ -44,7 +44,8 @@
             html.className = html.className.replace(/lang-active-\w+/g, '').trim();
             html.classList.add('lang-active-' + lang);
             html.setAttribute('lang', lang === 'fr' ? 'fr' : 'en');
-            if (localStorage.getItem('site-theme') === 'dark') {
+            // dark theme is the default; light only if explicitly chosen
+            if (localStorage.getItem('site-theme') !== 'light') {
                 html.classList.add('theme-dark');
             }
         })();

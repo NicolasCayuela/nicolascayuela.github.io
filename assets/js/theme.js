@@ -1,7 +1,8 @@
 (function() {
     // Theme is applied earlier by the inline <head> script to avoid a flash;
     // re-apply here as a fallback for layouts that miss it.
-    if (localStorage.getItem('site-theme') === 'dark') {
+    // Dark is the default; light only if explicitly chosen.
+    if (localStorage.getItem('site-theme') !== 'light') {
         document.documentElement.classList.add('theme-dark');
     }
 
