@@ -8,6 +8,9 @@ pages:
 - name: Research space
   name_fr: Espace de recherche
   url: research-map
+- name: Metamaterials space
+  name_fr: Espace métamatériaux
+  url: metamaterials-space
 - name: Playground
   name_fr: Terrain de jeu
   url: playground
