@@ -131,3 +131,108 @@ html.lang-active-fr .lang-fr {
     background-color: #d0dde8;
     height: 1rem;
 }
+
+/* ===== Dark theme toggle button ===== */
+.theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #d0dde8;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+    padding: 0.2rem 0.5rem;
+    color: #999;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    line-height: 1.4;
+}
+
+.theme-toggle:hover {
+    color: #4a7298;
+}
+
+/* ===== Dark theme (html.theme-dark) ===== */
+html.theme-dark body,
+html.theme-dark body.bg-light {
+    background-color: #000 !important;
+    color: #d6d6d6;
+}
+
+html.theme-dark .navbar.bg-light {
+    background-color: #111 !important;
+}
+
+html.theme-dark .navbar-light .navbar-brand,
+html.theme-dark .navbar-light .navbar-nav .nav-link,
+html.theme-dark .navbar-light .navbar-toggler {
+    color: #d6d6d6;
+}
+
+html.theme-dark .navbar-light .navbar-brand:hover,
+html.theme-dark .navbar-light .navbar-nav .nav-link:hover,
+html.theme-dark .navbar-light .navbar-nav .active > .nav-link {
+    color: #fff;
+}
+
+html.theme-dark .navbar-light .navbar-toggler {
+    border-color: #444;
+}
+
+html.theme-dark .card,
+html.theme-dark .bg-white {
+    background-color: #161616 !important;
+    color: #d6d6d6;
+}
+
+html.theme-dark .text-black,
+html.theme-dark a.text-black:link,
+html.theme-dark a.text-black:visited,
+html.theme-dark a.text-black:hover,
+html.theme-dark a.text-black:active {
+    color: #e8e8e8 !important;
+}
+
+html.theme-dark .text-muted {
+    color: #9aa0a6 !important;
+}
+
+html.theme-dark a:not(.btn):not(.nav-link):not(.text-black) {
+    color: #6ea8d8;
+}
+
+html.theme-dark blockquote {
+    background: #0e1c28;
+    color: #b8c4cc;
+}
+
+html.theme-dark .shadow-sm {
+    box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .7) !important;
+}
+
+html.theme-dark .btn-outline-dark {
+    color: #d6d6d6;
+    border-color: #777;
+}
+
+html.theme-dark .btn-outline-dark:hover,
+html.theme-dark .btn-outline-dark:not(:disabled):not(.disabled).active,
+html.theme-dark .btn-dark {
+    color: #111;
+    background-color: #e8e8e8;
+    border-color: #e8e8e8;
+}
+
+html.theme-dark .lang-toggle,
+html.theme-dark .theme-toggle {
+    border-color: #444;
+}
+
+html.theme-dark .lang-toggle-divider {
+    background-color: #444;
+}
+
+html.theme-dark hr {
+    border-top-color: #333;
+}
