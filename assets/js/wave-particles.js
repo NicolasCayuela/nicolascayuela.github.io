@@ -191,7 +191,18 @@
     // colormap floor and the resting opacity to keep the lattice visible
     var dark = document.documentElement.classList.contains("theme-dark");
     var tFloor = dark ? 0.10 : 0;
-    var baseA = dark ? 0.34 : CFG.baseAlpha;
+    var baseA = dark ? 0.45 : CFG.baseAlpha;
+    // pure jet blue is too dim on black: blend resting colors toward white,
+    // fading the lift out as amplitude rises so crests stay saturated
+    function lift(col, t) {
+      if (!dark) return col;
+      var f = 0.35 * (1 - t);
+      return [
+        (col[0] + (255 - col[0]) * f) | 0,
+        (col[1] + (255 - col[1]) * f) | 0,
+        (col[2] + (255 - col[2]) * f) | 0
+      ];
+    }
 
     // links bucketed by field amplitude -> COMSOL Rainbow (jet) colormap
     var paths = [], li, bb;
@@ -209,7 +220,7 @@
       var arr = paths[bb];
       if (!arr.length) continue;
       var t = bb / (LEVELS - 1);
-      var col = jet(tFloor + t * (HUECAP - tFloor));
+      var col = lift(jet(tFloor + t * (HUECAP - tFloor)), t);
       var alpha = baseA + (CFG.peakAlpha - baseA) * t;
       ctx.strokeStyle = "rgba(" + col[0] + "," + col[1] + "," + col[2] + "," + alpha.toFixed(3) + ")";
       ctx.lineWidth = 0.6 + t * 1.6;
@@ -225,7 +236,7 @@
     for (var ni = 0; ni < nodes.length; ni++) {
       var nd = nodes[ni];
       var ns = nd.strain / maxStrain; if (ns > 1) ns = 1;
-      var nc = jet(tFloor + ns * (HUECAP - tFloor));
+      var nc = lift(jet(tFloor + ns * (HUECAP - tFloor)), ns);
       ctx.fillStyle = "rgba(" + nc[0] + "," + nc[1] + "," + nc[2] + "," +
         ((dark ? 0.75 : CFG.nodeAlpha) * (0.4 + 0.6 * ns)).toFixed(3) + ")";
       var rad = 0.9 + ns * 1.9;
