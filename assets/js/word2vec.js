@@ -67,10 +67,11 @@
   }
   function render() {
     if (!ready) return;
+    var dark = document.documentElement.classList.contains("theme-dark");
     ctx.clearRect(0, 0, SIZE, SIZE);
-    ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, SIZE, SIZE);
+    ctx.fillStyle = dark ? "#101216" : "#fff"; ctx.fillRect(0, 0, SIZE, SIZE);
     var i, pr;
-    ctx.fillStyle = "rgba(90,100,120,0.45)";
+    ctx.fillStyle = dark ? "rgba(160,170,190,0.5)" : "rgba(90,100,120,0.45)";
     for (i = 0; i < data.xyz.length; i++) {
       pr = project(data.xyz[i]);
       ctx.fillRect(pr.sx - 1, pr.sy - 1, 2, 2);
@@ -82,7 +83,7 @@
       ctx.beginPath();
       ctx.arc(pr.sx, pr.sy, 4.5, 0, 6.2832);
       ctx.fillStyle = h.color; ctx.fill();
-      ctx.strokeStyle = "#fff"; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.strokeStyle = dark ? "#101216" : "#fff"; ctx.lineWidth = 1.5; ctx.stroke();
       ctx.font = "bold 12px sans-serif";
       ctx.fillStyle = h.color;
       ctx.fillText(data.words[h.i], pr.sx + 7, pr.sy - 6);
@@ -92,6 +93,7 @@
     if (autoSpin && !dragging) { yaw += 0.0035; render(); }
     requestAnimationFrame(tick);
   }
+  window.addEventListener("themechange", function () { render(); });
 
   // ---- interactions ----
   var dragging = false, lastX = 0, lastY = 0;

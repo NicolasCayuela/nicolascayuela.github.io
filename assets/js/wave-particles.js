@@ -187,6 +187,12 @@
   function draw() {
     ctx.clearRect(0, 0, W, H);
 
+    // dark theme: the jet low end (dark blue) vanishes on black, so lift the
+    // colormap floor and the resting opacity to keep the lattice visible
+    var dark = document.documentElement.classList.contains("theme-dark");
+    var tFloor = dark ? 0.10 : 0;
+    var baseA = dark ? 0.34 : CFG.baseAlpha;
+
     // links bucketed by field amplitude -> COMSOL Rainbow (jet) colormap
     var paths = [], li, bb;
     for (bb = 0; bb < LEVELS; bb++) paths.push([]);
@@ -203,8 +209,8 @@
       var arr = paths[bb];
       if (!arr.length) continue;
       var t = bb / (LEVELS - 1);
-      var col = jet(t * HUECAP);
-      var alpha = CFG.baseAlpha + (CFG.peakAlpha - CFG.baseAlpha) * t;
+      var col = jet(tFloor + t * (HUECAP - tFloor));
+      var alpha = baseA + (CFG.peakAlpha - baseA) * t;
       ctx.strokeStyle = "rgba(" + col[0] + "," + col[1] + "," + col[2] + "," + alpha.toFixed(3) + ")";
       ctx.lineWidth = 0.6 + t * 1.6;
       ctx.beginPath();
@@ -219,9 +225,9 @@
     for (var ni = 0; ni < nodes.length; ni++) {
       var nd = nodes[ni];
       var ns = nd.strain / maxStrain; if (ns > 1) ns = 1;
-      var nc = jet(ns * HUECAP);
+      var nc = jet(tFloor + ns * (HUECAP - tFloor));
       ctx.fillStyle = "rgba(" + nc[0] + "," + nc[1] + "," + nc[2] + "," +
-        (CFG.nodeAlpha * (0.4 + 0.6 * ns)).toFixed(3) + ")";
+        ((dark ? 0.75 : CFG.nodeAlpha) * (0.4 + 0.6 * ns)).toFixed(3) + ")";
       var rad = 0.9 + ns * 1.9;
       ctx.beginPath();
       ctx.arc(nd.x, nd.y, rad, 0, 6.2832);

@@ -16,6 +16,8 @@
         var dark = document.documentElement.classList.toggle('theme-dark');
         localStorage.setItem('site-theme', dark ? 'dark' : 'light');
         updateIcon();
+        // let canvas widgets redraw with theme-aware colors
+        window.dispatchEvent(new Event('themechange'));
     };
 
     if (document.readyState === 'loading') {

@@ -112,8 +112,9 @@
   var projected = [];              // last projected positions (for picking)
   function render() {
     if (!ready) return;
+    var dark = document.documentElement.classList.contains("theme-dark");
     mctx.clearRect(0, 0, SIZE, SIZE);
-    mctx.fillStyle = "#fff";
+    mctx.fillStyle = dark ? "#101216" : "#fff";
     mctx.fillRect(0, 0, SIZE, SIZE);
 
     projected = [];
@@ -141,11 +142,12 @@
         pr = projected[i];
         mctx.beginPath();
         mctx.arc(pr.sx, pr.sy, Math.max(5, 4.2 * pr.s) + 3, 0, 6.2832);
-        mctx.strokeStyle = "rgba(40,40,40,0.9)"; mctx.lineWidth = 2.5; mctx.stroke();
+        mctx.strokeStyle = dark ? "rgba(235,235,235,0.9)" : "rgba(40,40,40,0.9)"; mctx.lineWidth = 2.5; mctx.stroke();
         break;
       }
     }
   }
+  window.addEventListener("themechange", function () { render(); });
 
   function pickNearest() {
     if (!projected.length || !pointer.active) return;

@@ -132,7 +132,8 @@
         var pp = project(trail[i][0], trail[i][1], worldZ(f(trail[i][0], trail[i][1])) + 0.03);
         if (i === 0) ctx.moveTo(pp.X, pp.Y); else ctx.lineTo(pp.X, pp.Y);
       }
-      ctx.strokeStyle = "#111"; ctx.lineWidth = 2; ctx.stroke();
+      ctx.strokeStyle = document.documentElement.classList.contains("theme-dark") ? "#f0f0f0" : "#111";
+      ctx.lineWidth = 2; ctx.stroke();
     }
     // global-minimum target (the goal)
     if (target) {
@@ -155,6 +156,7 @@
     ctx.fillStyle = settled ? "#13a10e" : "#d61f1f"; ctx.fill();
     ctx.strokeStyle = "#fff"; ctx.lineWidth = 1.5; ctx.stroke();
   }
+  window.addEventListener("themechange", function () { render(); });
 
   function restart() {
     var s = SURF[surf].start;

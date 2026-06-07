@@ -89,9 +89,10 @@
 
   function draw() {
     var cssW = cols * CELL, cssH = rows * CELL, r, c, v;
+    var dark = document.documentElement.classList.contains("theme-dark");
     ctx.clearRect(0, 0, cssW, cssH);
-    if (mode === "fire") { ctx.fillStyle = COL_EMPTY; ctx.fillRect(0, 0, cssW, cssH); }
-    ctx.strokeStyle = "rgba(0,0,0,0.07)"; ctx.lineWidth = 1;
+    if (mode === "fire") { ctx.fillStyle = dark ? "#171411" : COL_EMPTY; ctx.fillRect(0, 0, cssW, cssH); }
+    ctx.strokeStyle = dark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.07)"; ctx.lineWidth = 1;
     ctx.beginPath();
     for (var x = 0; x <= cols; x++) { ctx.moveTo(x * CELL + 0.5, 0); ctx.lineTo(x * CELL + 0.5, cssH); }
     for (var y = 0; y <= rows; y++) { ctx.moveTo(0, y * CELL + 0.5); ctx.lineTo(cssW, y * CELL + 0.5); }
@@ -100,7 +101,7 @@
       for (c = 0; c < cols; c++) {
         v = grid[idx(c, r)];
         if (mode === "life") {
-          if (v) { ctx.fillStyle = "#111"; ctx.fillRect(c * CELL + 1, r * CELL + 1, CELL - 1, CELL - 1); }
+          if (v) { ctx.fillStyle = dark ? "#e8e8e8" : "#111"; ctx.fillRect(c * CELL + 1, r * CELL + 1, CELL - 1, CELL - 1); }
         } else if (v === 1) {
           ctx.fillStyle = COL_TREE; ctx.fillRect(c * CELL + 1, r * CELL + 1, CELL - 1, CELL - 1);
         } else if (v === 2) {
@@ -109,6 +110,7 @@
       }
     }
   }
+  window.addEventListener("themechange", function () { draw(); });
 
   function stepLife() {
     for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) {

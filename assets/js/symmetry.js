@@ -159,7 +159,7 @@
 
   function drawGrid() {
     setT({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 });
-    ctx.strokeStyle = "rgba(0,0,0,0.18)"; ctx.lineWidth = 0.6;
+    ctx.strokeStyle = "rgba(28,84,229,0.35)"; ctx.lineWidth = 1;
     var rng = latticeRange(), i, j;
     if (frieze) {
       var yc = H / 2;
