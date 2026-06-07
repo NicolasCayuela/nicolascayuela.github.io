@@ -191,12 +191,12 @@
     // colormap floor and the resting opacity to keep the lattice visible
     var dark = document.documentElement.classList.contains("theme-dark");
     var tFloor = dark ? 0.10 : 0;
-    var baseA = dark ? 0.45 : CFG.baseAlpha;
+    var baseA = dark ? 0.58 : CFG.baseAlpha;
     // pure jet blue is too dim on black: blend resting colors toward white,
     // fading the lift out as amplitude rises so crests stay saturated
     function lift(col, t) {
       if (!dark) return col;
-      var f = 0.35 * (1 - t);
+      var f = 0.55 * (1 - t);
       return [
         (col[0] + (255 - col[0]) * f) | 0,
         (col[1] + (255 - col[1]) * f) | 0,
@@ -238,7 +238,7 @@
       var ns = nd.strain / maxStrain; if (ns > 1) ns = 1;
       var nc = lift(jet(tFloor + ns * (HUECAP - tFloor)), ns);
       ctx.fillStyle = "rgba(" + nc[0] + "," + nc[1] + "," + nc[2] + "," +
-        ((dark ? 0.75 : CFG.nodeAlpha) * (0.4 + 0.6 * ns)).toFixed(3) + ")";
+        ((dark ? 0.9 : CFG.nodeAlpha) * (0.4 + 0.6 * ns)).toFixed(3) + ")";
       var rad = 0.9 + ns * 1.9;
       ctx.beginPath();
       ctx.arc(nd.x, nd.y, rad, 0, 6.2832);

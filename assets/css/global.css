@@ -379,3 +379,59 @@ html.theme-dark .wv-canvas,
 html.theme-dark .dg-canvas {
     box-shadow: 0 6px 22px rgba(0, 0, 0, .5) !important;
 }
+
+/* ===== Mobile layout (phones) ===== */
+@media (max-width: 575.98px) {
+    /* tighter cards: the p-4 padding wastes a third of a phone screen */
+    .card-body.p-4 {
+        padding: 1.1rem !important;
+    }
+
+    h1, .h1 {
+        font-size: 2rem;
+    }
+
+    /* education / experience rows: small logo, title + date wrap */
+    .cv-item {
+        gap: .6rem;
+        padding: .7rem .15rem;
+    }
+
+    .cv-logo {
+        flex: 0 0 64px;
+    }
+
+    .cv-logo img {
+        height: 40px;
+        max-width: 64px;
+    }
+
+    .cv-title {
+        font-size: .92rem;
+    }
+
+    .cv-body > .d-flex {
+        flex-wrap: wrap;
+    }
+
+    .cv-date {
+        margin-left: 0;
+        margin-top: .3rem;
+        order: 2;
+    }
+
+    /* publications: stack the cover above the text */
+    .pub-item {
+        flex-direction: column;
+    }
+
+    .pub-cover {
+        flex: 0 0 auto;
+        text-align: center;
+    }
+
+    .pub-cover img {
+        width: 100%;
+        max-width: 240px;
+    }
+}
