@@ -179,6 +179,7 @@
     draw();
   }
 
+  var lastDark = null;          // tracks theme to update canvas opacity only on change
   var LEVELS = 16;              // colormap quantisation; each level = one batched stroke
   // normalise against a single wave's crest (not the dynamic max) so every
   // wavefront reaches red all the way round; interference just stays clamped at red.
@@ -190,13 +191,18 @@
     // dark theme: the jet low end (dark blue) vanishes on black, so lift the
     // colormap floor and the resting opacity to keep the lattice visible
     var dark = document.documentElement.classList.contains("theme-dark");
+    // the whole-canvas opacity also caps visibility: raise it on dark
+    if (dark !== lastDark) {
+      lastDark = dark;
+      canvas.style.opacity = dark ? 0.9 : CFG.opacity;
+    }
     var tFloor = dark ? 0.10 : 0;
-    var baseA = dark ? 0.58 : CFG.baseAlpha;
+    var baseA = dark ? 0.7 : CFG.baseAlpha;
     // pure jet blue is too dim on black: blend resting colors toward white,
     // fading the lift out as amplitude rises so crests stay saturated
     function lift(col, t) {
       if (!dark) return col;
-      var f = 0.55 * (1 - t);
+      var f = 0.7 * (1 - t);
       return [
         (col[0] + (255 - col[0]) * f) | 0,
         (col[1] + (255 - col[1]) * f) | 0,
