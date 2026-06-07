@@ -23,7 +23,6 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .text-profile-bio {
-    /* font-family: "Raleway"; */
     font-weight: 400;
 }
 
@@ -341,11 +340,15 @@ html.theme-dark mark {
 /* ===== Playground (dark) ===== */
 /* canvases whose renderers are theme-aware (JS picks light colors on dark) */
 html.theme-dark #gol-canvas,
-html.theme-dark #gd-canvas,
+html.theme-dark #gd-canvas {
+    background: #101216 !important;
+}
+
 html.theme-dark .cf-canvas,
 html.theme-dark .wv-canvas,
 html.theme-dark .dg-canvas {
     background: #101216 !important;
+    box-shadow: 0 6px 22px rgba(0, 0, 0, .5) !important;
 }
 
 /* output canvases waiting for content */
@@ -392,12 +395,6 @@ html.theme-dark #w2v-area .wv-chip {
 
 html.theme-dark #style-area .st-thumb {
     border-color: #3a3a3a !important;
-}
-
-html.theme-dark .cf-canvas,
-html.theme-dark .wv-canvas,
-html.theme-dark .dg-canvas {
-    box-shadow: 0 6px 22px rgba(0, 0, 0, .5) !important;
 }
 
 /* ===== Mobile layout (phones) ===== */
