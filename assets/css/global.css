@@ -252,6 +252,14 @@ html.theme-dark .cv-pos em {
     color: #98a2b3;
 }
 
+/* logos are transparent PNGs with dark text: give them a white tile */
+html.theme-dark .cv-logo img {
+    background: #fff;
+    border-radius: 6px;
+    padding: 5px 8px;
+    box-sizing: content-box;
+}
+
 html.theme-dark .cv-date {
     color: #8fb9e8;
     background: #16243f;
