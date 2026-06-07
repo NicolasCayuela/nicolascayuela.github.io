@@ -5,9 +5,6 @@ pages:
 - name: Publications
   name_fr: Publications
   url: publications
-- name: Research space
-  name_fr: Espace de recherche
-  url: research-map
 - name: Metamaterials space
   name_fr: Espace métamatériaux
   url: metamaterials-space
