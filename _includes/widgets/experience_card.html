@@ -7,9 +7,25 @@
     .cv-logo img { height: 58px; width: auto; max-width: 150px; object-fit: contain; }
     .cv-body { flex: 1 1 auto; min-width: 0; }
     .cv-title { font-size: 1rem; font-weight: 600; margin: 0; }
-    .cv-date { font-size: .68rem; font-weight: 700; letter-spacing: .05em; color: #1c54e5;
-        background: #e8eefc; border-radius: 10px; padding: .15rem .6rem; white-space: nowrap;
-        align-self: flex-start; margin-left: .6rem; margin-top: .1rem; }
+    .cv-date { display: inline-flex; align-items: center; gap: .35rem;
+        font-size: .68rem; font-weight: 600; letter-spacing: .06em;
+        font-variant-numeric: tabular-nums; color: #2b4acb;
+        background: linear-gradient(180deg, #f4f7ff, #e7edfc);
+        border: 1px solid #d6e0f7; border-radius: 999px; padding: .25rem .7rem;
+        white-space: nowrap; align-self: flex-start; margin-left: .6rem; margin-top: .1rem;
+        box-shadow: 0 1px 2px rgba(28, 84, 229, .10); }
+    .cv-date::before { content: "\f073"; font-family: "Font Awesome 5 Free"; font-weight: 900;
+        font-size: .62rem; opacity: .65; letter-spacing: 0; }
+    /* ongoing position: green pill with a pulsing status dot instead of the calendar */
+    .cv-date-now { color: #0b7a4b; background: linear-gradient(180deg, #effbf4, #ddf3e7);
+        border-color: #bfe4d0; box-shadow: 0 1px 2px rgba(11, 122, 75, .10); }
+    .cv-date-now::before { content: ""; width: .42rem; height: .42rem; border-radius: 50%;
+        background: #18a266; animation: cv-pulse 2s ease-in-out infinite; }
+    @keyframes cv-pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(24, 162, 102, .45); }
+        50% { box-shadow: 0 0 0 4px rgba(24, 162, 102, 0); }
+    }
+    @media (prefers-reduced-motion: reduce) { .cv-date-now::before { animation: none; } }
     .cv-dept { font-size: .8rem; color: #6a7385; margin: .1rem 0 0; }
     .cv-pos { font-size: .8rem; margin: .15rem 0 0; }
     .cv-pos em { color: #6a7385; }
@@ -35,7 +51,7 @@
                         <div class="cv-body">
                             <div class="d-flex justify-content-between align-items-start">
                                 <p class="cv-title"><span class="lang-en">{{ item.name }}</span><span class="lang-fr">{{ site.data.profile.education_fr[forloop.index0].name }}</span></p>
-                                {% if item.date %}<span class="cv-date">{{ item.date }}</span>{% endif %}
+                                {% if item.date %}<span class="cv-date{% if item.date contains 'present' or item.date contains 'now' %} cv-date-now{% endif %}">{{ item.date }}</span>{% endif %}
                             </div>
                             {% if item.dept %}<p class="cv-dept">{{ item.dept }}</p>{% endif %}
                             <p class="cv-pos"><span class="lang-en">{{ item.position }}</span><span class="lang-fr">{{ site.data.profile.education_fr[forloop.index0].position }}</span></p>
@@ -69,7 +85,7 @@
                         <div class="cv-body">
                             <div class="d-flex justify-content-between align-items-start">
                                 <p class="cv-title"><span class="lang-en">{{ item.name }}</span><span class="lang-fr">{{ site.data.profile.experience_fr[forloop.index0].name }}</span></p>
-                                {% if item.date %}<span class="cv-date">{{ item.date }}</span>{% endif %}
+                                {% if item.date %}<span class="cv-date{% if item.date contains 'present' or item.date contains 'now' %} cv-date-now{% endif %}">{{ item.date }}</span>{% endif %}
                             </div>
                             {% if item.dept %}<p class="cv-dept">{{ item.dept }}</p>{% endif %}
                             <p class="cv-pos"><span class="lang-en">{{ item.position }}</span><span class="lang-fr">{{ site.data.profile.experience_fr[forloop.index0].position }}</span></p>

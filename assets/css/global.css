@@ -154,42 +154,53 @@ html.lang-active-fr .lang-fr {
 }
 
 /* ===== Dark theme (html.theme-dark) =====
-   Only the page background turns black; the white "rectangles"
-   (navbar, cards, panels) keep their light look. */
+   GitHub/YouTube-style: near-black page, dark-grey cards, light text. */
 html.theme-dark body,
 html.theme-dark body.bg-light {
     background-color: #000 !important;
-    color: #e8e8e8;
+    color: #e2e2e2;
 }
 
-/* navbar stays white like the cards */
 html.theme-dark .navbar.bg-light {
-    background-color: #fff !important;
+    background-color: #141414 !important;
 }
 
-/* cards keep the light theme: restore default text colors inside */
-html.theme-dark .card {
-    color: #212529;
+html.theme-dark .navbar-light .navbar-brand,
+html.theme-dark .navbar-light .navbar-nav .nav-link,
+html.theme-dark .navbar-light .navbar-toggler {
+    color: #d6d6d6;
 }
 
-/* text sitting directly on the black background */
-html.theme-dark .text-muted {
-    color: #9aa0a6 !important;
+html.theme-dark .navbar-light .navbar-brand:hover,
+html.theme-dark .navbar-light .navbar-nav .nav-link:hover,
+html.theme-dark .navbar-light .navbar-nav .active > .nav-link {
+    color: #fff;
 }
 
-html.theme-dark .text-black {
-    color: #e8e8e8 !important;
+html.theme-dark .navbar-light .navbar-toggler {
+    border-color: #3a3a3a;
 }
 
+html.theme-dark .card,
+html.theme-dark .bg-white {
+    background-color: #1a1a1a !important;
+    color: #e2e2e2;
+}
+
+html.theme-dark .text-black,
 html.theme-dark a.text-black:link,
 html.theme-dark a.text-black:visited,
 html.theme-dark a.text-black:hover,
 html.theme-dark a.text-black:active {
-    color: #e8e8e8;
+    color: #e8e8e8 !important;
+}
+
+html.theme-dark .text-muted {
+    color: #9aa0a6 !important;
 }
 
 html.theme-dark a:not(.btn):not(.nav-link):not(.text-black) {
-    color: #6ea8d8;
+    color: #7cb3e8;
 }
 
 html.theme-dark blockquote {
@@ -201,23 +212,67 @@ html.theme-dark hr {
     border-top-color: #333;
 }
 
-/* ...but inside white cards everything goes back to the light-theme colors */
-html.theme-dark .card .text-muted {
-    color: #6c757d !important;
+html.theme-dark .shadow-sm {
+    box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .7) !important;
 }
 
-html.theme-dark .card .text-black,
-html.theme-dark .card a.text-black:link,
-html.theme-dark .card a.text-black:visited,
-html.theme-dark .card a.text-black:hover,
-html.theme-dark .card a.text-black:active {
-    color: #000 !important;
+html.theme-dark .btn-outline-dark {
+    color: #d6d6d6;
+    border-color: #6a6a6a;
 }
 
-html.theme-dark .card a:not(.btn):not(.text-black) {
-    color: #007bff;
+html.theme-dark .btn-outline-dark:hover,
+html.theme-dark .btn-outline-dark:not(:disabled):not(.disabled).active,
+html.theme-dark .btn-dark {
+    color: #111;
+    background-color: #e8e8e8;
+    border-color: #e8e8e8;
 }
 
-html.theme-dark .card hr {
-    border-top-color: rgba(0, 0, 0, .1);
+html.theme-dark .lang-toggle,
+html.theme-dark .theme-toggle {
+    border-color: #3a3a3a;
+}
+
+html.theme-dark .lang-toggle-divider {
+    background-color: #3a3a3a;
+}
+
+/* CV items (education / experience) */
+html.theme-dark .cv-item {
+    border-bottom-color: #2a2a2a;
+}
+
+html.theme-dark .cv-item:hover {
+    background: #222;
+}
+
+html.theme-dark .cv-dept,
+html.theme-dark .cv-pos em {
+    color: #98a2b3;
+}
+
+html.theme-dark .cv-date {
+    color: #8fb9e8;
+    background: #16243f;
+    border-color: #2a3f63;
+    box-shadow: none;
+}
+
+html.theme-dark .cv-date-now {
+    color: #5fd0a0;
+    background: #0e2a1f;
+    border-color: #1e4a37;
+}
+
+/* chips & badges */
+html.theme-dark .blog-chip {
+    color: #aab4c8;
+    background: #242424;
+    border-color: #3a3a3a;
+}
+
+html.theme-dark .pub-badge {
+    color: #8fb9e8;
+    background: #16243f;
 }
