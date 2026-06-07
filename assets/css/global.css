@@ -284,3 +284,36 @@ html.theme-dark .pub-badge {
     color: #8fb9e8;
     background: #16243f;
 }
+
+/* publications list */
+html.theme-dark .pub-item {
+    border-bottom-color: #2a2a2a;
+}
+
+html.theme-dark .pub-item:hover {
+    background: #222;
+}
+
+html.theme-dark .pub-venue,
+html.theme-dark .pub-abstract {
+    color: #98a2b3;
+}
+
+html.theme-dark .pub-cover-placeholder {
+    color: #5d6878;
+    background: linear-gradient(135deg, #20242c, #181b21);
+}
+
+html.theme-dark .pub-links a {
+    color: #8fb9e8;
+    border-color: #2a3f63;
+}
+
+html.theme-dark .pub-links a:hover {
+    background: #2b4acb;
+    color: #fff;
+}
+
+html.theme-dark .pub-year-card {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, .55);
+}
