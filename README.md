@@ -14,7 +14,7 @@ Built with Jekyll on GitHub Pages, bilingual EN/FR, with an interactive ML/physi
 | Symmetry groups | drawing pad replicating strokes under the 17 wallpaper / 7 frieze groups | pure JS |
 | Gradient descent | SGD / Momentum / Adam rolling down 3D loss surfaces | canvas 3D |
 | Dog Creator | convolutional autoencoder + PCA on AFHQ dog faces, 64 latent sliders | PyTorch → ONNX, onnxruntime-web (WebGPU) |
-| Dog Diffusion | DDPM (eps-prediction UNet, 32x32) trained on AFHQ dogs, animated DDIM sampling | PyTorch → ONNX, onnxruntime-web (WebGPU) |
+| Dog Diffusion | DDPM (eps-prediction UNet, 64x64) trained on AFHQ dogs, animated DDIM sampling | PyTorch → ONNX, onnxruntime-web (WebGPU) |
 | Style transfer | fast neural style (Starry Night) + AdaIN arbitrary style with 23 public-domain paintings, up to 384px | PyTorch → ONNX, onnxruntime-web (WebGPU) |
 
 All models were trained on CPU with PyTorch (see `scripts/`) and exported to ONNX; inference runs client-side, no backend.

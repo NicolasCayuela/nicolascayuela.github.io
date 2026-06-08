@@ -64,7 +64,7 @@
   }
 
   function steps() {
-    return 60;                                 // fixed DDIM step count
+    return 100;                                // fixed DDIM step count (more = sharper, linearly slower)
   }
 
   function generate() {
