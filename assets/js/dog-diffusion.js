@@ -11,7 +11,7 @@
   if (!area || !canvas) return;
   var ctx = canvas.getContext("2d");
 
-  var ORT_URL = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.webgpu.min.js";
+  var ORT_URL = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/ort.webgpu.min.js";
   // try the GPU execution provider first, fall back to plain wasm
   function createSession(url) {
     return window.ort.InferenceSession.create(url, { executionProviders: ["webgpu", "wasm"] })

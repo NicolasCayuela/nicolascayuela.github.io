@@ -14,7 +14,7 @@
   var srcCtx = srcC.getContext("2d");
   var outCtx = outC.getContext("2d");
 
-  var ORT_URL = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.webgpu.min.js";
+  var ORT_URL = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/ort.webgpu.min.js";
   // try the GPU execution provider first, fall back to plain wasm
   var wasmOnly = false;
   function createSession(url) {
@@ -60,7 +60,7 @@
     if (sessions[style]) return Promise.resolve(sessions[style]);
     var base = area.getAttribute("data-base");
     setStatus("Loading style model…", "Chargement du modèle de style…");
-    return createSession(base + style + ".onnx?v=2").then(function (s) {
+    return createSession(base + style + ".onnx?v=3").then(function (s) {
       sessions[style] = s;
       return s;
     });
@@ -70,7 +70,7 @@
     if (adainSession) return Promise.resolve(adainSession);
     var base = area.getAttribute("data-base");
     setStatus("Loading AdaIN model (~28 MB)…", "Chargement du modèle AdaIN (~28 Mo)…");
-    return createSession(base + "adain.onnx?v=3").then(function (s) {
+    return createSession(base + "adain.onnx?v=4").then(function (s) {
       adainSession = s;
       return s;
     });
@@ -291,6 +291,8 @@
     if (inited) return;
     inited = true;
     setImageFromURL(area.getAttribute("data-sample"));   // sample dog photo
+    // warm the AdaIN session in the background so the first arbitrary-style click is instant
+    loadScript(ORT_URL).then(getAdainSession).catch(function () {});
   }
   window.__styleShow = init;
 })();
