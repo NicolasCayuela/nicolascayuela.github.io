@@ -165,7 +165,7 @@
     var base = area.getAttribute("data-base");
     Promise.all([
       loadScript(ORT_URL),
-      fetch(base + "dog_data.json?v=10").then(function (r) { return r.json(); })
+      fetch(base + "dog_data.json?v=11").then(function (r) { return r.json(); })
     ]).then(function (rs) {
       meta = rs[1];
       N = meta.latent || meta.stds.length;
@@ -173,7 +173,7 @@
       S = meta.img || 64;
       off.width = S; off.height = S;
       coords = new Float32Array(N);
-      return createSession(base + "dog_decoder.onnx?v=10");
+      return createSession(base + "dog_decoder.onnx?v=11");
     }).then(function (s) {
       session = s; ready = true; loading = false;
       setProgress(false);
@@ -191,10 +191,6 @@
 
   // ---- buttons ----
   function on(id, fn) { var el = document.getElementById(id); if (el) el.addEventListener("click", fn); }
-  on("dog-avg", function () {
-    if (!ready) return;
-    coords.fill(0); syncSliders(); requestRender();
-  });
   on("dog-random", function () {
     if (!ready) return;
     for (var i = 0; i < N; i++) coords[i] = randn() * meta.stds[i] * 0.85;
