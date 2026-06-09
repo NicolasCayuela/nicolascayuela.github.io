@@ -25,17 +25,17 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 CACHE = os.path.join(HERE, "afhq_cache")
 OUT_MODELS = os.path.join(HERE, "..", "assets", "models")
 IMG = 128
-LATENT = 512
+LATENT = 768                  # v6: wider latent for the residual+attention AE
 PCS = 64                      # principal components exposed as sliders
-EPOCHS = 150
-BATCH = 64
+EPOCHS = 300
+BATCH = 48                    # v6 is bigger (resblocks + attention); leave VRAM headroom
 LR_MAX, LR_MIN = 2e-4, 2e-5   # cosine decay
 THREADS = os.cpu_count() or 6
-PERC_W = 0.1                  # weight of the VGG perceptual loss vs pixel MSE
+PERC_W = 0.2                  # weight of the VGG perceptual loss vs pixel MSE (v6: stronger)
 Z_NOISE = 0.05                # latent noise (fraction of batch latent std) -> smoother sliders
 DOG_LABEL = 1                 # huggan/AFHQ: cat=0, dog=1, wild=2
 SAMPLES_IN_JSON = 300
-WARM_START = None             # v5 arch is new (128px, latent 512) - no warm start
+WARM_START = None             # v6 arch is new (resblocks + attention) - no warm start
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 torch.manual_seed(7)
@@ -61,60 +61,106 @@ def load_dogs():
     return data.permute(0, 3, 1, 2).contiguous()     # N x 3 x IMG x IMG
 
 
-def down_block(cin, cout):
-    """Strided conv + an extra 3x3 conv per scale for depth."""
-    return [nn.Conv2d(cin, cout, 4, 2, 1), nn.BatchNorm2d(cout), nn.ReLU(True),
-            nn.Conv2d(cout, cout, 3, padding=1), nn.BatchNorm2d(cout), nn.ReLU(True)]
+class ResBlock(nn.Module):
+    """GroupNorm-SiLU-conv residual block (the diffusion v4 block minus the
+    time embedding). GroupNorm + 1x1 skip; SiLU activation."""
+    def __init__(self, cin, cout):
+        super().__init__()
+        self.norm1 = nn.GroupNorm(8, cin)
+        self.conv1 = nn.Conv2d(cin, cout, 3, padding=1)
+        self.norm2 = nn.GroupNorm(8, cout)
+        self.conv2 = nn.Conv2d(cout, cout, 3, padding=1)
+        self.skip = nn.Conv2d(cin, cout, 1) if cin != cout else nn.Identity()
+        self.act = nn.SiLU()
+
+    def forward(self, x):
+        h = self.conv1(self.act(self.norm1(x)))
+        h = self.conv2(self.act(self.norm2(h)))
+        return h + self.skip(x)
 
 
-def up_block(cin, cout):
-    """Upsample + double conv avoids the checkerboard artifacts of ConvTranspose."""
-    return [nn.Upsample(scale_factor=2, mode="nearest"),
-            nn.Conv2d(cin, cout, 3, padding=1), nn.BatchNorm2d(cout), nn.ReLU(True),
-            nn.Conv2d(cout, cout, 3, padding=1), nn.BatchNorm2d(cout), nn.ReLU(True)]
+class SelfAttention(nn.Module):
+    """Multi-head spatial self-attention at 16x16: every position attends to
+    all others -> global face coherence (symmetric eyes, consistent colour).
+    Same module as build_dog_diffusion_v4.py; exports cleanly to ONNX/WebGPU."""
+    def __init__(self, c, heads=4):
+        super().__init__()
+        self.heads = heads
+        self.norm = nn.GroupNorm(8, c)
+        self.qkv = nn.Conv2d(c, 3 * c, 1)
+        self.proj = nn.Conv2d(c, c, 1)
+        self.scale = (c // heads) ** -0.5
+
+    def forward(self, x):
+        n, c, h, w = x.shape
+        hd, dh = self.heads, c // self.heads
+        qkv = self.qkv(self.norm(x)).reshape(n, 3, hd, dh, h * w)
+        q, k, v = qkv[:, 0], qkv[:, 1], qkv[:, 2]
+        attn = torch.softmax(q.transpose(-2, -1) @ k * self.scale, dim=-1)
+        out = (v @ attn.transpose(-2, -1)).reshape(n, c, h, w)
+        return x + self.proj(out)
 
 
 class Encoder(nn.Module):
+    """v6: residual blocks + self-attention at 16x16, 128->4 px, flat latent."""
     def __init__(self):
         super().__init__()
         self.net = nn.Sequential(
-            *down_block(3, 64),                        # 64
-            *down_block(64, 128),                      # 32
-            *down_block(128, 256),                     # 16
-            *down_block(256, 512),                     # 8
-            *down_block(512, 512),                     # 4
+            nn.Conv2d(3, 48, 3, padding=1),                    # 128
+            ResBlock(48, 48), ResBlock(48, 48),
+            nn.Conv2d(48, 96, 4, 2, 1),                        # 64
+            ResBlock(96, 96), ResBlock(96, 96),
+            nn.Conv2d(96, 192, 4, 2, 1),                       # 32
+            ResBlock(192, 192), ResBlock(192, 192),
+            nn.Conv2d(192, 320, 4, 2, 1),                      # 16
+            ResBlock(320, 320), ResBlock(320, 320),
+            SelfAttention(320),
+            nn.Conv2d(320, 384, 4, 2, 1),                      # 8
+            ResBlock(384, 384), ResBlock(384, 384),
+            nn.Conv2d(384, 384, 4, 2, 1),                      # 4
+            ResBlock(384, 384),
             nn.Flatten(),
-            nn.Linear(512 * 4 * 4, LATENT),
+            nn.Linear(384 * 4 * 4, LATENT),
         )
 
     def forward(self, x):
         return self.net(x)
 
 
+def up(cin, cout):
+    """Nearest upsample + 3x3 conv (anti-checkerboard) then a residual block."""
+    return [nn.Upsample(scale_factor=2, mode="nearest"),
+            nn.Conv2d(cin, cout, 3, padding=1), ResBlock(cout, cout)]
+
+
 class Decoder(nn.Module):
+    """v6 mirror: flat latent -> 4x4, residual upsampling, attention at 16x16."""
     def __init__(self):
         super().__init__()
-        self.fc = nn.Linear(LATENT, 512 * 4 * 4)
+        self.fc = nn.Linear(LATENT, 384 * 4 * 4)
         self.net = nn.Sequential(
-            *up_block(512, 512),                       # 8
-            *up_block(512, 256),                       # 16
-            *up_block(256, 128),                       # 32
-            *up_block(128, 64),                        # 64
-            nn.Upsample(scale_factor=2, mode="nearest"),
-            nn.Conv2d(64, 32, 3, padding=1), nn.BatchNorm2d(32), nn.ReLU(True),
-            nn.Conv2d(32, 3, 3, padding=1), nn.Sigmoid(),  # 128
+            ResBlock(384, 384),                                # 4
+            *up(384, 384),                                     # 8
+            *up(384, 320),                                     # 16
+            SelfAttention(320),
+            *up(320, 192),                                     # 32
+            *up(192, 96),                                      # 64
+            *up(96, 48),                                       # 128
+            nn.GroupNorm(8, 48), nn.SiLU(),
+            nn.Conv2d(48, 3, 3, padding=1), nn.Sigmoid(),
         )
 
     def forward(self, z):
-        h = self.fc(z).view(-1, 512, 4, 4)
+        h = self.fc(z).view(-1, 384, 4, 4)
         return self.net(h)
 
 
 class VGGFeats(nn.Module):
     """Frozen slice of the AdaIN-normalised VGG used as a multi-scale
-    perceptual loss: feature-space MSE at relu1_2 / relu2_2 / relu3_1 makes
-    reconstructions much sharper than pixel MSE alone (low layers add edge
-    and texture detail). Weights: scripts/adain_vgg.pth (MIT)."""
+    perceptual loss: feature-space MSE at relu1_2 / relu2_2 / relu3_1 / relu4_1
+    makes reconstructions much sharper than pixel MSE alone (low layers add edge
+    and texture detail, relu4_1 adds higher-level structure). Weights:
+    scripts/adain_vgg.pth (MIT)."""
     def __init__(self):
         super().__init__()
         vgg = nn.Sequential(
@@ -126,13 +172,18 @@ class VGGFeats(nn.Module):
             nn.ReflectionPad2d(1), nn.Conv2d(128, 128, 3), nn.ReLU(),    # idx 13: relu2_2
             nn.MaxPool2d(2, 2),
             nn.ReflectionPad2d(1), nn.Conv2d(128, 256, 3), nn.ReLU(),    # idx 17: relu3_1
+            nn.ReflectionPad2d(1), nn.Conv2d(256, 256, 3), nn.ReLU(),    # relu3_2
+            nn.ReflectionPad2d(1), nn.Conv2d(256, 256, 3), nn.ReLU(),    # relu3_3
+            nn.ReflectionPad2d(1), nn.Conv2d(256, 256, 3), nn.ReLU(),    # relu3_4
+            nn.MaxPool2d(2, 2),
+            nn.ReflectionPad2d(1), nn.Conv2d(256, 512, 3), nn.ReLU(),    # idx 30: relu4_1
         )
         vgg.load_state_dict(torch.load(os.path.join(HERE, "adain_vgg.pth"),
                                        map_location="cpu", weights_only=True), strict=False)
         for p in vgg.parameters():
             p.requires_grad_(False)
         self.net = vgg.eval()
-        self.taps = (7, 14, 18)                  # slice ends just past each tap ReLU
+        self.taps = (7, 14, 18, 31)              # relu1_2 / relu2_2 / relu3_1 / relu4_1
 
     def forward(self, x):                        # x in [0, 1]
         feats, prev = [], 0
@@ -167,7 +218,7 @@ def main():
     opt = torch.optim.Adam(list(enc.parameters()) + list(dec.parameters()), lr=LR_MAX)
     loss_fn = nn.MSELoss()
 
-    ckpt_path = os.path.join(HERE, "dog_ae5.pt")
+    ckpt_path = os.path.join(HERE, "dog_ae6.pt")
     start_epoch = 0
     if os.path.exists(ckpt_path):
         ck = torch.load(ckpt_path, map_location="cpu", weights_only=True)
@@ -199,7 +250,7 @@ def main():
             z = z + Z_NOISE * z.detach().std() * torch.randn_like(z)
             out = dec(z)
             pix = loss_fn(out, x)
-            perc = sum(loss_fn(fo, ft) for fo, ft in zip(vgg(out), vgg(x))) / 3
+            perc = sum(loss_fn(fo, ft) for fo, ft in zip(vgg(out), vgg(x))) / len(vgg.taps)
             loss = pix + PERC_W * perc
             loss.backward()
             opt.step()
