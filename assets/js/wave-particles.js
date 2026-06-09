@@ -176,7 +176,7 @@
       n.strain = Math.sqrt(ux * ux + uy * uy);
     }
 
-    draw();
+    draw(REF);                    // normalise node colour/size against the crest reference
   }
 
   var lastDark = null;          // tracks theme to update canvas opacity only on change
@@ -185,7 +185,7 @@
   // wavefront reaches red all the way round; interference just stays clamped at red.
   var REF = CFG.amp * 0.95;       // sets where the colormap saturates; lower -> more orange/yellow at the fronts
   var HUECAP = 0.82;              // compress colormap so the top is bright orange-red, not dark red
-  function draw() {
+  function draw(maxStrain) {
     ctx.clearRect(0, 0, W, H);
 
     // dark theme: the jet low end (dark blue) vanishes on black, so lift the
