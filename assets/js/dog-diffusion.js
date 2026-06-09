@@ -74,6 +74,7 @@
     var K = steps(), T = meta.tsteps, acp = meta.acp;
     var plane = 3 * IMG * IMG;
     var x = new Float32Array(plane);
+    var x0buf = new Float32Array(plane);     // the clean-image estimate, shown each step
     for (var i = 0; i < plane; i++) x[i] = randn();
     draw(x);
 
@@ -103,9 +104,10 @@
         for (var i = 0; i < plane; i++) {
           var x0 = (x[i] - s1a * eps[i]) / sa;
           if (x0 > 1) x0 = 1; else if (x0 < -1) x0 = -1;
+          x0buf[i] = x0;
           x[i] = sap * x0 + s1ap * eps[i];
         }
-        draw(x);
+        draw(x0buf);                           // show the predicted clean dog (forms from step 1), not the noisy state
         if (xin.dispose) xin.dispose();        // free WebGPU buffers (no-op on wasm)
         if (tin.dispose) tin.dispose();
         if (out.eps.dispose) out.eps.dispose();
