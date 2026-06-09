@@ -18,7 +18,8 @@
     return window.ort.InferenceSession.create(url, { executionProviders: ["webgpu", "wasm"] })
       .catch(function () { return window.ort.InferenceSession.create(url); });
   }
-  var N = 0;                                 // number of PCs (from the JSON)
+  var N = 0;                                 // decoder input dim = full PCA coords (from JSON)
+  var nSliders = 0;                          // how many top components get a UI slider
   var session = null, meta = null, loading = false, ready = false;
   var coords = null;                         // current PCA coordinates
   var sliders = [];
@@ -61,7 +62,7 @@
     var wrap = document.getElementById("dog-sliders");
     if (!wrap) return;
     wrap.innerHTML = "";
-    for (var i = 0; i < N; i++) {
+    for (var i = 0; i < nSliders; i++) {
       (function (i) {
         var row = document.createElement("div");
         row.className = "dg-row";
@@ -90,7 +91,7 @@
   }
 
   function syncSliders() {
-    for (var i = 0; i < N; i++) {
+    for (var i = 0; i < nSliders; i++) {
       var v = meta.stds[i] > 1e-8 ? (coords[i] / meta.stds[i]) * 100 : 0;
       sliders[i].value = Math.max(-300, Math.min(300, Math.round(v)));
       chipText(i);
@@ -164,14 +165,15 @@
     var base = area.getAttribute("data-base");
     Promise.all([
       loadScript(ORT_URL),
-      fetch(base + "dog_data.json?v=9").then(function (r) { return r.json(); })
+      fetch(base + "dog_data.json?v=10").then(function (r) { return r.json(); })
     ]).then(function (rs) {
       meta = rs[1];
       N = meta.latent || meta.stds.length;
+      nSliders = Math.min(meta.sliders || N, N);
       S = meta.img || 64;
       off.width = S; off.height = S;
       coords = new Float32Array(N);
-      return createSession(base + "dog_decoder.onnx?v=9");
+      return createSession(base + "dog_decoder.onnx?v=10");
     }).then(function (s) {
       session = s; ready = true; loading = false;
       setProgress(false);

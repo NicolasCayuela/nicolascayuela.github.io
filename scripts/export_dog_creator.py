@@ -12,7 +12,7 @@ import torch
 from PIL import Image
 
 from build_dog_creator import (Encoder, Decoder, PCADecoder, load_dogs,
-                               PCS, IMG, OUT_MODELS, SAMPLES_IN_JSON, HERE)
+                               PCS, SLIDERS, IMG, OUT_MODELS, SAMPLES_IN_JSON, HERE)
 from build_dog_diffusion import onnx_to_fp16
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -54,7 +54,7 @@ def main():
 
     pick = torch.randperm(n)[:SAMPLES_IN_JSON]
     samples = proj[pick, :PCS]
-    js = {"latent": PCS, "img": IMG,
+    js = {"latent": PCS, "sliders": SLIDERS, "img": IMG,
           "stds": [round(float(v), 4) for v in stds[:PCS]],
           "samples": [[round(float(v), 2) for v in row] for row in samples]}
     with open(os.path.join(OUT_MODELS, "dog_data.json"), "w") as f:

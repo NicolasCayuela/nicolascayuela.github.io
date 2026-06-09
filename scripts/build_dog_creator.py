@@ -26,7 +26,8 @@ CACHE = os.path.join(HERE, "afhq_cache")
 OUT_MODELS = os.path.join(HERE, "..", "assets", "models")
 IMG = 128
 LATENT = 768                  # v6: wider latent for the residual+attention AE
-PCS = 64                      # principal components exposed as sliders
+SLIDERS = 64                  # PCA components exposed as UI sliders (top, most semantic)
+PCS = LATENT                  # components fed to the decoder: full latent = no truncation blur
 EPOCHS = 300
 BATCH = 48                    # v6 is bigger (resblocks + attention); leave VRAM headroom
 LR_MAX, LR_MIN = 2e-4, 2e-5   # cosine decay
@@ -295,6 +296,7 @@ def main():
     samples = proj[pick, :PCS]
     js = {
         "latent": PCS,
+        "sliders": SLIDERS,
         "img": IMG,
         "stds": [round(float(v), 4) for v in stds[:PCS]],
         "samples": [[round(float(v), 2) for v in row] for row in samples],
