@@ -165,7 +165,7 @@
     var base = area.getAttribute("data-base");
     Promise.all([
       loadScript(ORT_URL),
-      fetch(base + "dog_data.json?v=11").then(function (r) { return r.json(); })
+      fetch(base + "dog_data.json?v=12").then(function (r) { return r.json(); })
     ]).then(function (rs) {
       meta = rs[1];
       N = meta.latent || meta.stds.length;
@@ -173,15 +173,21 @@
       S = meta.img || 64;
       off.width = S; off.height = S;
       coords = new Float32Array(N);
-      return createSession(base + "dog_decoder.onnx?v=11");
+      return createSession(base + "dog_decoder.onnx?v=12");
     }).then(function (s) {
       session = s; ready = true; loading = false;
       setProgress(false);
       setStatus("", "");
       buildSliders();
-      for (var i = 0; i < N; i++) coords[i] = randn() * meta.stds[i] * 0.85;
+      // start on a real dataset dog (sharp) rather than the blurry mean
+      if (meta.samples && meta.samples.length) {
+        var row = meta.samples[Math.floor(Math.random() * meta.samples.length)];
+        for (var i = 0; i < N; i++) coords[i] = row[i];
+      } else {
+        for (var i = 0; i < N; i++) coords[i] = randn() * meta.stds[i] * 0.85;
+      }
       syncSliders();
-      render();                              // start on a random dog, not the mean
+      render();
     }).catch(function (e) {
       loading = false;
       setProgress(false);
