@@ -68,8 +68,9 @@
   }
 
   function generate() {
-    if (!ready || running) { if (running) runId++; return; }
+    if (!ready || running) return;           // ignore clicks while a run is in flight
     running = true;
+    if (genBtn) genBtn.disabled = true;
     var myRun = ++runId;
     var K = steps(), T = meta.tsteps, acp = meta.acp;
     var plane = 3 * IMG * IMG;
@@ -83,9 +84,9 @@
 
     var stepIdx = 0;
     function step() {
-      if (myRun !== runId) { running = false; setStatus("", ""); generate(); return; }
       if (stepIdx >= K) {
         running = false;
+        if (genBtn) genBtn.disabled = false;
         setStatus("Done.", "Terminé.");
         return;
       }
@@ -110,6 +111,7 @@
         setTimeout(step, 30);                  // let the canvas update visibly
       }).catch(function (e) {
         running = false;
+        if (genBtn) genBtn.disabled = false;
         setStatus("Sampling failed: " + e, "Échec de l'échantillonnage : " + e);
       });
     }
