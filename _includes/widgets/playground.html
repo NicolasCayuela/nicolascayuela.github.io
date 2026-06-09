@@ -9,10 +9,10 @@
 
                 <!-- mode switch: Game of Life / Forest fire / Symmetry groups -->
                 <div class="btn-group btn-group-sm mb-3 flex-wrap" role="group">
-                    <button id="gol-mode-ddpm" type="button" class="btn btn-outline-dark">
+                    <button id="gol-mode-ddpm" type="button" class="btn btn-outline-dark active">
                         <i class="fas fa-magic"></i> <span class="lang-en">Dog Diffusion</span><span class="lang-fr">Diffusion de chiens</span>
                     </button>
-                    <button id="gol-mode-cifar" type="button" class="btn btn-outline-dark active">
+                    <button id="gol-mode-cifar" type="button" class="btn btn-outline-dark">
                         <i class="fas fa-image"></i> <span class="lang-en">CIFAR-100 Latent space</span><span class="lang-fr">Espace latent CIFAR-100</span>
                     </button>
                     <button id="gol-mode-w2v" type="button" class="btn btn-outline-dark">
@@ -266,7 +266,7 @@
                 </div>
 
                 <!-- ============ CIFAR-100 dataset explorer ============ -->
-                <div id="cifar-area">
+                <div id="cifar-area" class="d-none">
                     <p class="small text-muted mx-1 mb-3">
                         <span class="lang-en">A <strong>latent space</strong> is a low-dimensional map where each image is encoded to a point, so that visually similar images land close together. Here every real CIFAR-100 image is a dot, coloured by its class (100 classes), laid out in 3D. <strong>Drag to rotate</strong> the cloud, <strong>scroll to zoom</strong>, <strong>move the cursor</strong> through the space and the left panel shows the image at the nearest point. Dataset: <a href="https://www.cs.toronto.edu/~kriz/cifar.html" target="_blank" rel="noopener">CIFAR-100</a> (Krizhevsky, 2009).</span>
                         <span class="lang-fr">Un <strong>espace latent</strong> est une carte en faible dimension où chaque image est encodée en un point, de sorte que les images visuellement proches se retrouvent voisines. Ici chaque vraie image CIFAR-100 est un point, coloré selon sa classe (100 classes), disposé en 3D. <strong>Glisse pour tourner</strong> le nuage, <strong>molette pour zoomer</strong>, <strong>déplace le curseur</strong> dans l'espace et le panneau de gauche montre l'image du point le plus proche. Jeu de données : <a href="https://www.cs.toronto.edu/~kriz/cifar.html" target="_blank" rel="noopener">CIFAR-100</a> (Krizhevsky, 2009).</span>
@@ -372,7 +372,7 @@
                 </div>
 
                 <!-- ============ Dog Diffusion (DDPM) ============ -->
-                <div id="ddpm-area" class="d-none" data-base="{{ '/assets/models/' | relative_url }}">
+                <div id="ddpm-area" data-base="{{ '/assets/models/' | relative_url }}">
                     <p class="small text-muted mx-1 mb-3">
                         <span class="lang-en">A <strong>diffusion model</strong> learns to reverse a gradual noising process: starting from pure noise, a UNet predicts and removes the noise step by step until an image appears. This one was trained in PyTorch on AFHQ dog faces (128&times;128) and runs live in your browser. Press <strong>Generate</strong> and watch a dog emerge from the noise. DDPM: <a href="https://arxiv.org/abs/2006.11239" target="_blank" rel="noopener">Ho et al. (2020)</a>; DDIM sampler: <a href="https://arxiv.org/abs/2010.02502" target="_blank" rel="noopener">Song et al. (2020)</a>; data: <a href="https://arxiv.org/abs/1912.01865" target="_blank" rel="noopener">AFHQ (Choi et al., 2020)</a>.</span>
                         <span class="lang-fr">Un <strong>modèle de diffusion</strong> apprend à inverser un processus de bruitage progressif : à partir de bruit pur, un UNet prédit et retire le bruit étape par étape jusqu'à ce qu'une image apparaisse. Celui-ci a été entraîné avec PyTorch sur des visages de chiens AFHQ (128&times;128) et tourne en direct dans ton navigateur. Clique sur <strong>Générer</strong> et regarde un chien émerger du bruit. DDPM : <a href="https://arxiv.org/abs/2006.11239" target="_blank" rel="noopener">Ho et al. (2020)</a> ; échantillonneur DDIM : <a href="https://arxiv.org/abs/2010.02502" target="_blank" rel="noopener">Song et al. (2020)</a> ; données : <a href="https://arxiv.org/abs/1912.01865" target="_blank" rel="noopener">AFHQ (Choi et al., 2020)</a>.</span>
@@ -562,3 +562,5 @@
 <script src="{{ '/assets/js/dog-diffusion.js' | relative_url }}?v=17"></script>
 <script src="{{ '/assets/js/style-transfer.js' | relative_url }}?v=12"></script>
 <script src="{{ '/assets/js/word2vec.js' | relative_url }}?v=6"></script>
+<!-- Dog Diffusion is the default open tab: lazy-init its model on load -->
+<script>if (window.__ddpmShow) window.__ddpmShow();</script>
