@@ -140,6 +140,8 @@
       ctx.imageSmoothingEnabled = true;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(off, 0, 0, canvas.width, canvas.height);
+      if (input.dispose) input.dispose();      // free WebGPU buffers (no-op on wasm)
+      if (out.img.dispose) out.img.dispose();
       rendering = false;
       if (histPending && !pending) { histPending = false; addHistory(); }
       if (pending) { pending = false; render(); }

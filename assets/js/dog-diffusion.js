@@ -18,7 +18,7 @@
       .catch(function () { return window.ort.InferenceSession.create(url); });
   }
   var session = null, meta = null, loading = false, ready = false;
-  var running = false, runId = 0;
+  var running = false;
   var IMG = 32;
   var off = document.createElement("canvas");
   var offCtx = null;
@@ -71,7 +71,6 @@
     if (!ready || running) return;           // ignore clicks while a run is in flight
     running = true;
     if (genBtn) genBtn.disabled = true;
-    var myRun = ++runId;
     var K = steps(), T = meta.tsteps, acp = meta.acp;
     var plane = 3 * IMG * IMG;
     var x = new Float32Array(plane);
@@ -107,6 +106,9 @@
           x[i] = sap * x0 + s1ap * eps[i];
         }
         draw(x);
+        if (xin.dispose) xin.dispose();        // free WebGPU buffers (no-op on wasm)
+        if (tin.dispose) tin.dispose();
+        if (out.eps.dispose) out.eps.dispose();
         stepIdx++;
         setTimeout(step, 30);                  // let the canvas update visibly
       }).catch(function (e) {

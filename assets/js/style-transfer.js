@@ -135,34 +135,43 @@
     if (busy) { queued = true; return; }
     busy = true;
     setProgress(true);
+    var ins = [];                              // input tensors to free after the run
+    function freeIns() { ins.forEach(function (t) { if (t && t.dispose) t.dispose(); }); ins = []; }
     var run;
     if (cur.type === "adain") {
       run = loadScript(ORT_URL).then(function () {
         return Promise.all([getAdainSession(), getStyleTensor(cur.style)]);
       }).then(function (rs) {
         setStatus("Painting…", "Peinture en cours…");
-        return rs[0].run({
-          content: contentTensor(),
-          style: new window.ort.Tensor("float32", rs[1].slice(), [1, 3, SIZE, SIZE]),
-          alpha: new window.ort.Tensor("float32", new Float32Array([1]), [1])
-        });
+        var content = contentTensor();
+        var style = new window.ort.Tensor("float32", rs[1].slice(), [1, 3, SIZE, SIZE]);
+        var alpha = new window.ort.Tensor("float32", new Float32Array([1]), [1]);
+        ins.push(content, style, alpha);
+        return rs[0].run({ content: content, style: style, alpha: alpha });
       });
     } else {
       run = loadScript(ORT_URL).then(function () {
         return getSession(cur.style);
       }).then(function (session) {
         setStatus("Painting…", "Peinture en cours…");
-        return session.run({ input1: contentTensor() });
+        var content = contentTensor();
+        ins.push(content);
+        return session.run({ input1: content });
       });
     }
     run.then(function (out) {
-      lastStyled = out.output1.data;
+      // copy out of the tensor so we can free it and still re-blend on the
+      // strength slider (drawBlend reads lastStyled later)
+      lastStyled = out.output1.data.slice();
+      if (out.output1.dispose) out.output1.dispose();
+      freeIns();
       drawBlend();
       setStatus("", "");
       setProgress(false);
       busy = false;
       if (queued) { queued = false; stylize(); }
     }).catch(function (e) {
+      freeIns();
       setProgress(false);
       busy = false;
       if (!wasmOnly) {
@@ -207,6 +216,10 @@
   function setImageFromURL(url) {
     var im = new Image();
     im.onload = function () { srcImage = im; drawSource(); stylize(); };
+    im.onerror = function () {
+      setProgress(false);
+      setStatus("Couldn't load that image.", "Impossible de charger cette image.");
+    };
     im.src = url;
   }
 
