@@ -119,7 +119,7 @@
   function init() {
     if (loading || ready) return;
     loading = true;
-    setStatus("Loading model…", "Chargement du modèle…");
+    setStatus("Loading model (~54 MB)…", "Chargement du modèle (~54 Mo)…");
     var base = area.getAttribute("data-base");
     Promise.all([
       loadScript(ORT_URL),
@@ -146,6 +146,10 @@
   // the page is idle, so opening the tab / first Generate doesn't wait on the
   // full ~54 MB download. The WebGPU session is still compiled lazily on show.
   function prefetchModel() {
+    // Don't front-load 54 MB on metered or slow links: those users get the
+    // model lazily on demand (when they open the tab) instead.
+    var c = navigator.connection;
+    if (c && (c.saveData || /^(slow-2g|2g|3g)$/.test(c.effectiveType || ""))) return;
     var base = area.getAttribute("data-base");
     try {
       fetch(base + "dog_diffusion.onnx?v=6", { priority: "low" }).catch(function () {});
