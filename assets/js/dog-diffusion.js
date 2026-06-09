@@ -127,13 +127,13 @@
     var base = area.getAttribute("data-base");
     Promise.all([
       loadScript(ORT_URL),
-      fetch(base + "dog_diffusion.json?v=6").then(function (r) { return r.json(); })
+      fetch(base + "dog_diffusion.json?v=7").then(function (r) { return r.json(); })
     ]).then(function (rs) {
       meta = rs[1];
       IMG = meta.img;
       off.width = IMG; off.height = IMG;
       offCtx = off.getContext("2d");
-      return createSession(base + "dog_diffusion.onnx?v=6");
+      return createSession(base + "dog_diffusion.onnx?v=7");
     }).then(function (s) {
       session = s; ready = true; loading = false;
       setStatus("Ready - press Generate.", "Prêt - clique sur Générer.");
@@ -156,8 +156,8 @@
     if (c && (c.saveData || /^(slow-2g|2g|3g)$/.test(c.effectiveType || ""))) return;
     var base = area.getAttribute("data-base");
     try {
-      fetch(base + "dog_diffusion.onnx?v=6", { priority: "low" }).catch(function () {});
-      fetch(base + "dog_diffusion.json?v=6").catch(function () {});
+      fetch(base + "dog_diffusion.onnx?v=7", { priority: "low" }).catch(function () {});
+      fetch(base + "dog_diffusion.json?v=7").catch(function () {});
     } catch (e) {}
   }
   if (window.requestIdleCallback) window.requestIdleCallback(prefetchModel, { timeout: 4000 });
