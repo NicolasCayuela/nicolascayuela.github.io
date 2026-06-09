@@ -142,5 +142,18 @@
   var genBtn = document.getElementById("ddpm-generate");
   if (genBtn) genBtn.addEventListener("click", generate);
 
+  // Warm the HTTP cache for the large 128px model in the background as soon as
+  // the page is idle, so opening the tab / first Generate doesn't wait on the
+  // full ~54 MB download. The WebGPU session is still compiled lazily on show.
+  function prefetchModel() {
+    var base = area.getAttribute("data-base");
+    try {
+      fetch(base + "dog_diffusion.onnx?v=6", { priority: "low" }).catch(function () {});
+      fetch(base + "dog_diffusion.json?v=6").catch(function () {});
+    } catch (e) {}
+  }
+  if (window.requestIdleCallback) window.requestIdleCallback(prefetchModel, { timeout: 4000 });
+  else setTimeout(prefetchModel, 2000);
+
   window.__ddpmShow = init;
 })();
