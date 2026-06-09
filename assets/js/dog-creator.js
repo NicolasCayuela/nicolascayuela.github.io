@@ -175,7 +175,9 @@
       setProgress(false);
       setStatus("", "");
       buildSliders();
-      render();                              // average dog
+      for (var i = 0; i < N; i++) coords[i] = randn() * meta.stds[i] * 0.85;
+      syncSliders();
+      render();                              // start on a random dog, not the mean
     }).catch(function (e) {
       loading = false;
       setProgress(false);
