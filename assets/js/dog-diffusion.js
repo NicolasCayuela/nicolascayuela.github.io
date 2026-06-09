@@ -64,7 +64,7 @@
   }
 
   function steps() {
-    return 100;                                // fixed DDIM step count (more = sharper, linearly slower)
+    return 50;                                 // DDIM step count: 50 is sharp enough at 128px and ~2x faster than 100
   }
 
   function generate() {
