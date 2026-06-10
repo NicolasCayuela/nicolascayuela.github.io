@@ -28,6 +28,7 @@
   var srcImage = null;      // current source Image element
   var running = false, stopReq = false;
   var inited = false;
+  var tfPromise = null, basePromise = null;   // cached so a preload + a click never download twice
 
   var statusEl = document.getElementById("dream-status");
   function setStatus(en, fr) {
@@ -38,18 +39,21 @@
   }
 
   function loadScript(src) {
-    return new Promise(function (res, rej) {
-      if (window.tf) { res(); return; }
+    if (window.tf) return Promise.resolve();
+    if (tfPromise) return tfPromise;            // a load is already in flight
+    tfPromise = new Promise(function (res, rej) {
       var s = document.createElement("script");
       s.src = src; s.onload = res; s.onerror = rej;
       document.head.appendChild(s);
     });
+    return tfPromise;
   }
 
   function getBase() {
-    if (base) return Promise.resolve(base);
+    if (basePromise) return basePromise;        // dedupe concurrent loads (preload + click)
     setStatus("Loading MobileNet (~17 MB)…", "Chargement de MobileNet (~17 Mo)…");
-    return window.tf.loadLayersModel(MODEL_URL).then(function (m) { base = m; return m; });
+    basePromise = window.tf.loadLayersModel(MODEL_URL).then(function (m) { base = m; return m; });
+    return basePromise;
   }
 
   // Build the dog-maximizing gradient function once. MobileNet's declared input
@@ -120,21 +124,24 @@
     var btn = document.getElementById("dream-run");
     if (btn) btn.innerHTML = '<i class="fas fa-stop"></i> <span class="lang-en">Stop</span><span class="lang-fr">Arrêter</span>';
 
+    var tf, full = null, cur = null;
     try {
       await loadScript(TF_URL);
       await getBase();
-      var tf = window.tf;
+      tf = window.tf;
       buildGradFn();
 
       var iters = Math.round(ctrlVal("dream-iters", 20));
       var lr = ctrlVal("dream-step", 0.012);
       var octaves = Math.round(ctrlVal("dream-octaves", 3));
-      var maxSide = (typeof navigator !== "undefined" && navigator.gpu) ? 480 : 320;
+      // bigger working size on the fast WebGL backend -> a finer grid of dogs;
+      // stay small on the plain CPU backend so it doesn't freeze the tab
+      var maxSide = (tf.getBackend && tf.getBackend() === "webgl") ? 480 : 320;
       var octaveScale = 1.4;
 
-      var full = sourceTensor(maxSide);
+      full = sourceTensor(maxSide);
       var H = full.shape[1], W = full.shape[2];
-      var cur = tf.tidy(function () {
+      cur = tf.tidy(function () {
         var s = Math.pow(octaveScale, -(octaves - 1));
         return tf.image.resizeBilinear(full, [Math.round(H * s), Math.round(W * s)]);
       });
@@ -161,15 +168,15 @@
         await drawTensor(cur);
       }
 
-      full.dispose();
       var finalImg = tf.tidy(function () { return tf.image.resizeBilinear(cur, [H, W]); });
-      cur.dispose();
       await drawTensor(finalImg);
       finalImg.dispose();
       setStatus(stopReq ? "Stopped." : "Done.", stopReq ? "Arrêté." : "Terminé.");
     } catch (e) {
       setStatus("Failed: " + e, "Échec : " + e);
     } finally {
+      if (full && !full.isDisposed) full.dispose();
+      if (cur && !cur.isDisposed) cur.dispose();
       running = false;
       var b = document.getElementById("dream-run");
       if (b) b.innerHTML = '<i class="fas fa-magic"></i> <span class="lang-en">Dream</span><span class="lang-fr">Rêver</span>';
@@ -184,7 +191,7 @@
       var w = im.naturalWidth, h = im.naturalHeight, m = Math.max(w, h), s = 320 / m;
       outC.width = Math.round(w * s); outC.height = Math.round(h * s);
       outC.getContext("2d").drawImage(im, 0, 0, outC.width, outC.height);
-      setStatus("", "");
+      if (!(basePromise && !base)) setStatus("", "");   // don't clobber the "loading model" message
     };
     im.onerror = function () { setStatus("Couldn't load that image.", "Impossible de charger cette image."); };
     im.src = url;
@@ -214,10 +221,23 @@
     }
   });
 
+  // download tf.js + MobileNet in the background as soon as the tab is opened,
+  // so the first Dream click is instant instead of waiting on a ~17 MB fetch.
+  // Skip on metered / slow links: those users load it lazily on the first click.
+  function warm() {
+    var c = navigator.connection;
+    if (c && (c.saveData || /^(slow-2g|2g|3g)$/.test(c.effectiveType || ""))) return;
+    loadScript(TF_URL)
+      .then(getBase)
+      .then(function () { buildGradFn(); if (!running) setStatus("Ready - press Dream.", "Prêt - clique sur Rêver."); })
+      .catch(function () {});   // a failed warm just falls back to loading on click
+  }
+
   function init() {
     if (inited) return;
     inited = true;
     setImageFromURL(area.getAttribute("data-sample"));
+    warm();
   }
   window.__dreamShow = init;
 })();
