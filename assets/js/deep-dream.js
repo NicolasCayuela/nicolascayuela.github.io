@@ -1,11 +1,12 @@
 /*
- * Deep Dream (dogs everywhere): the classic Inceptionism look. We run a
- * pretrained ImageNet classifier (MobileNet v1, TF.js model hub) and, instead
- * of maximizing a layer's overall activation, we push the image toward the
- * network's DOG classes (ImageNet has ~120 dog breeds, indices 151-268). By
- * applying the classifier's 1x1 conv directly to the last conv feature map -
- * skipping the global pool - we get a *spatial* dog-logit map, so the gradient
- * ascent grows a dog face at every location: dogs hallucinate everywhere.
+ * Deep Dream (the classic Inceptionism look): gradient ascent on a deep layer of
+ * Inception, so the network's favourite shapes - dog faces, fur, eyes (ImageNet
+ * is dog-heavy) - hallucinate all over the image. We maximize the L2 of a deep
+ * conv layer (Inception v3 "mixed6"); the dogs come for free, no class steering.
+ *
+ * Model: Inception v3 truncated at mixed6, trained on ImageNet, converted from
+ * Keras to a TF.js LayersModel (~14 MB, hosted with the site). The BN layers are
+ * rebuilt with scale=True so their gradient works in the browser.
  *
  * This is the one playground tab on TensorFlow.js instead of onnxruntime-web:
  * Deep Dream needs gradients w.r.t. the input pixels, which the forward-only
@@ -20,15 +21,14 @@
   if (!outC) return;
 
   var TF_URL = "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js";
-  var MODEL_URL = "https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_1.0_224/model.json";
-  var FEAT_LAYER = "conv_pw_13_relu";   // last conv feature map, [.,H,W,1024]
+  var MODEL_URL = area.getAttribute("data-model") + "model.json";
 
-  var base = null;          // full MobileNet LayersModel
-  var gradFn = null;        // image -> gradient that grows dogs everywhere
+  var model = null;         // Inception v3 -> mixed6 (LayersModel)
+  var gradFn = null;        // image -> gradient that grows dogs
   var srcImage = null;      // current source Image element
   var running = false, stopReq = false;
   var inited = false;
-  var tfPromise = null, basePromise = null;   // cached so a preload + a click never download twice
+  var tfPromise = null, modelPromise = null;   // cached so preload + click never download twice
 
   var statusEl = document.getElementById("dream-status");
   function setStatus(en, fr) {
@@ -40,7 +40,7 @@
 
   function loadScript(src) {
     if (window.tf) return Promise.resolve();
-    if (tfPromise) return tfPromise;            // a load is already in flight
+    if (tfPromise) return tfPromise;
     tfPromise = new Promise(function (res, rej) {
       var s = document.createElement("script");
       s.src = src; s.onload = res; s.onerror = rej;
@@ -49,47 +49,37 @@
     return tfPromise;
   }
 
-  function getBase() {
-    if (basePromise) return basePromise;        // dedupe concurrent loads (preload + click)
-    setStatus("Loading MobileNet (~17 MB)…", "Chargement de MobileNet (~17 Mo)…");
-    basePromise = window.tf.loadLayersModel(MODEL_URL).then(function (m) { base = m; return m; });
-    return basePromise;
-  }
-
-  // Build the dog-maximizing gradient function once. MobileNet's declared input
-  // is fixed at 224x224, but Deep Dream runs the image at several octave
-  // resolutions; MobileNet v1 is a purely sequential stack of size-agnostic
-  // conv layers, so we rebuild a fully-convolutional sub-model on a flexible
-  // [null,null,3] input (re-applying the same layer objects keeps the
-  // pretrained weights) up to the last conv map, then apply the classifier's
-  // 1x1 conv on top of it to read off a spatial dog-logit map.
-  function buildGradFn() {
-    if (gradFn) return;
-    var tf = window.tf;
-    var inp = tf.input({ shape: [null, null, 3] });
-    var x = inp, layers = base.layers;
-    for (var i = 0; i < layers.length; i++) {
-      if (layers[i].getClassName() === "InputLayer") continue;
-      x = layers[i].apply(x);
-      if (layers[i].name === FEAT_LAYER) break;
-    }
-    var featModel = tf.model({ inputs: inp, outputs: x });
-    var convPreds = base.getLayer("conv_preds");      // 1x1 conv classifier head
-    var dogIdx = [];
-    for (var c = 151; c <= 268; c++) dogIdx.push(c);  // ImageNet dog breeds
-    var dogT = tf.tensor1d(dogIdx, "int32");          // kept alive for the session
-
-    gradFn = tf.grad(function (img) {
-      var feat = featModel.predict(img);              // [1,H,W,1024]
-      var logits = convPreds.apply(feat);             // [1,H,W,1000]
-      return tf.gather(logits, dogT, 3).mean();       // mean over dog channels
+  function getModel() {
+    if (modelPromise) return modelPromise;
+    setStatus("Loading dream model (~14 MB)…", "Chargement du modèle (~14 Mo)…");
+    modelPromise = window.tf.loadLayersModel(MODEL_URL).then(function (m) {
+      model = m;
+      gradFn = window.tf.grad(function (img) { return m.predict(img).square().mean(); });
+      return m;
     });
+    return modelPromise;
   }
 
   // ---- control readers ----
   function ctrlVal(id, dflt) {
     var el = document.getElementById(id);
     return el ? parseFloat(el.value) : dflt;
+  }
+
+  // roll (wrap-around shift) by sy rows / sx cols on a [1,H,W,3] tensor. Used for
+  // the per-step jitter that keeps Deep Dream's patterns coherent instead of a
+  // pixel grid. Done outside the gradient (eager), so it isn't differentiated.
+  function roll2d(t, sy, sx) {
+    return window.tf.tidy(function () {
+      var H = t.shape[1], W = t.shape[2];
+      sy = ((sy % H) + H) % H; sx = ((sx % W) + W) % W;
+      var r = t;
+      if (sy) r = window.tf.concat([r.slice([0, H - sy, 0, 0], [-1, sy, -1, -1]),
+                                    r.slice([0, 0, 0, 0], [-1, H - sy, -1, -1])], 1);
+      if (sx) r = window.tf.concat([r.slice([0, 0, W - sx, 0], [-1, -1, sx, -1]),
+                                    r.slice([0, 0, 0, 0], [-1, -1, W - sx, -1])], 2);
+      return r;
+    });
   }
 
   async function drawTensor(img4) {
@@ -103,13 +93,13 @@
     px.dispose();
   }
 
-  // source image -> [1,H,W,3] normalized to [-1,1] at a working resolution
+  // source image -> [1,H,W,3] normalized to [-1,1] (Inception preprocessing)
   function sourceTensor(maxSide) {
     var tf = window.tf;
     var w = srcImage.naturalWidth, h = srcImage.naturalHeight;
     var scale = maxSide / Math.max(w, h);
-    var tw = Math.max(32, Math.round(w * scale));
-    var th = Math.max(32, Math.round(h * scale));
+    var tw = Math.max(75, Math.round(w * scale));
+    var th = Math.max(75, Math.round(h * scale));
     var tmp = document.createElement("canvas");
     tmp.width = tw; tmp.height = th;
     tmp.getContext("2d").drawImage(srcImage, 0, 0, tw, th);
@@ -124,59 +114,68 @@
     var btn = document.getElementById("dream-run");
     if (btn) btn.innerHTML = '<i class="fas fa-stop"></i> <span class="lang-en">Stop</span><span class="lang-fr">Arrêter</span>';
 
-    var tf, full = null, cur = null;
+    var tf, base = null, img = null, detail = null;
     try {
       await loadScript(TF_URL);
-      await getBase();
+      await getModel();
       tf = window.tf;
-      buildGradFn();
 
-      var iters = Math.round(ctrlVal("dream-iters", 20));
-      var lr = ctrlVal("dream-step", 0.012);
-      var octaves = Math.round(ctrlVal("dream-octaves", 3));
-      // bigger working size on the fast WebGL backend -> a finer grid of dogs;
-      // stay small on the plain CPU backend so it doesn't freeze the tab
-      var maxSide = (tf.getBackend && tf.getBackend() === "webgl") ? 480 : 320;
-      var octaveScale = 1.4;
+      var iters = Math.round(ctrlVal("dream-iters", 25));
+      var lr = ctrlVal("dream-step", 0.04);
+      var octaves = Math.round(ctrlVal("dream-octaves", 4));
+      var jitter = 16, octaveScale = 1.4;
+      // bigger working size on the fast WebGL backend; smaller on plain CPU
+      var maxSide = (tf.getBackend && tf.getBackend() === "webgl") ? 500 : 300;
 
-      full = sourceTensor(maxSide);
-      var H = full.shape[1], W = full.shape[2];
-      cur = tf.tidy(function () {
-        var s = Math.pow(octaveScale, -(octaves - 1));
-        return tf.image.resizeBilinear(full, [Math.round(H * s), Math.round(W * s)]);
-      });
+      base = sourceTensor(maxSide);
+      var H = base.shape[1], W = base.shape[2];
 
-      for (var o = 0; o < octaves && !stopReq; o++) {
-        var s = Math.pow(octaveScale, -(octaves - 1 - o));
-        var oh = Math.round(H * s), ow = Math.round(W * s);
-        var resized = tf.tidy(function () { return tf.image.resizeBilinear(cur, [oh, ow]); });
-        cur.dispose(); cur = resized;
+      // octave sizes, smallest -> largest; carry "detail" (the dreamed-in change)
+      // up across scales so the hallucination is multi-scale and coherent
+      var sizes = [];
+      for (var o = 0; o < octaves; o++) {
+        var sc = Math.pow(octaveScale, -(octaves - 1 - o));
+        sizes.push([Math.max(75, Math.round(H * sc)), Math.max(75, Math.round(W * sc))]);
+      }
+      detail = tf.zeros([1, sizes[0][0], sizes[0][1], 3]);
 
-        setStatus("Growing dogs… octave " + (o + 1) + "/" + octaves,
-                  "Pousse des chiens… octave " + (o + 1) + "/" + octaves);
+      for (var k = 0; k < sizes.length && !stopReq; k++) {
+        var oh = sizes[k][0], ow = sizes[k][1];
+        if (img) { img.dispose(); }
+        img = tf.tidy(function () { return tf.image.resizeBilinear(base, [oh, ow]); });
+        var d2 = tf.tidy(function () { return tf.image.resizeBilinear(detail, [oh, ow]); });
+        detail.dispose(); detail = d2;
+        var x = tf.tidy(function () { return img.add(detail); });
+
+        setStatus("Growing dogs… octave " + (k + 1) + "/" + octaves,
+                  "Pousse des chiens… octave " + (k + 1) + "/" + octaves);
 
         for (var i = 0; i < iters && !stopReq; i++) {
-          var next = tf.tidy(function () {
-            var g = gradFn(cur);
-            // normalize by std so the step size is scale-free
-            var std = tf.moments(g).variance.sqrt().add(1e-8);
-            return cur.add(g.div(std).mul(lr)).clipByValue(-1, 1);
+          var sy = (Math.random() * (2 * jitter + 1) | 0) - jitter;
+          var sx = (Math.random() * (2 * jitter + 1) | 0) - jitter;
+          var rolled = roll2d(x, sy, sx); x.dispose();
+          var stepped = tf.tidy(function () {
+            var g = gradFn(rolled);
+            var norm = g.abs().mean().add(1e-8);          // scale-free step
+            return rolled.add(g.div(norm).mul(lr)).clipByValue(-1, 1);
           });
-          cur.dispose(); cur = next;
-          if (i % 2 === 0) { await drawTensor(cur); await tf.nextFrame(); }
+          rolled.dispose();
+          x = roll2d(stepped, -sy, -sx); stepped.dispose();
+          if (i % 2 === 0) { await drawTensor(x); await tf.nextFrame(); }
         }
-        await drawTensor(cur);
-      }
 
-      var finalImg = tf.tidy(function () { return tf.image.resizeBilinear(cur, [H, W]); });
-      await drawTensor(finalImg);
-      finalImg.dispose();
+        var nd = tf.tidy(function () { return x.sub(img); });   // detail = dreamed change
+        detail.dispose(); detail = nd;
+        await drawTensor(x);
+        x.dispose();
+      }
       setStatus(stopReq ? "Stopped." : "Done.", stopReq ? "Arrêté." : "Terminé.");
     } catch (e) {
       setStatus("Failed: " + e, "Échec : " + e);
     } finally {
-      if (full && !full.isDisposed) full.dispose();
-      if (cur && !cur.isDisposed) cur.dispose();
+      if (base && !base.isDisposed) base.dispose();
+      if (img && !img.isDisposed) img.dispose();
+      if (detail && !detail.isDisposed) detail.dispose();
       running = false;
       var b = document.getElementById("dream-run");
       if (b) b.innerHTML = '<i class="fas fa-magic"></i> <span class="lang-en">Dream</span><span class="lang-fr">Rêver</span>';
@@ -191,7 +190,7 @@
       var w = im.naturalWidth, h = im.naturalHeight, m = Math.max(w, h), s = 320 / m;
       outC.width = Math.round(w * s); outC.height = Math.round(h * s);
       outC.getContext("2d").drawImage(im, 0, 0, outC.width, outC.height);
-      if (!(basePromise && !base)) setStatus("", "");   // don't clobber the "loading model" message
+      if (!(modelPromise && !model)) setStatus("", "");   // don't clobber the "loading model" message
     };
     im.onerror = function () { setStatus("Couldn't load that image.", "Impossible de charger cette image."); };
     im.src = url;
@@ -221,16 +220,15 @@
     }
   });
 
-  // download tf.js + MobileNet in the background as soon as the tab is opened,
-  // so the first Dream click is instant instead of waiting on a ~17 MB fetch.
-  // Skip on metered / slow links: those users load it lazily on the first click.
+  // download tf.js + the dream model in the background when the tab opens, so the
+  // first Dream click is instant. Skip on metered / slow links.
   function warm() {
     var c = navigator.connection;
     if (c && (c.saveData || /^(slow-2g|2g|3g)$/.test(c.effectiveType || ""))) return;
     loadScript(TF_URL)
-      .then(getBase)
-      .then(function () { buildGradFn(); if (!running) setStatus("Ready - press Dream.", "Prêt - clique sur Rêver."); })
-      .catch(function () {});   // a failed warm just falls back to loading on click
+      .then(getModel)
+      .then(function () { if (!running) setStatus("Ready - press Dream.", "Prêt - clique sur Rêver."); })
+      .catch(function () {});
   }
 
   function init() {
