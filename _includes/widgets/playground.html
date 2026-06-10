@@ -491,8 +491,8 @@
                 <div id="dream-area" class="d-none"
                      data-sample="{{ '/assets/images/style_sample.jpg' | relative_url }}?v=2">
                     <p class="small text-muted mx-1 mb-3">
-                        <span class="lang-en"><strong>Deep Dream</strong>: instead of training a network, we run it <em>backwards</em> on the picture. A pretrained image classifier (MobileNet, trained on ImageNet) is asked which patterns a chosen layer likes, then the <strong>pixels</strong> are nudged - by gradient ascent - to make that layer fire harder. The network's favourite shapes hallucinate into the image: swirls and eyes, and since ImageNet is full of dogs, plenty of dog snouts. Pick a layer (shallow = textures, deep = object parts), upload a photo (it stays in your browser) and press <strong>Dream</strong>. This tab runs on TensorFlow.js because it needs gradients of the input pixels. Inceptionism: <a href="https://research.google/blog/inceptionism-going-deeper-into-neural-networks/" target="_blank" rel="noopener">Mordvintsev et al. (2015)</a>.</span>
-                        <span class="lang-fr"><strong>Deep Dream</strong> : au lieu d'entraîner un réseau, on le fait tourner <em>à l'envers</em> sur l'image. Un classifieur pré-entraîné (MobileNet, entraîné sur ImageNet) indique quels motifs une couche choisie préfère, puis on ajuste les <strong>pixels</strong> - par montée de gradient - pour faire réagir cette couche plus fort. Les formes favorites du réseau hallucinent dans l'image : tourbillons et yeux, et comme ImageNet regorge de chiens, beaucoup de museaux. Choisis une couche (superficielle = textures, profonde = parties d'objets), charge une photo (elle reste dans ton navigateur) et clique sur <strong>Rêver</strong>. Cet onglet utilise TensorFlow.js car il faut les gradients des pixels. Inceptionism : <a href="https://research.google/blog/inceptionism-going-deeper-into-neural-networks/" target="_blank" rel="noopener">Mordvintsev et al. (2015)</a>.</span>
+                        <span class="lang-en"><strong>Deep Dream</strong>: instead of training a network, we run it <em>backwards</em> on the picture. A pretrained image classifier (MobileNet, trained on ImageNet) is steered toward its <strong>dog</strong> classes - ImageNet has about 120 dog breeds - and the <strong>pixels</strong> are nudged, by gradient ascent, to make dogs appear. Reading the classifier at every location turns the whole image into a field of hallucinated dog faces and eyes (the classic <em>Inceptionism</em> look). Upload a photo (it stays in your browser) and press <strong>Dream</strong>. This tab runs on TensorFlow.js because it needs gradients of the input pixels. Inceptionism: <a href="https://research.google/blog/inceptionism-going-deeper-into-neural-networks/" target="_blank" rel="noopener">Mordvintsev et al. (2015)</a>.</span>
+                        <span class="lang-fr"><strong>Deep Dream</strong> : au lieu d'entraîner un réseau, on le fait tourner <em>à l'envers</em> sur l'image. Un classifieur pré-entraîné (MobileNet, entraîné sur ImageNet) est orienté vers ses classes de <strong>chiens</strong> - ImageNet compte environ 120 races - et on ajuste les <strong>pixels</strong>, par montée de gradient, pour faire apparaître des chiens. En lisant le classifieur à chaque position, toute l'image devient un champ de museaux et d'yeux de chiens hallucinés (le fameux effet <em>Inceptionism</em>). Charge une photo (elle reste dans ton navigateur) et clique sur <strong>Rêver</strong>. Cet onglet utilise TensorFlow.js car il faut les gradients des pixels. Inceptionism : <a href="https://research.google/blog/inceptionism-going-deeper-into-neural-networks/" target="_blank" rel="noopener">Mordvintsev et al. (2015)</a>.</span>
                     </p>
                     <style>
                         #dream-area .dd-ctrl { display:flex; align-items:center; gap:.4rem; }
@@ -508,18 +508,9 @@
                         </div>
                         <div class="d-flex flex-column" style="width:300px; max-width:100%; gap:.7rem;">
                             <div class="dd-ctrl">
-                                <label for="dream-layer"><span class="lang-en">Layer</span><span class="lang-fr">Couche</span></label>
-                                <select id="dream-layer" class="form-control form-control-sm" style="border-radius:8px;">
-                                    <option value="textures">textures / swirls</option>
-                                    <option value="patterns" selected>patterns</option>
-                                    <option value="objects">object parts</option>
-                                    <option value="deep">deep (eyes, snouts)</option>
-                                </select>
-                            </div>
-                            <div class="dd-ctrl">
                                 <label for="dream-iters"><span class="lang-en">Iterations / octave</span><span class="lang-fr">Itérations / octave</span></label>
-                                <input id="dream-iters" type="range" min="5" max="40" step="1" value="15">
-                                <span id="dream-iters-val" class="dd-val">15</span>
+                                <input id="dream-iters" type="range" min="5" max="40" step="1" value="20">
+                                <span id="dream-iters-val" class="dd-val">20</span>
                             </div>
                             <div class="dd-ctrl">
                                 <label for="dream-step"><span class="lang-en">Step size</span><span class="lang-fr">Pas</span></label>
@@ -624,7 +615,7 @@
 <script src="{{ '/assets/js/dog-creator.js' | relative_url }}?v=17"></script>
 <script src="{{ '/assets/js/dog-diffusion.js' | relative_url }}?v=17"></script>
 <script src="{{ '/assets/js/style-transfer.js' | relative_url }}?v=12"></script>
-<script src="{{ '/assets/js/deep-dream.js' | relative_url }}?v=1"></script>
+<script src="{{ '/assets/js/deep-dream.js' | relative_url }}?v=2"></script>
 <script src="{{ '/assets/js/word2vec.js' | relative_url }}?v=6"></script>
 <!-- Dog Diffusion is the default open tab: lazy-init its model on load -->
 <script>if (window.__ddpmShow) window.__ddpmShow();</script>
