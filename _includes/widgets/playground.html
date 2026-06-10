@@ -27,6 +27,9 @@
                     <button id="gol-mode-style" type="button" class="btn btn-outline-dark">
                         <i class="fas fa-palette"></i> <span class="lang-en">Style transfer</span><span class="lang-fr">Transfert de style</span>
                     </button>
+                    <button id="gol-mode-dream" type="button" class="btn btn-outline-dark">
+                        <i class="fas fa-brain"></i> <span class="lang-en">Deep Dream</span><span class="lang-fr">Deep Dream</span>
+                    </button>
                     <button id="gol-mode-life" type="button" class="btn btn-outline-dark">
                         <i class="fas fa-border-all"></i> <span class="lang-en">Game of Life</span><span class="lang-fr">Jeu de la vie</span>
                     </button>
@@ -484,6 +487,66 @@
                     <div id="style-status" class="small text-muted mt-2">&nbsp;</div>
                 </div>
 
+                <!-- ============ Deep Dream (gradient ascent on a CNN, TF.js) ============ -->
+                <div id="dream-area" class="d-none"
+                     data-sample="{{ '/assets/images/style_sample.jpg' | relative_url }}?v=2">
+                    <p class="small text-muted mx-1 mb-3">
+                        <span class="lang-en"><strong>Deep Dream</strong>: instead of training a network, we run it <em>backwards</em> on the picture. A pretrained image classifier (MobileNet, trained on ImageNet) is asked which patterns a chosen layer likes, then the <strong>pixels</strong> are nudged - by gradient ascent - to make that layer fire harder. The network's favourite shapes hallucinate into the image: swirls and eyes, and since ImageNet is full of dogs, plenty of dog snouts. Pick a layer (shallow = textures, deep = object parts), upload a photo (it stays in your browser) and press <strong>Dream</strong>. This tab runs on TensorFlow.js because it needs gradients of the input pixels. Inceptionism: <a href="https://research.google/blog/inceptionism-going-deeper-into-neural-networks/" target="_blank" rel="noopener">Mordvintsev et al. (2015)</a>.</span>
+                        <span class="lang-fr"><strong>Deep Dream</strong> : au lieu d'entraîner un réseau, on le fait tourner <em>à l'envers</em> sur l'image. Un classifieur pré-entraîné (MobileNet, entraîné sur ImageNet) indique quels motifs une couche choisie préfère, puis on ajuste les <strong>pixels</strong> - par montée de gradient - pour faire réagir cette couche plus fort. Les formes favorites du réseau hallucinent dans l'image : tourbillons et yeux, et comme ImageNet regorge de chiens, beaucoup de museaux. Choisis une couche (superficielle = textures, profonde = parties d'objets), charge une photo (elle reste dans ton navigateur) et clique sur <strong>Rêver</strong>. Cet onglet utilise TensorFlow.js car il faut les gradients des pixels. Inceptionism : <a href="https://research.google/blog/inceptionism-going-deeper-into-neural-networks/" target="_blank" rel="noopener">Mordvintsev et al. (2015)</a>.</span>
+                    </p>
+                    <style>
+                        #dream-area .dd-ctrl { display:flex; align-items:center; gap:.4rem; }
+                        #dream-area .dd-ctrl label { margin:0; font-size:.78rem; color:#6b7484; white-space:nowrap; }
+                        #dream-area .dd-ctrl input[type=range] { width:120px; vertical-align:middle; }
+                        #dream-area .dd-ctrl .dd-val { font-size:.78rem; color:#1c54e5; font-weight:700; min-width:1.8em; text-align:right; }
+                    </style>
+                    <div class="d-flex flex-wrap justify-content-center align-items-start" style="gap:1.4rem;">
+                        <div class="text-center">
+                            <canvas id="dream-canvas" width="320" height="320"
+                                    style="border-radius:14px; box-shadow:0 6px 22px rgba(25,40,80,.15); max-width:100%; background:#eee;"></canvas>
+                            <div id="dream-status" class="small text-muted mt-2">&nbsp;</div>
+                        </div>
+                        <div class="d-flex flex-column" style="width:300px; max-width:100%; gap:.7rem;">
+                            <div class="dd-ctrl">
+                                <label for="dream-layer"><span class="lang-en">Layer</span><span class="lang-fr">Couche</span></label>
+                                <select id="dream-layer" class="form-control form-control-sm" style="border-radius:8px;">
+                                    <option value="textures">textures / swirls</option>
+                                    <option value="patterns" selected>patterns</option>
+                                    <option value="objects">object parts</option>
+                                    <option value="deep">deep (eyes, snouts)</option>
+                                </select>
+                            </div>
+                            <div class="dd-ctrl">
+                                <label for="dream-iters"><span class="lang-en">Iterations / octave</span><span class="lang-fr">Itérations / octave</span></label>
+                                <input id="dream-iters" type="range" min="5" max="40" step="1" value="15">
+                                <span id="dream-iters-val" class="dd-val">15</span>
+                            </div>
+                            <div class="dd-ctrl">
+                                <label for="dream-step"><span class="lang-en">Step size</span><span class="lang-fr">Pas</span></label>
+                                <input id="dream-step" type="range" min="0.004" max="0.04" step="0.002" value="0.012">
+                                <span id="dream-step-val" class="dd-val">0.012</span>
+                            </div>
+                            <div class="dd-ctrl">
+                                <label for="dream-octaves"><span class="lang-en">Octaves</span><span class="lang-fr">Octaves</span></label>
+                                <input id="dream-octaves" type="range" min="1" max="5" step="1" value="3">
+                                <span id="dream-octaves-val" class="dd-val">3</span>
+                            </div>
+                            <div class="d-flex flex-wrap" style="gap:.4rem;">
+                                <button id="dream-run" class="btn btn-sm btn-dark" style="border-radius:20px;">
+                                    <i class="fas fa-magic"></i> <span class="lang-en">Dream</span><span class="lang-fr">Rêver</span>
+                                </button>
+                                <button id="dream-reset" class="btn btn-sm btn-outline-dark" style="border-radius:20px;">
+                                    <i class="fas fa-undo"></i> <span class="lang-en">Reset</span><span class="lang-fr">Réinitialiser</span>
+                                </button>
+                                <label class="btn btn-sm btn-outline-dark mb-0" style="border-radius:20px;">
+                                    <i class="fas fa-upload"></i> <span class="lang-en">Upload</span><span class="lang-fr">Charger</span>
+                                    <input id="dream-file" type="file" accept="image/*" style="display:none;">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- ============ Word embeddings (word2vec / GloVe) ============ -->
                 <div id="w2v-area" class="d-none" data-json="{{ '/assets/models/word_embeddings.json' | relative_url }}?v=2">
                     <p class="small text-muted mx-1 mb-3">
@@ -554,13 +617,14 @@
     </div>
 </div>
 
-<script src="{{ '/assets/js/game-of-life.js' | relative_url }}?v=19"></script>
+<script src="{{ '/assets/js/game-of-life.js' | relative_url }}?v=20"></script>
 <script src="{{ '/assets/js/symmetry.js' | relative_url }}?v=9"></script>
 <script src="{{ '/assets/js/gradient-descent.js' | relative_url }}?v=14"></script>
 <script src="{{ '/assets/js/cifar.js' | relative_url }}?v=10"></script>
 <script src="{{ '/assets/js/dog-creator.js' | relative_url }}?v=17"></script>
 <script src="{{ '/assets/js/dog-diffusion.js' | relative_url }}?v=17"></script>
 <script src="{{ '/assets/js/style-transfer.js' | relative_url }}?v=12"></script>
+<script src="{{ '/assets/js/deep-dream.js' | relative_url }}?v=1"></script>
 <script src="{{ '/assets/js/word2vec.js' | relative_url }}?v=6"></script>
 <!-- Dog Diffusion is the default open tab: lazy-init its model on load -->
 <script>if (window.__ddpmShow) window.__ddpmShow();</script>

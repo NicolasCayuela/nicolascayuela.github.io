@@ -270,6 +270,8 @@
     if (dfBtn) dfBtn.classList.toggle("active", m === "ddpm");
     var stBtn = document.getElementById("gol-mode-style");
     if (stBtn) stBtn.classList.toggle("active", m === "style");
+    var ddBtn = document.getElementById("gol-mode-dream");
+    if (ddBtn) ddBtn.classList.toggle("active", m === "dream");
     var wvBtn = document.getElementById("gol-mode-w2v");
     if (wvBtn) wvBtn.classList.toggle("active", m === "w2v");
 
@@ -280,6 +282,7 @@
     show("dog-area", m === "dog");
     show("ddpm-area", m === "ddpm");
     show("style-area", m === "style");
+    show("dream-area", m === "dream");
     show("w2v-area", m === "w2v");
     if (m === "sym") { if (window.__symResize) window.__symResize(); return; }
     if (m === "gd") { if (window.__gdResize) window.__gdResize(); return; }
@@ -287,6 +290,7 @@
     if (m === "dog") { if (window.__dogShow) window.__dogShow(); return; }
     if (m === "ddpm") { if (window.__ddpmShow) window.__ddpmShow(); return; }
     if (m === "style") { if (window.__styleShow) window.__styleShow(); return; }
+    if (m === "dream") { if (window.__dreamShow) window.__dreamShow(); return; }
     if (m === "w2v") { if (window.__w2vShow) window.__w2vShow(); return; }
 
     mode = m;
@@ -312,6 +316,7 @@
   on("gol-mode-dog", function () { setMode("dog"); });
   on("gol-mode-ddpm", function () { setMode("ddpm"); });
   on("gol-mode-style", function () { setMode("style"); });
+  on("gol-mode-dream", function () { setMode("dream"); });
   on("gol-mode-w2v", function () { setMode("w2v"); });
 
   // ---- init ----
