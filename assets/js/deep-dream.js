@@ -21,7 +21,7 @@
   if (!outC) return;
 
   var TF_URL = "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js";
-  var MODEL_URL = area.getAttribute("data-model") + "model.json";
+  var MODEL_URL = area.getAttribute("data-model") + "model.json?v=2";
 
   var model = null;         // Inception v3 -> mixed6 (LayersModel)
   var gradFn = null;        // image -> gradient that grows dogs
@@ -120,9 +120,9 @@
       await getModel();
       tf = window.tf;
 
-      var iters = Math.round(ctrlVal("dream-iters", 25));
-      var lr = ctrlVal("dream-step", 0.04);
-      var octaves = Math.round(ctrlVal("dream-octaves", 4));
+      var iters = Math.round(ctrlVal("dream-iters", 30));
+      var lr = ctrlVal("dream-step", 0.03);
+      var octaves = Math.round(ctrlVal("dream-octaves", 5));
       var jitter = 16, octaveScale = 1.4;
       // bigger working size on the fast WebGL backend; smaller on plain CPU
       var maxSide = (tf.getBackend && tf.getBackend() === "webgl") ? 500 : 300;

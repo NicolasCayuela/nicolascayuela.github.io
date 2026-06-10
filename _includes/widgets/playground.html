@@ -510,18 +510,18 @@
                         <div class="d-flex flex-column" style="width:300px; max-width:100%; gap:.7rem;">
                             <div class="dd-ctrl">
                                 <label for="dream-iters"><span class="lang-en">Iterations / octave</span><span class="lang-fr">Itérations / octave</span></label>
-                                <input id="dream-iters" type="range" min="5" max="40" step="1" value="25">
-                                <span id="dream-iters-val" class="dd-val">25</span>
+                                <input id="dream-iters" type="range" min="5" max="40" step="1" value="30">
+                                <span id="dream-iters-val" class="dd-val">30</span>
                             </div>
                             <div class="dd-ctrl">
                                 <label for="dream-step"><span class="lang-en">Step size</span><span class="lang-fr">Pas</span></label>
-                                <input id="dream-step" type="range" min="0.01" max="0.08" step="0.005" value="0.04">
-                                <span id="dream-step-val" class="dd-val">0.04</span>
+                                <input id="dream-step" type="range" min="0.01" max="0.08" step="0.005" value="0.03">
+                                <span id="dream-step-val" class="dd-val">0.03</span>
                             </div>
                             <div class="dd-ctrl">
                                 <label for="dream-octaves"><span class="lang-en">Octaves</span><span class="lang-fr">Octaves</span></label>
-                                <input id="dream-octaves" type="range" min="1" max="5" step="1" value="4">
-                                <span id="dream-octaves-val" class="dd-val">4</span>
+                                <input id="dream-octaves" type="range" min="1" max="6" step="1" value="5">
+                                <span id="dream-octaves-val" class="dd-val">5</span>
                             </div>
                             <div class="d-flex flex-wrap" style="gap:.4rem;">
                                 <button id="dream-run" class="btn btn-sm btn-dark" style="border-radius:20px;">
@@ -616,7 +616,7 @@
 <script src="{{ '/assets/js/dog-creator.js' | relative_url }}?v=17"></script>
 <script src="{{ '/assets/js/dog-diffusion.js' | relative_url }}?v=17"></script>
 <script src="{{ '/assets/js/style-transfer.js' | relative_url }}?v=12"></script>
-<script src="{{ '/assets/js/deep-dream.js' | relative_url }}?v=4"></script>
+<script src="{{ '/assets/js/deep-dream.js' | relative_url }}?v=5"></script>
 <script src="{{ '/assets/js/word2vec.js' | relative_url }}?v=6"></script>
 <!-- Dog Diffusion is the default open tab: lazy-init its model on load -->
 <script>if (window.__ddpmShow) window.__ddpmShow();</script>

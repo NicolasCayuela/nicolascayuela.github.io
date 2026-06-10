@@ -37,7 +37,7 @@ xt = tf.random.normal([1, 96, 96, 3])
 d = float(tf.reduce_max(tf.abs(incp(xt) - cloned(xt))))
 print("max forward diff after clone:", d, flush=True)
 
-m = keras.Model(cloned.input, cloned.get_layer("mixed6").output, name="incp_mixed6")
+m = keras.Model(cloned.input, cloned.get_layer("mixed4").output, name="incp_mixed4")
 print("params:", m.count_params(), "out shape:", m.output_shape, flush=True)
 tfjs.converters.save_keras_model(m, out, quantization_dtype_map={"uint16": "*"})
 print("converted to", out, flush=True)
