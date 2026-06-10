@@ -17,14 +17,17 @@ description: "Interactive map of the metamaterials literature: semantic embeddin
                     <span class="lang-en">An interactive map of the <strong>metamaterials literature</strong>: semantic embeddings of every metamaterials paper, projected in 2D - every dot is a publication, neighbourhoods are research topics (phononic crystals, acoustic/elastic metamaterials, photonics, mechanical lattices...). Zoom, search, explore.</span>
                     <span class="lang-fr">Une carte interactive de la <strong>littérature des métamatériaux</strong>&nbsp;: embeddings sémantiques de tous les articles du domaine, projetés en 2D - chaque point est une publication, les quartiers sont des thématiques (cristaux phononiques, métamatériaux acoustiques/élastiques, photonique, réseaux mécaniques...). Zoome, cherche, explore.</span>
                 </p>
-                <div id="mms-wrap" style="width:100%; height:76vh; min-height:520px; border-radius:8px; overflow:hidden; background:#0b0e14; display:flex; align-items:center; justify-content:center;">
-                    <!-- the embedding map viewer will be mounted here -->
-                    <div class="text-center" style="color:#8a93a3;">
-                        <i class="fas fa-drafting-compass fa-2x mb-2 d-block"></i>
-                        <span class="lang-en">The map is being built - coming soon.</span>
-                        <span class="lang-fr">La carte est en construction - bientôt disponible.</span>
-                    </div>
+                <div id="mms-wrap" style="width:100%; height:76vh; min-height:520px; border-radius:8px; overflow:hidden; background:#0b0e14;">
+                    <iframe src="https://nicolascayuela.github.io/metamaterials-map/"
+                            title="Metamaterials research space map"
+                            loading="lazy"
+                            style="width:100%; height:100%; border:0; display:block;"
+                            allowfullscreen></iframe>
                 </div>
+                <p class="small text-muted mt-2 mb-0">
+                    <span class="lang-en">Map not loading? Open it <a href="https://nicolascayuela.github.io/metamaterials-map/" target="_blank" rel="noopener">in full screen</a>.</span>
+                    <span class="lang-fr">La carte ne charge pas&nbsp;? Ouvrez-la <a href="https://nicolascayuela.github.io/metamaterials-map/" target="_blank" rel="noopener">en plein écran</a>.</span>
+                </p>
             </div>
         </div>
     </div>
