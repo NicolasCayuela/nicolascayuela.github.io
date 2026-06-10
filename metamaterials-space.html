@@ -14,20 +14,21 @@ description: "Interactive map of the metamaterials literature: semantic embeddin
                     <span class="lang-en">Metamaterials space</span><span class="lang-fr">Espace métamatériaux</span>
                 </h6>
                 <p class="small text-muted mb-2">
-                    <span class="lang-en">An interactive map of the <strong>metamaterials literature</strong>: semantic embeddings of every metamaterials paper, projected in 2D - every dot is a publication, neighbourhoods are research topics (phononic crystals, acoustic/elastic metamaterials, photonics, mechanical lattices...). Zoom, search, explore.</span>
-                    <span class="lang-fr">Une carte interactive de la <strong>littérature des métamatériaux</strong>&nbsp;: embeddings sémantiques de tous les articles du domaine, projetés en 2D - chaque point est une publication, les quartiers sont des thématiques (cristaux phononiques, métamatériaux acoustiques/élastiques, photonique, réseaux mécaniques...). Zoome, cherche, explore.</span>
+                    <span class="lang-en">An interactive map of the <strong>metamaterials literature</strong>: about 600,000 papers published between 1987 and 2026, collected from Semantic Scholar, arXiv, OpenAlex, Crossref and HAL. Each one is embedded with <strong>Qwen3-Embedding-4B</strong> and projected to 2D with <strong>UMAP</strong>, so every dot is a publication and neighbourhoods are research topics (phononic crystals, acoustic and elastic metamaterials, photonics, mechanical lattices...). Zoom, search, explore.</span>
+                    <span class="lang-fr">Une carte interactive de la <strong>littérature des métamatériaux</strong>&nbsp;: environ 600&nbsp;000 articles publiés entre 1987 et 2026, collectés depuis Semantic Scholar, arXiv, OpenAlex, Crossref et HAL. Chacun est encodé avec <strong>Qwen3-Embedding-4B</strong> puis projeté en 2D avec <strong>UMAP</strong>, si bien que chaque point est une publication et les quartiers sont des thématiques (cristaux phononiques, métamatériaux acoustiques et élastiques, photonique, réseaux mécaniques...). Zoome, cherche, explore.</span>
                 </p>
-                <div id="mms-wrap" style="width:100%; height:76vh; min-height:520px; border-radius:8px; overflow:hidden; background:#0b0e14;">
-                    <iframe src="https://nicolascayuela.github.io/metamaterials-map/"
+                <div id="mms-wrap" style="position:relative; width:100%; height:76vh; min-height:520px; border-radius:8px; overflow:hidden; background:#0b0e14;">
+                    <iframe id="mms-frame" src="https://nicolascayuela.github.io/metamaterials-map/"
                             title="Metamaterials research space map"
                             loading="lazy"
                             style="width:100%; height:100%; border:0; display:block;"
                             allowfullscreen></iframe>
+                    <button type="button" onclick="(function(f){(f.requestFullscreen||f.webkitRequestFullscreen||(()=>window.open(f.src,'_blank'))).call(f);})(document.getElementById('mms-frame'))"
+                            title="Fullscreen" aria-label="Fullscreen"
+                            style="position:absolute; top:10px; right:10px; z-index:5; width:34px; height:34px; border:0; border-radius:6px; background:rgba(11,14,20,.7); color:#cdd6e4; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                        <i class="fas fa-expand"></i>
+                    </button>
                 </div>
-                <p class="small text-muted mt-2 mb-0">
-                    <span class="lang-en">Map not loading? Open it <a href="https://nicolascayuela.github.io/metamaterials-map/" target="_blank" rel="noopener">in full screen</a>.</span>
-                    <span class="lang-fr">La carte ne charge pas&nbsp;? Ouvrez-la <a href="https://nicolascayuela.github.io/metamaterials-map/" target="_blank" rel="noopener">en plein écran</a>.</span>
-                </p>
             </div>
         </div>
     </div>
