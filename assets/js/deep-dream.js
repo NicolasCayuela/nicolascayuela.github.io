@@ -124,8 +124,10 @@
       var lr = ctrlVal("dream-step", 0.03);
       var octaves = Math.round(ctrlVal("dream-octaves", 5));
       var jitter = 16, octaveScale = 1.4;
-      // bigger working size on the fast WebGL backend; smaller on plain CPU
-      var maxSide = (tf.getBackend && tf.getBackend() === "webgl") ? 500 : 300;
+      // keep the working size modest: the dream runs on the main thread, so a
+      // big image makes each gradient step a long GPU job and the page janks.
+      // Mobile GPUs especially choke above ~380px.
+      var maxSide = (tf.getBackend && tf.getBackend() === "webgl") ? 384 : 240;
 
       base = sourceTensor(maxSide);
       var H = base.shape[1], W = base.shape[2];
@@ -161,7 +163,11 @@
           });
           rolled.dispose();
           x = roll2d(stepped, -sy, -sx); stepped.dispose();
-          if (i % 2 === 0) { await drawTensor(x); await tf.nextFrame(); }
+          // paint to canvas only occasionally: tf.browser.toPixels does a
+          // blocking GPU->CPU readback that stalls the page. Always yield a
+          // frame so the tab stays responsive (Stop button, scrolling).
+          if (i % 8 === 0) await drawTensor(x);
+          await tf.nextFrame();
         }
 
         var nd = tf.tidy(function () { return x.sub(img); });   // detail = dreamed change
