@@ -24,14 +24,14 @@ short_bio: >-
   at <strong>Institut Jean Lamour</strong> in Nancy, France. My research focuses on the design
   and study of phononic crystals and acoustic/elastic metamaterials using
   <strong>machine learning with graphs</strong>.
-  <br> <span style="color: red; font-style: italic;"><i class="far fa-envelope"></i>&nbsp; Feel free to reach out to discuss or collaborate.</span>
+  <br> <span style="color: red; font-style: italic;"><i class="far fa-envelope"></i>&nbsp; <a href="mailto:githubcontact.sublime067@simplelogin.com" style="color: inherit; text-decoration: underline;">Feel free to reach out to discuss or collaborate.</a></span>
 
 short_bio_fr: >-
   Je m'appelle <strong>Nicolas Cayuela</strong>, doctorant en phononique et métamatériaux
   à l'<strong>Institut Jean Lamour</strong> à Nancy. Mes recherches portent sur la conception
   et l'étude des cristaux phononiques et des métamatériaux acoustiques/élastiques à l'aide du
   <strong>machine learning sur graphes</strong>.
-  <br> <span style="color: red; font-style: italic;"><i class="far fa-envelope"></i>&nbsp; N'hésitez pas à me contacter pour échanger ou collaborer.</span>
+  <br> <span style="color: red; font-style: italic;"><i class="far fa-envelope"></i>&nbsp; <a href="mailto:githubcontact.sublime067@simplelogin.com" style="color: inherit; text-decoration: underline;">N'hésitez pas à me contacter pour échanger ou collaborer.</a></span>
 
 show_portrait: true
 portrait_url: assets/images/photos/profile.jpg
