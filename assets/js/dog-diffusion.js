@@ -22,8 +22,9 @@
   var pendingGen = false;
   // Old phones lag on the ~54 MB model + onnxruntime init. On mobile we skip the
   // eager prefetch / auto-init and load the model only when the user taps Generate.
-  var isMobile = !!(window.matchMedia &&
-    window.matchMedia("(max-width: 820px), (pointer: coarse)").matches);
+  // isMobileViewport() is the shared phone-breakpoint test defined in the layout <head>.
+  var isMobile = window.isMobileViewport ? window.isMobileViewport()
+    : !!(window.matchMedia && window.matchMedia("(max-width: 820px), (pointer: coarse)").matches);
   var IMG = 32;
   var off = document.createElement("canvas");
   var offCtx = null;
@@ -184,8 +185,12 @@
   // Mobile: stay idle and prompt the user to tap Generate, which triggers init().
   window.__ddpmShow = function () {
     if (isMobile) {
-      setStatus("Tap Generate to load the model (~54 MB).",
-                "Touche Générer pour charger le modèle (~54 Mo).");
+      // Only prompt before the model exists; don't clobber the live status
+      // (Loading…/Denoising…/Done.) when the user re-opens the tab after loading.
+      if (!ready && !loading) {
+        setStatus("Tap Generate to load the model (~54 MB).",
+                  "Touche Générer pour charger le modèle (~54 Mo).");
+      }
       return;
     }
     init();

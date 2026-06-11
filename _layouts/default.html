@@ -96,6 +96,14 @@
             bottom: 10px;
         }
     </style>
+    <!-- Shared mobile-viewport test (single source of truth for the phone breakpoint).
+         Defined in <head> so it's available to body/footer scripts on every page. -->
+    <script>
+        window.isMobileViewport = function () {
+            return !!(window.matchMedia &&
+                window.matchMedia("(max-width: 820px), (pointer: coarse)").matches);
+        };
+    </script>
 </head>
 
 <body class="bg-light" {{ page.body_attr }}>
