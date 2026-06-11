@@ -18,17 +18,53 @@ description: "Interactive map of the metamaterials literature: semantic embeddin
                     <span class="lang-fr">Une carte interactive de la <strong>littérature des métamatériaux</strong>&nbsp;: environ 600&nbsp;000 articles publiés entre 1987 et 2026, collectés depuis Semantic Scholar, arXiv, OpenAlex, Crossref et HAL. Chacun est encodé avec <strong>Qwen3-Embedding-4B</strong> puis projeté en 2D avec <strong>UMAP</strong>, si bien que chaque point est une publication et les quartiers sont des thématiques (cristaux phononiques, métamatériaux acoustiques et élastiques, photonique, réseaux mécaniques...). Zoome, cherche, explore.</span>
                 </p>
                 <div id="mms-wrap" style="position:relative; width:100%; height:76vh; min-height:520px; border-radius:8px; overflow:hidden; background:#0b0e14;">
-                    <iframe id="mms-frame" src="https://nicolascayuela.github.io/metamaterials_space/"
+                    <!-- iframe src is set by JS on desktop only; phones get the teaser instead -->
+                    <iframe id="mms-frame"
+                            data-src="https://nicolascayuela.github.io/metamaterials_space/"
                             title="Metamaterials research space map"
                             loading="lazy"
                             style="width:100%; height:100%; border:0; display:block;"
                             allowfullscreen></iframe>
-                    <button type="button" onclick="(function(f){(f.requestFullscreen||f.webkitRequestFullscreen||(()=>window.open(f.src,'_blank'))).call(f);})(document.getElementById('mms-frame'))"
+                    <button id="mms-fs" type="button" onclick="(function(f){(f.requestFullscreen||f.webkitRequestFullscreen||(()=>window.open(f.src,'_blank'))).call(f);})(document.getElementById('mms-frame'))"
                             title="Fullscreen" aria-label="Fullscreen"
                             style="position:absolute; top:10px; right:10px; z-index:5; width:34px; height:34px; border:0; border-radius:6px; background:rgba(11,14,20,.7); color:#cdd6e4; cursor:pointer; display:flex; align-items:center; justify-content:center;">
                         <i class="fas fa-expand"></i>
                     </button>
+                    <!-- mobile: tap-to-open teaser, shown by JS in place of the heavy inline map -->
+                    <div id="mms-teaser" style="display:none; position:absolute; inset:0; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:2.2rem 1.4rem; color:#cdd6e4;">
+                        <i class="fas fa-atom fa-3x mb-3" style="color:#7aa0ff;"></i>
+                        <div class="mb-3" style="max-width:300px; font-size:.85rem; line-height:1.5; color:#aab4c5;">
+                            <span class="lang-en">The interactive map is heavy on phones. Open it full-screen for a smooth experience.</span>
+                            <span class="lang-fr">La carte interactive est lourde sur téléphone. Ouvre-la en plein écran pour une expérience fluide.</span>
+                        </div>
+                        <a href="https://nicolascayuela.github.io/metamaterials_space/" target="_blank" rel="noopener"
+                           class="btn btn-light btn-sm" style="border-radius:20px; font-weight:600;">
+                            <i class="fas fa-expand"></i>&nbsp;
+                            <span class="lang-en">Open the map</span><span class="lang-fr">Ouvrir la carte</span>
+                        </a>
+                    </div>
                 </div>
+                <script>
+                (function () {
+                    var wrap = document.getElementById("mms-wrap");
+                    var frame = document.getElementById("mms-frame");
+                    var teaser = document.getElementById("mms-teaser");
+                    var fsBtn = document.getElementById("mms-fs");
+                    var isMobile = !!(window.matchMedia &&
+                        window.matchMedia("(max-width: 820px), (pointer: coarse)").matches);
+                    if (isMobile) {
+                        // Don't load the WebGL map inline on phones: show a tap-to-open teaser,
+                        // and shrink the box since there's no inline map to fill it.
+                        frame.style.display = "none";
+                        fsBtn.style.display = "none";
+                        teaser.style.display = "flex";
+                        wrap.style.height = "auto";
+                        wrap.style.minHeight = "300px";
+                    } else {
+                        frame.src = frame.getAttribute("data-src");   // desktop: load inline
+                    }
+                })();
+                </script>
             </div>
         </div>
     </div>
