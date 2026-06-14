@@ -45,6 +45,7 @@
 
   function loadScript(src) {
     return new Promise(function (res, rej) {
+      if (window.ort) { res(); return; }   // ORT already injected by another widget
       var s = document.createElement("script");
       s.src = src; s.onload = res; s.onerror = rej;
       document.head.appendChild(s);

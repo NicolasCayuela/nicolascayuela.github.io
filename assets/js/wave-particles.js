@@ -294,6 +294,9 @@
   build();
   if (reduce) {
     renderStatic();
+    // Animated mode re-reads the theme every frame; the static render runs once,
+    // so it must repaint when the user toggles dark/light (theme.js fires this).
+    window.addEventListener("themechange", renderStatic);
   } else {
     spawn(W * 0.06, H * 0.5, CFG.amp * (1.4 + Math.random() * 0.8));   // start at the left edge, not behind the centred text
     requestAnimationFrame(frame);

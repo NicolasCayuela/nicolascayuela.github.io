@@ -71,14 +71,18 @@
   var base = mapC.getAttribute("data-json");
   var spriteUrl = mapC.getAttribute("data-sprite");
 
-  fetch(base).then(function (r) { return r.json(); }).then(function (j) {
+  fetch(base).then(function (r) {
+    if (!r.ok) throw new Error("cifar data HTTP " + r.status);
+    return r.json();
+  }).then(function (j) {
     data = j;
     makeColors(data.classes.length);
     build3D();
     sprite = new Image();
     sprite.onload = function () { ready = true; drawImg(); requestAnimationFrame(tick); };
+    sprite.onerror = function () { console.error("cifar: sprite failed to load", spriteUrl); };
     sprite.src = spriteUrl;
-  });
+  }).catch(function (e) { console.error("cifar: load failed", e); });
 
   function layoutSize() {
     var w = mapC.parentNode.clientWidth || 360;
