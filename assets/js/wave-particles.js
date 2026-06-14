@@ -1,12 +1,20 @@
 /*
- * Elastic-wave metamaterial background.
+ * Elastic-wave metamaterial background (v2).
  *
  * A periodic lattice of nodes (the "unit cells" of a phononic crystal /
- * acoustic metamaterial). Radial elastic waves travel through it, displacing
- * the nodes; the links between neighbours light up with the local strain, so
- * you literally see the wavefronts ripple through the periodic medium.
- * Moving the pointer injects small ripples, clicking emits a strong pulse.
+ * acoustic metamaterial). Elastic waves travel through it and displace the
+ * nodes; the links between neighbours light up with the local strain, so you
+ * literally see the wavefronts ripple through the periodic medium.
  *
+ * Two wave kinds run together:
+ *   - radial pulses (point sources, like a tap on the medium), and
+ *   - plane waves that sweep across the lattice along a direction (Bloch-like
+ *     propagation along a path).
+ * Each carries a longitudinal part (motion along propagation) and a smaller
+ * transverse/shear part a quarter-phase out, so nodes trace little ellipses,
+ * the way particles move in a real surface elastic wave.
+ *
+ * Moving the pointer injects small ripples, clicking emits a strong pulse.
  * Pure <canvas>, no dependency. Runs behind the page content.
  */
 (function () {
@@ -25,6 +33,9 @@
     maxWaves: 40,       // perf backstop only; high so live ripples are never cut
     autoMin: 1.2,       // min seconds between random excitations
     autoMax: 3,         // max seconds between random excitations
+    planeProb: 0.34,    // share of auto excitations that are sweeping plane waves
+    shear: 0.42,        // transverse amplitude as a fraction of longitudinal
+    frontWidth: 30,     // wavefront thickness (px, gaussian std) -> sharpness
     linkDist: 1.9,      // neighbour link cutoff, in lattice pitches
     baseAlpha: 0.22,    // resting link opacity (idle = faint blue, COMSOL low end)
     peakAlpha: 0.95,    // link opacity at the crest (COMSOL high end)
@@ -54,7 +65,8 @@
   var nodes = [];       // {ox, oy} rest positions
   var cols = 0, rows = 0;
   var links = [];       // [iA, iB] precomputed neighbour pairs
-  var waves = [];       // {x, y, t, amp, k, life}
+  var waves = [];       // {kind, x, y, nx, ny, t, amp, k, life}
+  var SIG2 = 2 * CFG.frontWidth * CFG.frontWidth;
 
   // deterministic pseudo-random so the lattice disorder is stable across resizes
   function rand(seed) {
@@ -106,26 +118,66 @@
     }
   }
 
-  function spawn(x, y, amp) {
+  function spawnRadial(x, y, amp) {
     if (waves.length >= CFG.maxWaves) waves.shift();
     waves.push({
-      x: x, y: y, t: 0,
-      amp: amp,
-      k: (2 * Math.PI) / CFG.wavelength,
-      life: CFG.waveLife
+      kind: 0, x: x, y: y, nx: 0, ny: 0, t: 0,
+      amp: amp, k: (2 * Math.PI) / CFG.wavelength, life: CFG.waveLife
     });
   }
 
-  // displacement contribution of one wave at distance d, plus its radial dir handled by caller
-  function waveField(w, d) {
-    var front = CFG.speed * w.t;          // current radius of the wavefront
-    var ring = d - front;                 // signed distance to the front
-    // narrow gaussian envelope -> thin, sharp wavefronts (background stays calm
-    // even with many overlapping ripples), plus global time decay
-    var env = Math.exp(-(ring * ring) / (2 * 850));
+  // plane wave: a flat front entering from one edge and sweeping across, the
+  // origin point sits just outside that edge so the front crosses the screen.
+  function spawnPlane(amp) {
+    if (waves.length >= CFG.maxWaves) waves.shift();
+    var ang = Math.random() * Math.PI * 2;
+    var nx = Math.cos(ang), ny = Math.sin(ang);
+    var cx = W * 0.5, cy = H * 0.5, span = Math.sqrt(W * W + H * H) * 0.5;
+    waves.push({
+      kind: 1, x: cx - nx * span, y: cy - ny * span, nx: nx, ny: ny, t: 0,
+      amp: amp, k: (2 * Math.PI) / CFG.wavelength, life: CFG.waveLife
+    });
+  }
+
+  // scalar field of one wave at signed propagation coordinate `p`. quad=true
+  // returns the quarter-phase (cosine) component used for the transverse part.
+  function waveField(w, p, quad) {
+    var ring = p - CFG.speed * w.t;          // signed distance to the front
+    var env = Math.exp(-(ring * ring) / SIG2);
     var decay = 1 - w.t / w.life;
     if (decay < 0) decay = 0;
-    return w.amp * decay * env * Math.sin(w.k * ring);
+    var ph = w.k * ring;
+    return w.amp * decay * env * (quad ? Math.cos(ph) : Math.sin(ph));
+  }
+
+  // Displace every node by the superposition of all live waves. Each wave adds
+  // a longitudinal term (along propagation) and a smaller transverse term a
+  // quarter-phase out, so a node traces an ellipse. Returns the peak strain.
+  function displaceNodes() {
+    var maxStrain = 1e-4, i, k, w, dx, dy, d, p, dirx, diry, lon, sh;
+    for (i = 0; i < nodes.length; i++) {
+      var n = nodes[i], ux = 0, uy = 0;
+      for (k = 0; k < waves.length; k++) {
+        w = waves[k];
+        if (w.kind === 0) {                  // radial
+          dx = n.ox - w.x; dy = n.oy - w.y;
+          d = Math.sqrt(dx * dx + dy * dy) + 0.001;
+          dirx = dx / d; diry = dy / d; p = d;
+        } else {                             // plane
+          dirx = w.nx; diry = w.ny;
+          p = (n.ox - w.x) * w.nx + (n.oy - w.y) * w.ny;
+        }
+        lon = waveField(w, p, false);
+        sh = waveField(w, p, true) * CFG.shear;
+        ux += dirx * lon - diry * sh;        // longitudinal + transverse (perp)
+        uy += diry * lon + dirx * sh;
+      }
+      n.x = n.ox + ux;
+      n.y = n.oy + uy;
+      n.strain = Math.sqrt(ux * ux + uy * uy);
+      if (n.strain > maxStrain) maxStrain = n.strain;
+    }
+    return maxStrain;
   }
 
   var last = 0, acc = 0, autoTimer = 0, nextAuto = 0;
@@ -135,6 +187,14 @@
     nextAuto = CFG.autoMin + Math.random() * (CFG.autoMax - CFG.autoMin);
   }
   scheduleAuto();
+
+  function autoExcite() {
+    if (Math.random() < CFG.planeProb) {
+      spawnPlane(CFG.amp * (1.0 + Math.random() * 0.6));
+    } else {
+      spawnRadial(Math.random() * W, Math.random() * H, CFG.amp * (1.4 + Math.random() * 0.8));
+    }
+  }
 
   function frame(now) {
     requestAnimationFrame(frame);
@@ -146,36 +206,18 @@
     if (acc < frameInterval) return;   // throttle to target fps
     var step = acc; acc = 0;
 
-    // advance waves
     autoTimer += step;
     if (autoTimer >= nextAuto) {
       autoTimer = 0;
-      scheduleAuto();   // new random delay in [autoMin, autoMax] seconds
-      spawn(Math.random() * W, Math.random() * H, CFG.amp * (1.4 + Math.random() * 0.8));
+      scheduleAuto();
+      autoExcite();
     }
     for (var wI = waves.length - 1; wI >= 0; wI--) {
       waves[wI].t += step;
       if (waves[wI].t >= waves[wI].life) waves.splice(wI, 1);
     }
 
-    // displace nodes
-    var i, w, n, dx, dy, d, disp;
-    for (i = 0; i < nodes.length; i++) {
-      n = nodes[i];
-      var ux = 0, uy = 0;
-      for (var k = 0; k < waves.length; k++) {
-        w = waves[k];
-        dx = n.ox - w.x; dy = n.oy - w.y;
-        d = Math.sqrt(dx * dx + dy * dy) + 0.001;
-        disp = waveField(w, d);
-        ux += (dx / d) * disp;          // longitudinal: displace along radius
-        uy += (dy / d) * disp;
-      }
-      n.x = n.ox + ux;
-      n.y = n.oy + uy;
-      n.strain = Math.sqrt(ux * ux + uy * uy);
-    }
-
+    displaceNodes();
     draw(REF);                    // normalise node colour/size against the crest reference
   }
 
@@ -191,7 +233,6 @@
     // dark theme: the jet low end (dark blue) vanishes on black, so lift the
     // colormap floor and the resting opacity to keep the lattice visible
     var dark = document.documentElement.classList.contains("theme-dark");
-    // the whole-canvas opacity also caps visibility: raise it on dark
     if (dark !== lastDark) {
       lastDark = dark;
       canvas.style.opacity = dark ? 0.9 : CFG.opacity;
@@ -238,7 +279,29 @@
       ctx.stroke();
     }
 
-    // nodes coloured by the same colormap, brighter/larger where the field is strong
+    // crest bloom: re-stroke the brightest buckets wide and faint with additive
+    // blending so wavefronts glow where they overlap. Few links live up here,
+    // so it is cheap. Strongest on dark; a gentle touch on light.
+    var bloomFrom = (LEVELS * 0.72) | 0;
+    ctx.globalCompositeOperation = "lighter";
+    for (bb = bloomFrom; bb < LEVELS; bb++) {
+      var barr = paths[bb];
+      if (!barr.length) continue;
+      var bt = bb / (LEVELS - 1);
+      var bcol = jet(tFloor + bt * (HUECAP - tFloor));
+      ctx.strokeStyle = "rgba(" + bcol[0] + "," + bcol[1] + "," + bcol[2] + "," +
+        ((dark ? 0.16 : 0.08) * bt).toFixed(3) + ")";
+      ctx.lineWidth = 3 + bt * 5;
+      ctx.beginPath();
+      for (var bj = 0; bj < barr.length; bj += 4) {
+        ctx.moveTo(barr[bj], barr[bj + 1]);
+        ctx.lineTo(barr[bj + 2], barr[bj + 3]);
+      }
+      ctx.stroke();
+    }
+
+    // nodes coloured by the same colormap, brighter/larger where the field is
+    // strong. Additive so crossing wavefronts bloom at the nodes too.
     for (var ni = 0; ni < nodes.length; ni++) {
       var nd = nodes[ni];
       var ns = nd.strain / maxStrain; if (ns > 1) ns = 1;
@@ -250,24 +313,15 @@
       ctx.arc(nd.x, nd.y, rad, 0, 6.2832);
       ctx.fill();
     }
+    ctx.globalCompositeOperation = "source-over";
   }
 
   // static render for reduced-motion users: one frozen wavefront, no animation
   function renderStatic() {
-    spawn(W * 0.06, H * 0.5, CFG.amp * 1.8);
+    waves = [];
+    spawnRadial(W * 0.06, H * 0.5, CFG.amp * 1.8);
     waves[0].t = (CFG.wavelength * 1.2) / CFG.speed;
-    var maxStrain = 1e-4, i, n, w, dx, dy, d, disp, ux, uy;
-    for (i = 0; i < nodes.length; i++) {
-      n = nodes[i]; ux = 0; uy = 0;
-      w = waves[0];
-      dx = n.ox - w.x; dy = n.oy - w.y; d = Math.sqrt(dx * dx + dy * dy) + 0.001;
-      disp = waveField(w, d);
-      ux = (dx / d) * disp; uy = (dy / d) * disp;
-      n.x = n.ox + ux; n.y = n.oy + uy;
-      n.strain = Math.sqrt(ux * ux + uy * uy);
-      if (n.strain > maxStrain) maxStrain = n.strain;
-    }
-    draw(maxStrain);
+    draw(displaceNodes());
   }
 
   // pointer = wave source
@@ -276,10 +330,10 @@
     var t = performance.now();
     if (t - moveAcc < 90) return;     // throttle ripple injection
     moveAcc = t;
-    spawn(e.clientX, e.clientY, CFG.amp * 0.55);
+    spawnRadial(e.clientX, e.clientY, CFG.amp * 0.55);
   }, { passive: true });
   window.addEventListener("pointerdown", function (e) {
-    spawn(e.clientX, e.clientY, CFG.amp * 1.8);
+    spawnRadial(e.clientX, e.clientY, CFG.amp * 1.8);
   }, { passive: true });
 
   var resizeTimer;
@@ -298,7 +352,7 @@
     // so it must repaint when the user toggles dark/light (theme.js fires this).
     window.addEventListener("themechange", renderStatic);
   } else {
-    spawn(W * 0.06, H * 0.5, CFG.amp * (1.4 + Math.random() * 0.8));   // start at the left edge, not behind the centred text
+    spawnRadial(W * 0.06, H * 0.5, CFG.amp * (1.4 + Math.random() * 0.8));   // start at the left edge, not behind the centred text
     requestAnimationFrame(frame);
   }
 })();
