@@ -125,5 +125,16 @@
 
     <!-- Elastic-wave metamaterial background on every page (bump ?v= to bust cache) -->
     <script src="{{ '/assets/js/wave-particles.js' | relative_url }}?v=ring25"></script>
+
+    {% if page.mathjax %}
+    <!-- MathJax: only loaded on pages that opt in via `mathjax: true` front matter -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['\\(', '\\)']], displayMath: [['$$', '$$']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" async></script>
+    {% endif %}
 </body>
 </html>

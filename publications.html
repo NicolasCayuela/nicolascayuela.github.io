@@ -2,6 +2,7 @@
 layout: default
 title : Publications
 navbar_name: Publications
+mathjax: true
 body_attr: >-
   data-spy="scroll" data-target="#navbar-year" data-offset="100"
 ---
@@ -28,6 +29,9 @@ body_attr: >-
         text-decoration: none; transition: background .12s, color .12s; }
     .pub-links a:hover { background: #1c54e5; color: #fff; }
     .pub-year-card { border-radius: 14px; box-shadow: 0 4px 16px rgba(25,40,80,.08); overflow: hidden; }
+    /* Long band-structure equations scroll horizontally on narrow screens
+       instead of forcing the abstract column wider than the card. */
+    .pub-abstract mjx-container[display="true"] { max-width: 100%; overflow-x: auto; overflow-y: hidden; }
 </style>
 
 {% if site.data.profile.gscholar %}
