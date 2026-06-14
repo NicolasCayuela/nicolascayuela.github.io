@@ -31,8 +31,8 @@
     speed: 115,         // wave phase speed (px/s)
     waveLife: 18,       // seconds a ripple stays alive
     maxWaves: 24,       // perf backstop only; high so live ripples are never cut
-    autoMin: 1.5,       // min seconds between random excitations
-    autoMax: 3,         // max seconds between random excitations
+    autoMin: 1,         // min seconds between random excitations
+    autoMax: 2,         // max seconds between random excitations
     planeProb: 0.34,    // share of auto excitations that are sweeping plane waves
     topoProb: 0.16,     // share that are robust topological edge modes (border path)
     shearProb: 0.32,    // share of waves that are shear-dominant (transverse mode)
