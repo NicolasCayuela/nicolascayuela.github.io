@@ -28,7 +28,10 @@
     jitter: 0.18,       // random lattice disorder (0 = perfect crystal)
     amp: 12,            // peak node displacement (px)
     wavelength: 175,    // spatial period of a wave (px)
-    speed: 115,         // wave phase speed (px/s)
+    speed: 115,         // wave phase speed (px/s), longitudinal (P) reference
+    shearSpeedFrac: 0.62, // shear (S) waves travel slower than P (dispersion)
+    edgeSpeedFrac: 0.80,  // topological edge mode speed, fraction of P
+    fadeIn: 1.1,        // seconds to ramp the canvas in on load
     waveLife: 18,       // seconds a ripple stays alive
     maxWaves: 24,       // perf backstop only; high so live ripples are never cut
     autoMin: 1,         // min seconds between random excitations
@@ -128,18 +131,19 @@
 
   // lon/sh are the longitudinal and transverse (shear) weights of the wave.
   // P-wave: lon=1, sh=CFG.shear. Shear-dominant: lon small, sh large.
-  function spawnRadial(x, y, amp, lon, sh) {
+  function spawnRadial(x, y, amp, lon, sh, speed) {
     if (waves.length >= CFG.maxWaves) waves.shift();
     waves.push({
       kind: 0, x: x, y: y, nx: 0, ny: 0, t: 0,
       amp: amp, k: (2 * Math.PI) / CFG.wavelength, life: CFG.waveLife,
-      lon: lon == null ? 1 : lon, sh: sh == null ? CFG.shear : sh
+      lon: lon == null ? 1 : lon, sh: sh == null ? CFG.shear : sh,
+      speed: speed == null ? CFG.speed : speed
     });
   }
 
   // plane wave: a flat front entering from one edge and sweeping across, the
   // origin point sits just outside that edge so the front crosses the screen.
-  function spawnPlane(amp, lon, sh) {
+  function spawnPlane(amp, lon, sh, speed) {
     if (waves.length >= CFG.maxWaves) waves.shift();
     var ang = Math.random() * Math.PI * 2;
     var nx = Math.cos(ang), ny = Math.sin(ang);
@@ -147,7 +151,8 @@
     waves.push({
       kind: 1, x: cx - nx * span, y: cy - ny * span, nx: nx, ny: ny, t: 0,
       amp: amp, k: (2 * Math.PI) / CFG.wavelength, life: CFG.waveLife,
-      lon: lon == null ? 1 : lon, sh: sh == null ? CFG.shear : sh
+      lon: lon == null ? 1 : lon, sh: sh == null ? CFG.shear : sh,
+      speed: speed == null ? CFG.speed : speed
     });
   }
 
@@ -156,7 +161,7 @@
   // corners without backscattering, exciting only nodes within a thin channel
   // around the path. The rest of the lattice stays still, like a chiral edge
   // state in a topological phononic insulator.
-  function spawnEdge(amp) {
+  function spawnEdge(amp, speed) {
     if (waves.length >= CFG.maxWaves) waves.shift();
     var m = CFG.spacing * 2.2;            // channel inset from the border
     var pts = [[m, m], [W - m, m], [W - m, H - m], [m, H - m]];
@@ -171,14 +176,15 @@
     waves.push({
       kind: 2, t: 0, amp: amp, k: (2 * Math.PI) / CFG.wavelength, life: CFG.waveLife,
       segs: segs, L: arc, inset: m, chHalf: chHalf, chCull: chHalf * 3,
-      sigA: CFG.wavelength * 1.1, dir: Math.random() < 0.5 ? 1 : -1
+      sigA: CFG.wavelength * 1.1, dir: Math.random() < 0.5 ? 1 : -1,
+      speed: speed == null ? CFG.speed : speed
     });
   }
 
   // scalar field of one wave at signed propagation coordinate `p`. quad=true
   // returns the quarter-phase (cosine) component used for the transverse part.
   function waveField(w, p, quad) {
-    var ring = p - CFG.speed * w.t;          // signed distance to the front
+    var ring = p - w.speed * w.t;            // signed distance to the front
     var env = Math.exp(-(ring * ring) / SIG2);
     var decay = 1 - w.t / w.life;
     if (decay < 0) decay = 0;
@@ -195,7 +201,7 @@
     // per-wave front radius + cull band (squared) so the inner loop can skip
     // nodes outside the active ring without any sqrt.
     for (k = 0; k < waves.length; k++) {
-      var fr = CFG.speed * waves[k].t;
+      var fr = waves[k].speed * waves[k].t;
       waves[k]._lo = Math.max(0, fr - cull); waves[k]._hi = fr + cull;
       waves[k]._lo2 = waves[k]._lo * waves[k]._lo;
       waves[k]._hi2 = waves[k]._hi * waves[k]._hi;
@@ -218,7 +224,7 @@
           }
           var trans = Math.sqrt(best);
           if (trans > w.chCull) continue;
-          var da = bArc - w.dir * CFG.speed * w.t;
+          var da = bArc - w.dir * w.speed * w.t;
           da -= w.L * Math.round(da / w.L);                  // wrap around the loop
           var decE = 1 - w.t / w.life; if (decE < 0) decE = 0;
           var dE = w.amp * decE
@@ -262,24 +268,30 @@
 
   function autoExcite() {
     // robust topological edge mode now and then: travels the boundary, leaves
-    // the bulk still.
-    if (Math.random() < CFG.topoProb) { spawnEdge(CFG.amp * 1.15); return; }
-    // otherwise a randomly polarised bulk wave. shear-dominant mode: mostly
-    // transverse motion (lon small, sh large), the S-wave counterpart of the
-    // default longitudinal P-wave.
+    // the bulk still. Edge mode runs at its own speed (dispersion).
+    if (Math.random() < CFG.topoProb) {
+      spawnEdge(CFG.amp * 1.15, CFG.speed * CFG.edgeSpeedFrac);
+      return;
+    }
+    // otherwise a randomly polarised bulk wave. shear-dominant (S) waves are
+    // mostly transverse and travel slower than the longitudinal (P) default,
+    // so the two modes visibly separate as they propagate (dispersion).
     var shearMode = Math.random() < CFG.shearProb;
     var lon = shearMode ? 0.35 : 1;
     var sh = shearMode ? 1.0 : CFG.shear;
+    var spd = shearMode ? CFG.speed * CFG.shearSpeedFrac : CFG.speed;
     if (Math.random() < CFG.planeProb) {
-      spawnPlane(CFG.amp * (1.0 + Math.random() * 0.6), lon, sh);
+      spawnPlane(CFG.amp * (1.0 + Math.random() * 0.6), lon, sh, spd);
     } else {
-      spawnRadial(Math.random() * W, Math.random() * H, CFG.amp * (1.4 + Math.random() * 0.8), lon, sh);
+      spawnRadial(Math.random() * W, Math.random() * H, CFG.amp * (1.4 + Math.random() * 0.8), lon, sh, spd);
     }
   }
 
   function frame(now) {
     requestAnimationFrame(frame);
     if (document.hidden) { last = 0; return; }   // idle in background tabs (battery)
+    if (!loadStart) loadStart = now;
+    fadeAmt = CFG.fadeIn > 0 ? Math.min(1, (now - loadStart) / (CFG.fadeIn * 1000)) : 1;
     if (!last) last = now;
     var dt = (now - last) / 1000;
     last = now;
@@ -303,8 +315,9 @@
     draw(REF);                    // normalise node colour/size against the crest reference
   }
 
-  var lastDark = null;          // tracks theme to update canvas opacity only on change
-  var LEVELS = 16;              // colormap quantisation; each level = one batched stroke
+  var fadeAmt = reduce ? 1 : 0; // load fade-in multiplier (0 -> 1 over CFG.fadeIn)
+  var loadStart = 0;
+  var LEVELS = 32;             // colormap quantisation; each level = one batched stroke
   // normalise against a single wave's crest (not the dynamic max) so every
   // wavefront reaches red all the way round; interference just stays clamped at red.
   var REF = CFG.amp * 0.95;       // sets where the colormap saturates; lower -> more orange/yellow at the fronts
@@ -315,10 +328,8 @@
     // dark theme: the jet low end (dark blue) vanishes on black, so lift the
     // colormap floor and the resting opacity to keep the lattice visible
     var dark = document.documentElement.classList.contains("theme-dark");
-    if (dark !== lastDark) {
-      lastDark = dark;
-      canvas.style.opacity = dark ? 0.9 : CFG.opacity;
-    }
+    // whole-canvas opacity: theme target scaled by the load fade-in
+    canvas.style.opacity = ((dark ? 0.9 : CFG.opacity) * fadeAmt).toFixed(3);
     var tFloor = dark ? 0.10 : 0;
     var baseA = dark ? 0.7 : CFG.baseAlpha;
     // pure jet blue is too dim on black: blend resting colors toward white,
