@@ -33,7 +33,7 @@
     edgeSpeedFrac: 0.80,  // topological edge mode speed, fraction of P
     fadeIn: 1.1,        // seconds to ramp the canvas in on load
     waveLife: 18,       // seconds a ripple stays alive
-    maxWaves: 24,       // perf backstop only; high so live ripples are never cut
+    maxWaves: 50,       // perf backstop only; high so live ripples are never cut
     autoMin: 1,         // min seconds between random excitations
     autoMax: 2,         // max seconds between random excitations
     planeProb: 0.34,    // share of auto excitations that are sweeping plane waves
