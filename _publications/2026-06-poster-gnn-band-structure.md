@@ -4,6 +4,6 @@ authors:
   - Nicolas Cayuela
 pub: "Poster"
 date: 2026-06-01
-cover: assets/images/empty_300x200.png
+cover: assets/images/poster-gnn-band-structure.png
 abstract: "Explanation of the Poster: coming soon."
 ---
