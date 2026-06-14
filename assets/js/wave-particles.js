@@ -39,6 +39,7 @@
     shear: 0.45,        // transverse amplitude as a fraction of longitudinal (P mode)
     frontWidth: 26,     // wavefront thickness (px, gaussian std) -> sharpness
     cullWidth: 4,       // node-vs-wave cull band, in frontWidths (perf)
+    clickCooldown: 600, // ms between pointer-click pulses (anti-spam)
     linkDist: 1.6,      // neighbour link cutoff, in lattice pitches
     vigMin: 0.26,       // field opacity behind the centred content (0 = hidden)
     vigAx: 0.55,        // half-width of the dimmed central band (frac of W/2)
@@ -423,6 +424,21 @@
   }
 
   // pointer = wave source
+  var moveAcc = 0;
+  window.addEventListener("pointermove", function (e) {
+    var t = performance.now();
+    if (t - moveAcc < 90) return;     // throttle ripple injection
+    moveAcc = t;
+    spawnRadial(e.clientX, e.clientY, CFG.amp * 0.55);
+  }, { passive: true });
+  var clickAcc = 0;
+  window.addEventListener("pointerdown", function (e) {
+    var t = performance.now();
+    if (t - clickAcc < CFG.clickCooldown) return;   // cooldown between click pulses
+    clickAcc = t;
+    spawnRadial(e.clientX, e.clientY, CFG.amp * 1.8);
+  }, { passive: true });
+
   var resizeTimer;
   window.addEventListener("resize", function () {
     clearTimeout(resizeTimer);
