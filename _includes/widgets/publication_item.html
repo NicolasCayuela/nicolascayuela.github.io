@@ -5,7 +5,9 @@
 <div class="pub-item d-none d-md-flex">
     <div class="pub-cover">
         {% if has_cover %}
-        <img data-src="{{ '/' | append: item.cover | relative_url }}" alt="{{ item.title }}" class="lazy" src="{{ '/assets/images/empty_300x200.png' | relative_url }}">
+        <a href="{{ '/' | append: item.cover | relative_url }}" target="_blank" rel="noopener" title="{{ item.title }}">
+            <span class="pub-cover-zoom"><img data-src="{{ '/' | append: item.cover | relative_url }}" alt="{{ item.title }}" class="lazy" src="{{ '/assets/images/empty_300x200.png' | relative_url }}"></span>
+        </a>
         {% else %}
         <div class="pub-cover-placeholder"><i class="far fa-file-alt"></i></div>
         {% endif %}
@@ -36,7 +38,9 @@
 
 <div class="pub-item d-md-none flex-column">
     {% if has_cover %}
-    <img data-src="{{ '/' | append: item.cover | relative_url }}" alt="{{ item.title }}" class="lazy w-100 rounded-sm mb-2" src="{{ '/assets/images/empty_300x200.png' | relative_url }}">
+    <a href="{{ '/' | append: item.cover | relative_url }}" target="_blank" rel="noopener" class="pub-cover-m mb-2" title="{{ item.title }}">
+        <img data-src="{{ '/' | append: item.cover | relative_url }}" alt="{{ item.title }}" class="lazy w-100" src="{{ '/assets/images/empty_300x200.png' | relative_url }}">
+    </a>
     {% endif %}
     <div>
         <h5 class="pub-title">{{ item.title }} {% if item.pub %}<span class="pub-badge">{{ item.pub }}</span>{% endif %}</h5>
