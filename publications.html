@@ -12,22 +12,28 @@ body_attr: >-
     .pub-item:last-child { border-bottom: 0; }
     .pub-item:hover { background: #f7f9fc; }
     .pub-cover { flex: 0 0 210px; }
-    .pub-cover a { display: block; border-radius: 12px; padding: 4px;
-        background: linear-gradient(135deg, #2bb39a 0%, #1c54e5 55%, #7a3df0 100%);
-        box-shadow: 0 8px 24px rgba(15,25,55,.22); transition: transform .2s ease, box-shadow .2s ease; }
-    .pub-cover a:hover { transform: translateY(-4px); box-shadow: 0 16px 38px rgba(15,25,55,.34); }
+    .pub-cover a { display: block; border-radius: 12px; padding: 4px; cursor: zoom-in;
+        background: linear-gradient(135deg, #6fc7a6 0%, #2f9e86 50%, #1c6f5a 100%);
+        box-shadow: 0 8px 24px rgba(20,70,55,.26); transition: transform .2s ease, box-shadow .2s ease; }
+    .pub-cover a:hover { transform: translateY(-4px); box-shadow: 0 16px 38px rgba(20,70,55,.38); }
     .pub-cover img { width: 100%; display: block; border-radius: 9px; }
     .pub-cover .pub-cover-zoom { position: relative; }
     .pub-cover .pub-cover-zoom::after { content: "\f00e"; font-family: "Font Awesome 5 Free"; font-weight: 900;
         position: absolute; right: 10px; bottom: 10px; width: 28px; height: 28px; border-radius: 50%;
         display: flex; align-items: center; justify-content: center; font-size: .8rem; color: #fff;
-        background: rgba(11,14,20,.6); opacity: 0; transition: opacity .2s ease; }
+        background: rgba(28,111,90,.75); opacity: 0; transition: opacity .2s ease; }
     .pub-cover a:hover .pub-cover-zoom::after { opacity: 1; }
     /* Mobile cover gets the same gradient frame, full width. */
-    .pub-cover-m { display: block; border-radius: 12px; padding: 4px;
-        background: linear-gradient(135deg, #2bb39a 0%, #1c54e5 55%, #7a3df0 100%);
-        box-shadow: 0 8px 24px rgba(15,25,55,.22); }
+    .pub-cover-m { display: block; border-radius: 12px; padding: 4px; cursor: zoom-in;
+        background: linear-gradient(135deg, #6fc7a6 0%, #2f9e86 50%, #1c6f5a 100%);
+        box-shadow: 0 8px 24px rgba(20,70,55,.26); }
     .pub-cover-m img { border-radius: 9px; display: block; }
+    /* On-page lightbox: click a cover to zoom in without leaving the page. */
+    .pub-lb { position: fixed; inset: 0; z-index: 1080; display: none; align-items: center; justify-content: center;
+        background: rgba(6,12,10,.9); padding: 3vmin; cursor: zoom-out; }
+    .pub-lb.open { display: flex; }
+    .pub-lb img { max-width: 95vw; max-height: 95vh; border-radius: 8px;
+        box-shadow: 0 24px 70px rgba(0,0,0,.6); }
     .pub-cover-placeholder { width: 150px; height: 100px; border-radius: 10px; display: flex; align-items: center;
         justify-content: center; font-size: 2rem; color: #aab6cb;
         background: linear-gradient(135deg, #eef2f8, #dde5f0); }
@@ -113,3 +119,32 @@ body_attr: >-
     </div>
 
 </div>
+
+<!-- Cover lightbox: zoom a poster on the page instead of opening a new tab -->
+<div id="pub-lightbox" class="pub-lb" aria-hidden="true"><img src="" alt=""></div>
+<script>
+(function () {
+    var lb = document.getElementById("pub-lightbox");
+    if (!lb) return;
+    var img = lb.querySelector("img");
+    function open(src, alt) {
+        img.src = src; img.alt = alt || "";
+        lb.classList.add("open"); lb.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+    }
+    function close() {
+        lb.classList.remove("open"); lb.setAttribute("aria-hidden", "true");
+        img.src = ""; document.body.style.overflow = "";
+    }
+    document.querySelectorAll("a.pub-lightbox").forEach(function (a) {
+        a.addEventListener("click", function (e) {
+            e.preventDefault();
+            open(a.getAttribute("href"), a.getAttribute("title"));
+        });
+    });
+    lb.addEventListener("click", close);
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") close();
+    });
+})();
+</script>
