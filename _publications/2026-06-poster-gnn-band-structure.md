@@ -2,6 +2,8 @@
 title: "Graph Neural Networks for Full Band-Structure Prediction in Architected Metamaterials"
 authors:
   - Nicolas Cayuela
+  - Mourad Oudich
+  - Badreddine Assouar
 pub: "Poster"
 date: 2026-06-01
 cover: assets/images/poster-gnn-band-structure.png
