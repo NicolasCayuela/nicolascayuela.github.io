@@ -25,28 +25,28 @@
 
   var CFG = {
     spacing: 46,        // lattice pitch in px (unit-cell size)
-    jitter: 0.32,       // random lattice disorder (0 = perfect crystal)
-    amp: 15,            // peak node displacement (px)
-    wavelength: 190,    // spatial period of a wave (px)
-    speed: 100,         // wave phase speed (px/s)
-    waveLife: 20,     // seconds a ripple stays alive
-    maxWaves: 40,       // perf backstop only; high so live ripples are never cut
-    autoMin: 2,       // min seconds between random excitations
-    autoMax: 5,       // max seconds between random excitations
-    planeProb: 0.5,    // share of auto excitations that are sweeping plane waves
-    topoProb: 0.18,     // share that are robust topological edge modes (border path)
-    shearProb: 0.3,     // share of waves that are shear-dominant (transverse mode)
-    shear: 0.42,        // transverse amplitude as a fraction of longitudinal (P mode)
-    frontWidth: 30,     // wavefront thickness (px, gaussian std) -> sharpness
+    jitter: 0.18,       // random lattice disorder (0 = perfect crystal)
+    amp: 12,            // peak node displacement (px)
+    wavelength: 175,    // spatial period of a wave (px)
+    speed: 115,         // wave phase speed (px/s)
+    waveLife: 18,       // seconds a ripple stays alive
+    maxWaves: 24,       // perf backstop only; high so live ripples are never cut
+    autoMin: 2.5,       // min seconds between random excitations
+    autoMax: 5.5,       // max seconds between random excitations
+    planeProb: 0.34,    // share of auto excitations that are sweeping plane waves
+    topoProb: 0.16,     // share that are robust topological edge modes (border path)
+    shearProb: 0.32,    // share of waves that are shear-dominant (transverse mode)
+    shear: 0.45,        // transverse amplitude as a fraction of longitudinal (P mode)
+    frontWidth: 26,     // wavefront thickness (px, gaussian std) -> sharpness
     cullWidth: 4,       // node-vs-wave cull band, in frontWidths (perf)
-    linkDist: 1.9,      // neighbour link cutoff, in lattice pitches
-    vigMin: 0.30,       // field opacity behind the centred content (0 = hidden)
-    vigAx: 0.52,        // half-width of the dimmed central band (frac of W/2)
-    vigAy: 0.85,        // half-height of the dimmed central band (frac of H/2)
-    baseAlpha: 0.22,    // resting link opacity (idle = faint blue, COMSOL low end)
-    peakAlpha: 0.95,    // link opacity at the crest 
-    nodeAlpha: 0.6,
-    opacity: 0.6,       // whole-canvas opacity
+    linkDist: 1.6,      // neighbour link cutoff, in lattice pitches
+    vigMin: 0.26,       // field opacity behind the centred content (0 = hidden)
+    vigAx: 0.55,        // half-width of the dimmed central band (frac of W/2)
+    vigAy: 0.90,        // half-height of the dimmed central band (frac of H/2)
+    baseAlpha: 0.16,    // resting link opacity (idle = faint blue, COMSOL low end)
+    peakAlpha: 0.90,    // link opacity at the crest
+    nodeAlpha: 0.5,
+    opacity: 0.55,      // whole-canvas opacity
     fps: 60
   };
 
