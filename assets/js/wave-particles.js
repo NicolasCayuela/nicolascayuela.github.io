@@ -25,15 +25,15 @@
 
   var CFG = {
     spacing: 46,        // lattice pitch in px (unit-cell size)
-    jitter: 0.18,       // random lattice disorder (0 = perfect crystal)
-    amp: 19,            // peak node displacement (px)
+    jitter: 0.32,       // random lattice disorder (0 = perfect crystal)
+    amp: 15,            // peak node displacement (px)
     wavelength: 190,    // spatial period of a wave (px)
-    speed: 130,         // wave phase speed (px/s)
-    waveLife: 22.5,     // seconds a ripple stays alive
+    speed: 100,         // wave phase speed (px/s)
+    waveLife: 20,     // seconds a ripple stays alive
     maxWaves: 40,       // perf backstop only; high so live ripples are never cut
-    autoMin: 1.8,       // min seconds between random excitations
-    autoMax: 4.5,       // max seconds between random excitations
-    planeProb: 0.34,    // share of auto excitations that are sweeping plane waves
+    autoMin: 2,       // min seconds between random excitations
+    autoMax: 5,       // max seconds between random excitations
+    planeProb: 0.5,    // share of auto excitations that are sweeping plane waves
     topoProb: 0.18,     // share that are robust topological edge modes (border path)
     shearProb: 0.3,     // share of waves that are shear-dominant (transverse mode)
     shear: 0.42,        // transverse amplitude as a fraction of longitudinal (P mode)
@@ -44,13 +44,13 @@
     vigAx: 0.52,        // half-width of the dimmed central band (frac of W/2)
     vigAy: 0.85,        // half-height of the dimmed central band (frac of H/2)
     baseAlpha: 0.22,    // resting link opacity (idle = faint blue, COMSOL low end)
-    peakAlpha: 0.95,    // link opacity at the crest (COMSOL high end)
+    peakAlpha: 0.95,    // link opacity at the crest 
     nodeAlpha: 0.6,
     opacity: 0.6,       // whole-canvas opacity
     fps: 60
   };
 
-  // COMSOL "Rainbow" (jet) colormap: t in [0,1] -> [r,g,b] 0..255
+  // "Rainbow" (jet) colormap: t in [0,1] -> [r,g,b] 0..255
   function jet(t) {
     if (t < 0) t = 0; else if (t > 1) t = 1;
     var r = Math.max(0, Math.min(1, Math.min(4 * t - 1.5, -4 * t + 4.5)));
