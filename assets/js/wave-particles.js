@@ -38,7 +38,6 @@
     frontWidth: 30,     // wavefront thickness (px, gaussian std) -> sharpness
     gapRadius: 0.13,    // band-gap inclusion radius, fraction of min(W,H)
     gapDamp: 0.10,      // residual node response inside the inclusion (the gap)
-    linkDist: 1.9,      // neighbour link cutoff, in lattice pitches
     baseAlpha: 0.22,    // resting link opacity (idle = faint blue, COMSOL low end)
     peakAlpha: 0.95,    // link opacity at the crest (COMSOL high end)
     nodeAlpha: 0.6,
@@ -85,18 +84,23 @@
     canvas.height = H * DPR;
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
+    // Triangular (hexagonal) lattice: alternate rows offset by half a pitch and
+    // packed at sqrt(3)/2 vertical spacing, so each cell has six equidistant
+    // neighbours, like a real phononic lattice (vs the old square grid).
     var s = CFG.spacing;
+    var vs = s * 0.8660254;            // row pitch of a triangular lattice
     cols = Math.ceil(W / s) + 2;
-    rows = Math.ceil(H / s) + 2;
+    rows = Math.ceil(H / vs) + 2;
     nodes = [];
     for (var r = 0; r < rows; r++) {
+      var rowOff = (r & 1) ? s * 0.5 : 0;
       for (var c = 0; c < cols; c++) {
         var seed = r * 73.13 + c * 31.7 + 1;
         var jx = (rand(seed) - 0.5) * 2 * CFG.jitter * s;
         var jy = (rand(seed + 0.5) - 0.5) * 2 * CFG.jitter * s;
         nodes.push({
-          ox: (c - 0.5) * s + jx,
-          oy: (r - 0.5) * s + jy,
+          ox: (c - 0.5) * s + rowOff + jx,
+          oy: (r - 0.5) * vs + jy,
           x: 0, y: 0, strain: 0
         });
       }
@@ -118,14 +122,16 @@
       gn.heavy = gd < gapR;                       // drawn as fixed resonators
     }
 
-    // neighbour links: right, down, both diagonals (within cutoff)
-    var cut = (CFG.linkDist * s) * (CFG.linkDist * s);
+    // neighbour links: the forward half of the 6-neighbourhood. The cutoff is
+    // just above one pitch so only nearest neighbours connect (clean triangles);
+    // the candidate set covers both row parities.
+    var cut = (s * 1.15) * (s * 1.15);
     links = [];
     function idx(c, r) { return r * cols + c; }
     for (var rr = 0; rr < rows; rr++) {
       for (var cc = 0; cc < cols; cc++) {
         var a = idx(cc, rr);
-        var cand = [[cc + 1, rr], [cc, rr + 1], [cc + 1, rr + 1], [cc - 1, rr + 1]];
+        var cand = [[cc + 1, rr], [cc - 1, rr + 1], [cc, rr + 1], [cc + 1, rr + 1]];
         for (var n = 0; n < cand.length; n++) {
           var nc = cand[n][0], nr = cand[n][1];
           if (nc < 0 || nc >= cols || nr < 0 || nr >= rows) continue;
