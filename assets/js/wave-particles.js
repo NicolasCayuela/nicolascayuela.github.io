@@ -34,10 +34,16 @@
     autoMin: 1.2,       // min seconds between random excitations
     autoMax: 3,         // max seconds between random excitations
     planeProb: 0.34,    // share of auto excitations that are sweeping plane waves
-    shear: 0.42,        // transverse amplitude as a fraction of longitudinal
+    shearProb: 0.3,     // share of waves that are shear-dominant (transverse mode)
+    shear: 0.42,        // transverse amplitude as a fraction of longitudinal (P mode)
     frontWidth: 30,     // wavefront thickness (px, gaussian std) -> sharpness
+    cullWidth: 4,       // node-vs-wave cull band, in frontWidths (perf)
     gapRadius: 0.13,    // band-gap inclusion radius, fraction of min(W,H)
     gapDamp: 0.10,      // residual node response inside the inclusion (the gap)
+    linkDist: 1.9,      // neighbour link cutoff, in lattice pitches
+    vigMin: 0.30,       // field opacity behind the centred content (0 = hidden)
+    vigAx: 0.52,        // half-width of the dimmed central band (frac of W/2)
+    vigAy: 0.85,        // half-height of the dimmed central band (frac of H/2)
     baseAlpha: 0.22,    // resting link opacity (idle = faint blue, COMSOL low end)
     peakAlpha: 0.95,    // link opacity at the crest (COMSOL high end)
     nodeAlpha: 0.6,
@@ -84,23 +90,19 @@
     canvas.height = H * DPR;
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
-    // Triangular (hexagonal) lattice: alternate rows offset by half a pitch and
-    // packed at sqrt(3)/2 vertical spacing, so each cell has six equidistant
-    // neighbours, like a real phononic lattice (vs the old square grid).
+    // Square lattice of unit cells with a little disorder.
     var s = CFG.spacing;
-    var vs = s * 0.8660254;            // row pitch of a triangular lattice
     cols = Math.ceil(W / s) + 2;
-    rows = Math.ceil(H / vs) + 2;
+    rows = Math.ceil(H / s) + 2;
     nodes = [];
     for (var r = 0; r < rows; r++) {
-      var rowOff = (r & 1) ? s * 0.5 : 0;
       for (var c = 0; c < cols; c++) {
         var seed = r * 73.13 + c * 31.7 + 1;
         var jx = (rand(seed) - 0.5) * 2 * CFG.jitter * s;
         var jy = (rand(seed + 0.5) - 0.5) * 2 * CFG.jitter * s;
         nodes.push({
-          ox: (c - 0.5) * s + rowOff + jx,
-          oy: (r - 0.5) * vs + jy,
+          ox: (c - 0.5) * s + jx,
+          oy: (r - 0.5) * s + jy,
           x: 0, y: 0, strain: 0
         });
       }
@@ -122,16 +124,14 @@
       gn.heavy = gd < gapR;                       // drawn as fixed resonators
     }
 
-    // neighbour links: the forward half of the 6-neighbourhood. The cutoff is
-    // just above one pitch so only nearest neighbours connect (clean triangles);
-    // the candidate set covers both row parities.
-    var cut = (s * 1.15) * (s * 1.15);
+    // neighbour links: right, down, both diagonals (within cutoff)
+    var cut = (CFG.linkDist * s) * (CFG.linkDist * s);
     links = [];
     function idx(c, r) { return r * cols + c; }
-    for (var rr = 0; rr < rows; rr++) {
+    for (var rrr = 0; rrr < rows; rrr++) {
       for (var cc = 0; cc < cols; cc++) {
-        var a = idx(cc, rr);
-        var cand = [[cc + 1, rr], [cc - 1, rr + 1], [cc, rr + 1], [cc + 1, rr + 1]];
+        var a = idx(cc, rrr);
+        var cand = [[cc + 1, rrr], [cc, rrr + 1], [cc + 1, rrr + 1], [cc - 1, rrr + 1]];
         for (var n = 0; n < cand.length; n++) {
           var nc = cand[n][0], nr = cand[n][1];
           if (nc < 0 || nc >= cols || nr < 0 || nr >= rows) continue;
@@ -143,24 +143,28 @@
     }
   }
 
-  function spawnRadial(x, y, amp) {
+  // lon/sh are the longitudinal and transverse (shear) weights of the wave.
+  // P-wave: lon=1, sh=CFG.shear. Shear-dominant: lon small, sh large.
+  function spawnRadial(x, y, amp, lon, sh) {
     if (waves.length >= CFG.maxWaves) waves.shift();
     waves.push({
       kind: 0, x: x, y: y, nx: 0, ny: 0, t: 0,
-      amp: amp, k: (2 * Math.PI) / CFG.wavelength, life: CFG.waveLife
+      amp: amp, k: (2 * Math.PI) / CFG.wavelength, life: CFG.waveLife,
+      lon: lon == null ? 1 : lon, sh: sh == null ? CFG.shear : sh
     });
   }
 
   // plane wave: a flat front entering from one edge and sweeping across, the
   // origin point sits just outside that edge so the front crosses the screen.
-  function spawnPlane(amp) {
+  function spawnPlane(amp, lon, sh) {
     if (waves.length >= CFG.maxWaves) waves.shift();
     var ang = Math.random() * Math.PI * 2;
     var nx = Math.cos(ang), ny = Math.sin(ang);
     var cx = W * 0.5, cy = H * 0.5, span = Math.sqrt(W * W + H * H) * 0.5;
     waves.push({
       kind: 1, x: cx - nx * span, y: cy - ny * span, nx: nx, ny: ny, t: 0,
-      amp: amp, k: (2 * Math.PI) / CFG.wavelength, life: CFG.waveLife
+      amp: amp, k: (2 * Math.PI) / CFG.wavelength, life: CFG.waveLife,
+      lon: lon == null ? 1 : lon, sh: sh == null ? CFG.shear : sh
     });
   }
 
@@ -180,20 +184,32 @@
   // quarter-phase out, so a node traces an ellipse. Returns the peak strain.
   function displaceNodes() {
     var maxStrain = 1e-4, i, k, w, dx, dy, d, p, dirx, diry, lon, sh;
+    var cull = CFG.cullWidth * CFG.frontWidth;
+    // per-wave front radius + cull band (squared) so the inner loop can skip
+    // nodes outside the active ring without any sqrt.
+    for (k = 0; k < waves.length; k++) {
+      var fr = CFG.speed * waves[k].t;
+      waves[k]._lo = Math.max(0, fr - cull); waves[k]._hi = fr + cull;
+      waves[k]._lo2 = waves[k]._lo * waves[k]._lo;
+      waves[k]._hi2 = waves[k]._hi * waves[k]._hi;
+    }
     for (i = 0; i < nodes.length; i++) {
       var n = nodes[i], ux = 0, uy = 0;
       for (k = 0; k < waves.length; k++) {
         w = waves[k];
         if (w.kind === 0) {                  // radial
           dx = n.ox - w.x; dy = n.oy - w.y;
-          d = Math.sqrt(dx * dx + dy * dy) + 0.001;
+          var dsq = dx * dx + dy * dy;
+          if (dsq > w._hi2 || dsq < w._lo2) continue;   // outside the active ring
+          d = Math.sqrt(dsq) + 0.001;
           dirx = dx / d; diry = dy / d; p = d;
         } else {                             // plane
           dirx = w.nx; diry = w.ny;
           p = (n.ox - w.x) * w.nx + (n.oy - w.y) * w.ny;
+          if (p < w._lo || p > w._hi) continue;         // front not here yet / gone
         }
-        lon = waveField(w, p, false);
-        sh = waveField(w, p, true) * CFG.shear;
+        lon = waveField(w, p, false) * w.lon;
+        sh = waveField(w, p, true) * w.sh;
         ux += dirx * lon - diry * sh;        // longitudinal + transverse (perp)
         uy += diry * lon + dirx * sh;
       }
@@ -215,15 +231,21 @@
   scheduleAuto();
 
   function autoExcite() {
+    // shear-dominant mode: mostly transverse motion (lon small, sh large),
+    // the S-wave counterpart of the default longitudinal P-wave.
+    var shearMode = Math.random() < CFG.shearProb;
+    var lon = shearMode ? 0.35 : 1;
+    var sh = shearMode ? 1.0 : CFG.shear;
     if (Math.random() < CFG.planeProb) {
-      spawnPlane(CFG.amp * (1.0 + Math.random() * 0.6));
+      spawnPlane(CFG.amp * (1.0 + Math.random() * 0.6), lon, sh);
     } else {
-      spawnRadial(Math.random() * W, Math.random() * H, CFG.amp * (1.4 + Math.random() * 0.8));
+      spawnRadial(Math.random() * W, Math.random() * H, CFG.amp * (1.4 + Math.random() * 0.8), lon, sh);
     }
   }
 
   function frame(now) {
     requestAnimationFrame(frame);
+    if (document.hidden) { last = 0; return; }   // idle in background tabs (battery)
     if (!last) last = now;
     var dt = (now - last) / 1000;
     last = now;
@@ -351,6 +373,23 @@
       ctx.arc(nd.x, nd.y, rad, 0, 6.2832);
       ctx.fill();
     }
+    ctx.globalCompositeOperation = "source-over";
+
+    // legibility vignette: fade the whole field inside a central ellipse so it
+    // does not compete with the page text. One destination-out gradient pass,
+    // removing up to (1 - vigMin) of the centre and nothing at the edges.
+    ctx.save();
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.translate(W * 0.5, H * 0.5);
+    ctx.scale(W * 0.5 * CFG.vigAx, H * 0.5 * CFG.vigAy);
+    var vg = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
+    vg.addColorStop(0, "rgba(0,0,0," + (1 - CFG.vigMin).toFixed(3) + ")");
+    vg.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = vg;
+    ctx.beginPath();
+    ctx.arc(0, 0, 1, 0, 6.2832);
+    ctx.fill();
+    ctx.restore();
     ctx.globalCompositeOperation = "source-over";
   }
 
