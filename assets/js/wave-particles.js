@@ -34,6 +34,7 @@
     autoMin: 1.2,       // min seconds between random excitations
     autoMax: 3,         // max seconds between random excitations
     planeProb: 0.34,    // share of auto excitations that are sweeping plane waves
+    topoProb: 0.18,     // share that are robust topological edge modes (border path)
     shearProb: 0.3,     // share of waves that are shear-dominant (transverse mode)
     shear: 0.42,        // transverse amplitude as a fraction of longitudinal (P mode)
     frontWidth: 30,     // wavefront thickness (px, gaussian std) -> sharpness
@@ -168,6 +169,30 @@
     });
   }
 
+  // robust topological edge mode: a wave packet that travels along the lattice
+  // boundary (rectangular path, inset from the screen edges) and turns the
+  // corners without backscattering, exciting only nodes within a thin channel
+  // around the path. The rest of the lattice stays still, like a chiral edge
+  // state in a topological phononic insulator.
+  function spawnEdge(amp) {
+    if (waves.length >= CFG.maxWaves) waves.shift();
+    var m = CFG.spacing * 2.2;            // channel inset from the border
+    var pts = [[m, m], [W - m, m], [W - m, H - m], [m, H - m]];
+    var segs = [], arc = 0;
+    for (var i = 0; i < 4; i++) {
+      var a = pts[i], b = pts[(i + 1) % 4];
+      var dx = b[0] - a[0], dy = b[1] - a[1], len = Math.sqrt(dx * dx + dy * dy);
+      segs.push({ x: a[0], y: a[1], ux: dx / len, uy: dy / len, len: len, arc: arc });
+      arc += len;
+    }
+    var chHalf = CFG.spacing * 1.2;
+    waves.push({
+      kind: 2, t: 0, amp: amp, k: (2 * Math.PI) / CFG.wavelength, life: CFG.waveLife,
+      segs: segs, L: arc, inset: m, chHalf: chHalf, chCull: chHalf * 3,
+      sigA: CFG.wavelength * 1.1, dir: Math.random() < 0.5 ? 1 : -1
+    });
+  }
+
   // scalar field of one wave at signed propagation coordinate `p`. quad=true
   // returns the quarter-phase (cosine) component used for the transverse part.
   function waveField(w, p, quad) {
@@ -197,6 +222,30 @@
       var n = nodes[i], ux = 0, uy = 0;
       for (k = 0; k < waves.length; k++) {
         w = waves[k];
+        if (w.kind === 2) {                  // topological edge mode (border path)
+          var mb = Math.min(n.ox, W - n.ox, n.oy, H - n.oy);
+          if (Math.abs(mb - w.inset) > w.chCull) continue;   // not near the channel
+          var best = 1e9, bArc = 0, bdx = 0, bdy = 0, sgi;
+          for (sgi = 0; sgi < 4; sgi++) {
+            var sg = w.segs[sgi];
+            var pr = (n.ox - sg.x) * sg.ux + (n.oy - sg.y) * sg.uy;
+            if (pr < 0) pr = 0; else if (pr > sg.len) pr = sg.len;
+            var ex = n.ox - (sg.x + sg.ux * pr), ey = n.oy - (sg.y + sg.uy * pr);
+            var e2 = ex * ex + ey * ey;
+            if (e2 < best) { best = e2; bArc = sg.arc + pr; bdx = sg.ux; bdy = sg.uy; }
+          }
+          var trans = Math.sqrt(best);
+          if (trans > w.chCull) continue;
+          var da = bArc - w.dir * CFG.speed * w.t;
+          da -= w.L * Math.round(da / w.L);                  // wrap around the loop
+          var decE = 1 - w.t / w.life; if (decE < 0) decE = 0;
+          var dE = w.amp * decE
+            * Math.exp(-(da * da) / (2 * w.sigA * w.sigA))
+            * Math.exp(-(trans * trans) / (2 * w.chHalf * w.chHalf))
+            * Math.sin(w.k * da);
+          ux += -bdy * dE; uy += bdx * dE;                   // transverse to the path
+          continue;
+        }
         if (w.kind === 0) {                  // radial
           dx = n.ox - w.x; dy = n.oy - w.y;
           var dsq = dx * dx + dy * dy;
@@ -231,8 +280,12 @@
   scheduleAuto();
 
   function autoExcite() {
-    // shear-dominant mode: mostly transverse motion (lon small, sh large),
-    // the S-wave counterpart of the default longitudinal P-wave.
+    // robust topological edge mode now and then: travels the boundary, leaves
+    // the bulk still.
+    if (Math.random() < CFG.topoProb) { spawnEdge(CFG.amp * 1.15); return; }
+    // otherwise a randomly polarised bulk wave. shear-dominant mode: mostly
+    // transverse motion (lon small, sh large), the S-wave counterpart of the
+    // default longitudinal P-wave.
     var shearMode = Math.random() < CFG.shearProb;
     var lon = shearMode ? 0.35 : 1;
     var sh = shearMode ? 1.0 : CFG.shear;
@@ -429,7 +482,9 @@
     // so it must repaint when the user toggles dark/light (theme.js fires this).
     window.addEventListener("themechange", renderStatic);
   } else {
-    spawnRadial(W * 0.06, H * 0.5, CFG.amp * (1.4 + Math.random() * 0.8));   // start at the left edge, not behind the centred text
+    // Random first excitation on every page load: position, polarisation and
+    // wave kind all vary, so the background never opens the same way twice.
+    autoExcite();
     requestAnimationFrame(frame);
   }
 })();
