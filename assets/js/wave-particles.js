@@ -29,10 +29,10 @@
     amp: 19,            // peak node displacement (px)
     wavelength: 190,    // spatial period of a wave (px)
     speed: 130,         // wave phase speed (px/s)
-    waveLife: 15,       // seconds a ripple stays alive
+    waveLife: 22.5,     // seconds a ripple stays alive
     maxWaves: 40,       // perf backstop only; high so live ripples are never cut
-    autoMin: 1.2,       // min seconds between random excitations
-    autoMax: 3,         // max seconds between random excitations
+    autoMin: 1.8,       // min seconds between random excitations
+    autoMax: 4.5,       // max seconds between random excitations
     planeProb: 0.34,    // share of auto excitations that are sweeping plane waves
     topoProb: 0.18,     // share that are robust topological edge modes (border path)
     shearProb: 0.3,     // share of waves that are shear-dominant (transverse mode)
