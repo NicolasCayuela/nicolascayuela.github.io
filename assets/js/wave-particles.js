@@ -1,20 +1,21 @@
 /*
- * Elastic-wave metamaterial background (v2).
+ * Elastic-wave metamaterial background.
  *
  * A periodic lattice of nodes (the "unit cells" of a phononic crystal /
  * acoustic metamaterial). Elastic waves travel through it and displace the
  * nodes; the links between neighbours light up with the local strain, so you
  * literally see the wavefronts ripple through the periodic medium.
  *
- * Two wave kinds run together:
- *   - radial pulses (point sources, like a tap on the medium), and
- *   - plane waves that sweep across the lattice along a direction (Bloch-like
- *     propagation along a path).
- * Each carries a longitudinal part (motion along propagation) and a smaller
- * transverse/shear part a quarter-phase out, so nodes trace little ellipses,
- * the way particles move in a real surface elastic wave.
+ * Three wave kinds run together, each at its own speed (dispersion):
+ *   - radial pulses (point sources, like a tap on the medium),
+ *   - plane waves sweeping across the lattice along a direction, and
+ *   - topological edge modes that travel the boundary and turn the corners,
+ *     exciting only a thin channel and leaving the bulk still.
+ * Bulk waves carry a longitudinal part (motion along propagation) and a
+ * smaller transverse/shear part a quarter-phase out, so nodes trace little
+ * ellipses, the way particles move in a real surface elastic wave.
  *
- * Moving the pointer injects small ripples, clicking emits a strong pulse.
+ * Pointer move injects small ripples; click emits a stronger pulse (cooldown).
  * Pure <canvas>, no dependency. Runs behind the page content.
  */
 (function () {
