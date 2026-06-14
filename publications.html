@@ -52,7 +52,13 @@ body_attr: >-
     .pub-year-card { border-radius: 14px; box-shadow: 0 4px 16px rgba(25,40,80,.08); overflow: hidden; }
     /* Long band-structure equations scroll horizontally on narrow screens
        instead of forcing the abstract column wider than the card. */
-    .pub-abstract mjx-container[display="true"] { max-width: 100%; overflow-x: auto; overflow-y: hidden; }
+    .pub-abstract mjx-container[display="true"] { max-width: 100%; overflow-x: auto; overflow-y: hidden;
+        margin: .35em 0; }
+    /* Abstract section headers: bold, larger, higher contrast than the body. */
+    .pub-abstract .pub-h { display: block; font-size: 1.0rem; font-weight: 700; letter-spacing: .01em;
+        color: #16223c; margin: 1rem 0 .3rem; }
+    .pub-abstract .pub-h:first-child { margin-top: 0; }
+    html.theme-dark .pub-abstract .pub-h { color: #e6edfa; }
 </style>
 
 {% if site.data.profile.gscholar %}
