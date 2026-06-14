@@ -423,17 +423,6 @@
   }
 
   // pointer = wave source
-  var moveAcc = 0;
-  window.addEventListener("pointermove", function (e) {
-    var t = performance.now();
-    if (t - moveAcc < 90) return;     // throttle ripple injection
-    moveAcc = t;
-    spawnRadial(e.clientX, e.clientY, CFG.amp * 0.55);
-  }, { passive: true });
-  window.addEventListener("pointerdown", function (e) {
-    spawnRadial(e.clientX, e.clientY, CFG.amp * 1.8);
-  }, { passive: true });
-
   var resizeTimer;
   window.addEventListener("resize", function () {
     clearTimeout(resizeTimer);
