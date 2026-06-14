@@ -123,10 +123,8 @@
     <script src="assets/js/i18n.js?v=fr"></script>
     <script src="assets/js/theme.js?v=2"></script>
 
-    <!-- Elastic-wave metamaterial background on every page (bump ?v= to bust cache).
-         wave-field.js runs a WebGL field simulation on desktop and self-falls-back
-         to wave-particles.js (canvas2d) on phones / reduced-motion / no-WebGL. -->
-    <script src="{{ '/assets/js/wave-field.js' | relative_url }}?v=1"></script>
+    <!-- Elastic-wave metamaterial background on every page (bump ?v= to bust cache) -->
+    <script src="{{ '/assets/js/wave-particles.js' | relative_url }}?v=v3"></script>
 
     {% if page.mathjax %}
     <!-- MathJax: only loaded on pages that opt in via `mathjax: true` front matter -->
