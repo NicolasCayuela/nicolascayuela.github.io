@@ -39,8 +39,6 @@
     shear: 0.42,        // transverse amplitude as a fraction of longitudinal (P mode)
     frontWidth: 30,     // wavefront thickness (px, gaussian std) -> sharpness
     cullWidth: 4,       // node-vs-wave cull band, in frontWidths (perf)
-    gapRadius: 0.13,    // band-gap inclusion radius, fraction of min(W,H)
-    gapDamp: 0.10,      // residual node response inside the inclusion (the gap)
     linkDist: 1.9,      // neighbour link cutoff, in lattice pitches
     vigMin: 0.30,       // field opacity behind the centred content (0 = hidden)
     vigAx: 0.52,        // half-width of the dimmed central band (frac of W/2)
@@ -75,7 +73,6 @@
   var links = [];       // [iA, iB] precomputed neighbour pairs
   var waves = [];       // {kind, x, y, nx, ny, t, amp, k, life}
   var SIG2 = 2 * CFG.frontWidth * CFG.frontWidth;
-  var gapCx = 0, gapCy = 0, gapR = 0;   // band-gap inclusion (mass-loaded zone)
 
   // deterministic pseudo-random so the lattice disorder is stable across resizes
   function rand(seed) {
@@ -107,22 +104,6 @@
           x: 0, y: 0, strain: 0
         });
       }
-    }
-
-    // Band-gap inclusion: a circular cluster of mass-loaded "heavy" unit cells.
-    // Sits off the centred page text (right side). Nodes inside barely respond,
-    // so wavefronts ripple up to it and the region stays calm: a visible gap.
-    gapR = CFG.gapRadius * Math.min(W, H);
-    gapCx = W * 0.80;
-    gapCy = H * 0.30;
-    var edge = s * 1.6;
-    for (var gi = 0; gi < nodes.length; gi++) {
-      var gn = nodes[gi];
-      var gd = Math.sqrt((gn.ox - gapCx) * (gn.ox - gapCx) + (gn.oy - gapCy) * (gn.oy - gapCy));
-      var tt = (gd - gapR) / edge; if (tt < 0) tt = 0; else if (tt > 1) tt = 1;
-      var sm = tt * tt * (3 - 2 * tt);            // smoothstep ramp at the edge
-      gn.gap = CFG.gapDamp + (1 - CFG.gapDamp) * sm;
-      gn.heavy = gd < gapR;                       // drawn as fixed resonators
     }
 
     // neighbour links: right, down, both diagonals (within cutoff)
@@ -262,7 +243,6 @@
         ux += dirx * lon - diry * sh;        // longitudinal + transverse (perp)
         uy += diry * lon + dirx * sh;
       }
-      ux *= n.gap; uy *= n.gap;          // band-gap inclusion damps the response
       n.x = n.ox + ux;
       n.y = n.oy + uy;
       n.strain = Math.sqrt(ux * ux + uy * uy);
@@ -380,17 +360,6 @@
       ctx.stroke();
     }
 
-    // mass-loaded resonators of the band-gap inclusion: opaque fixed markers
-    // (source-over, before the additive passes so they read on light theme too)
-    ctx.fillStyle = dark ? "rgba(150,172,205,0.85)" : "rgba(86,108,150,0.7)";
-    for (var hi = 0; hi < nodes.length; hi++) {
-      var hn = nodes[hi];
-      if (!hn.heavy) continue;
-      ctx.beginPath();
-      ctx.arc(hn.x, hn.y, 2.4, 0, 6.2832);
-      ctx.fill();
-    }
-
     // crest bloom: re-stroke the brightest buckets wide and faint with additive
     // blending so wavefronts glow where they overlap. Few links live up here,
     // so it is cheap. Strongest on dark; a gentle touch on light.
@@ -416,7 +385,6 @@
     // strong. Additive so crossing wavefronts bloom at the nodes too.
     for (var ni = 0; ni < nodes.length; ni++) {
       var nd = nodes[ni];
-      if (nd.heavy) continue;            // resonators drawn opaque in their own pass
       var ns = nd.strain / maxStrain; if (ns > 1) ns = 1;
       var nc = lift(jet(tFloor + ns * (HUECAP - tFloor)), ns);
       ctx.fillStyle = "rgba(" + nc[0] + "," + nc[1] + "," + nc[2] + "," +
