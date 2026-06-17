@@ -12,7 +12,7 @@ layout: null
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>{{ site.url }}{{ site.baseurl }}/research-map</loc>
+    <loc>{{ site.url }}{{ site.baseurl }}/metamaterials-space</loc>
     <priority>0.5</priority>
   </url>
   <url>
