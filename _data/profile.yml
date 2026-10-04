@@ -18,10 +18,10 @@ short_bio: >-
   PhD student in phononics and metamaterials at <strong>Institut Jean Lamour</strong> in Nancy,
   France. I design phononic crystals and acoustic/elastic metamaterials, and use
   <strong>graph neural networks</strong> to predict how waves travel through them and to find geometries for a target response.
-  <br> <span style="color: red; font-style: italic;"><i class="far fa-envelope"></i>&nbsp; <a href="mailto:githubcontact.sublime067@simplelogin.com" style="color: inherit; text-decoration: underline;">Email me about research or collaborations.</a></span>
+  <br> <span class="bio-contact"><i class="far fa-envelope"></i>&nbsp; <a href="mailto:githubcontact.sublime067@simplelogin.com">Email me about research or collaborations.</a></span>
 
 show_portrait: true
-portrait_url: assets/images/photos/profile.jpg
+portrait_url: assets/images/photos/profile.webp
 # One chronological timeline (education + work), drawn as an arrow 2019 -> 2028
 # by _includes/widgets/timeline.html. kind: study | work. end: a year, or
 # "present" with `until` = planned end (drawn dashed after today).
@@ -29,7 +29,7 @@ timeline:
   - title: CPGE TSI
     org: Lycée Jean-Baptiste-Dumas
     place: Alès, France
-    logo: assets/images/badges/cpge.png
+    logo: assets/images/badges/cpge.webp
     url: "https://cpge-tsi-jbdumas.lycee-ales.fr/"
     kind: study
     start: 2019
@@ -38,7 +38,7 @@ timeline:
   - title: Engineering degree
     org: SUPMICROTECH-ENSMM, National School of Mechanics and Microtechnology
     place: Besançon, France
-    logo: assets/images/badges/ensmm.png
+    logo: assets/images/badges/ensmm.webp
     url: "https://www.supmicrotech.fr/"
     kind: study
     start: 2021
@@ -46,7 +46,7 @@ timeline:
   - title: Master Smart Mechanics
     org: EIPHI-BFC Graduate School
     place: Besançon, France
-    logo: assets/images/badges/umlp.png
+    logo: assets/images/badges/umlp.webp
     url: "https://www.umlp.fr/"
     kind: study
     start: 2023
@@ -64,7 +64,7 @@ timeline:
       - Damping identified by logarithmic decrement; storage (stiffness) modulus via COMSOL
   - title: "Internship: Multi-physics optomechanical sensor study"
     org: CEA-Leti, Université Grenoble Alpes
-    logo: assets/images/badges/leti.png
+    logo: assets/images/badges/leti.webp
     url: "https://www.leti-cea.fr/"
     kind: work
     start: 2025
@@ -76,7 +76,7 @@ timeline:
   - title: "PhD: Sustainable architected metamaterials for elastic wave manipulation"
     org: "Institut Jean Lamour, UMR CNRS 7198, N2EV department, Metamaterials and Phononics group · C2MP Doctoral School"
     place: Nancy, France
-    logo: assets/images/badges/ijl.jpg
+    logo: assets/images/badges/ijl.webp
     url: "https://ijl.univ-lorraine.fr/"
     kind: work
     start: 2025

@@ -591,54 +591,61 @@
     core.start();
   }
 
-  var canvas = makeCanvas();
-  var worker = null;
-  if (canvas.transferControlToOffscreen && window.Worker && scriptSrc) {
-    try {
-      var off = canvas.transferControlToOffscreen();
-      worker = new Worker(scriptSrc);
-      worker.onmessage = function (e) {
-        if (e.data.type === "opacity") canvas.style.opacity = e.data.v;
-        else if (e.data.type === "tier") tierNow = e.data.v;
-      };
-      // a worker that cannot run (blocked, no 2D OffscreenCanvas...) falls
-      // back to drawing on the page, on a fresh canvas (the old one is detached)
-      worker.onerror = function () {
-        worker.terminate(); worker = null;
-        canvas.remove(); canvas = makeCanvas(); startOnPage(canvas);
-      };
-      var init = state();
-      init.type = "init"; init.canvas = off;
-      worker.postMessage(init, [off]);
-      send = function (m) { if (worker) worker.postMessage(m); };
-    } catch (err) {
-      worker = null; canvas.remove(); canvas = makeCanvas();
+  // start once the page has loaded, so creating the canvas and the worker
+  // never competes with the first paint (scriptSrc was captured above, while
+  // document.currentScript was still valid)
+  var canvas, worker = null;
+  function bootPage() {
+    canvas = makeCanvas();
+    if (canvas.transferControlToOffscreen && window.Worker && scriptSrc) {
+      try {
+        var off = canvas.transferControlToOffscreen();
+        worker = new Worker(scriptSrc);
+        worker.onmessage = function (e) {
+          if (e.data.type === "opacity") canvas.style.opacity = e.data.v;
+          else if (e.data.type === "tier") tierNow = e.data.v;
+        };
+        // a worker that cannot run (blocked, no 2D OffscreenCanvas...) falls
+        // back to drawing on the page, on a fresh canvas (the old one is detached)
+        worker.onerror = function () {
+          worker.terminate(); worker = null;
+          canvas.remove(); canvas = makeCanvas(); startOnPage(canvas);
+        };
+        var init = state();
+        init.type = "init"; init.canvas = off;
+        worker.postMessage(init, [off]);
+        send = function (m) { if (worker) worker.postMessage(m); };
+      } catch (err) {
+        worker = null; canvas.remove(); canvas = makeCanvas();
+      }
     }
-  }
-  if (!worker) startOnPage(canvas);
+    if (!worker) startOnPage(canvas);
 
-  // pointer = wave source (throttled here so the worker gets few messages)
-  var moveAcc = 0, clickAcc = 0;
-  window.addEventListener("pointermove", function (e) {
-    var t = performance.now();
-    if (t - moveAcc < 90) return;     // throttle ripple injection
-    moveAcc = t;
-    send({ type: "pointer", x: e.clientX, y: e.clientY, strong: false });
-  }, { passive: true });
-  window.addEventListener("pointerdown", function (e) {
-    var t = performance.now();
-    if (t - clickAcc < CFG.clickCooldown) return;   // cooldown between click pulses
-    clickAcc = t;
-    send({ type: "pointer", x: e.clientX, y: e.clientY, strong: true });
-  }, { passive: true });
-  var resizeTimer;
-  window.addEventListener("resize", function () {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(function () {
-      send({ type: "resize", W: window.innerWidth, H: window.innerHeight, dpr: window.devicePixelRatio || 1 });
-    }, 150);
-  });
-  // theme.js fires this when the user toggles dark/light
-  window.addEventListener("themechange", function () { send({ type: "theme", dark: isDark() }); });
-  document.addEventListener("visibilitychange", function () { send({ type: "hidden", v: document.hidden }); });
+    // pointer = wave source (throttled here so the worker gets few messages)
+    var moveAcc = 0, clickAcc = 0;
+    window.addEventListener("pointermove", function (e) {
+      var t = performance.now();
+      if (t - moveAcc < 90) return;     // throttle ripple injection
+      moveAcc = t;
+      send({ type: "pointer", x: e.clientX, y: e.clientY, strong: false });
+    }, { passive: true });
+    window.addEventListener("pointerdown", function (e) {
+      var t = performance.now();
+      if (t - clickAcc < CFG.clickCooldown) return;   // cooldown between click pulses
+      clickAcc = t;
+      send({ type: "pointer", x: e.clientX, y: e.clientY, strong: true });
+    }, { passive: true });
+    var resizeTimer;
+    window.addEventListener("resize", function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () {
+        send({ type: "resize", W: window.innerWidth, H: window.innerHeight, dpr: window.devicePixelRatio || 1 });
+      }, 150);
+    });
+    // theme.js fires this when the user toggles dark/light
+    window.addEventListener("themechange", function () { send({ type: "theme", dark: isDark() }); });
+    document.addEventListener("visibilitychange", function () { send({ type: "hidden", v: document.hidden }); });
+  }
+  if (document.readyState === "complete") bootPage();
+  else window.addEventListener("load", bootPage, { once: true });
 })();

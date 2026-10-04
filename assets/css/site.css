@@ -1,0 +1,9 @@
+---
+# One stylesheet for the whole site, concatenated by Jekyll at build time (one
+# render-blocking request instead of four, no third-party origin). Edit the
+# parts, then bump ?v= on site.css in _layouts/default.html.
+---
+{% include_relative fonts.css %}
+{% include_relative vendor/bootstrap.purged.css %}
+{% include_relative icons.css %}
+{% include_relative global.css %}

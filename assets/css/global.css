@@ -336,3 +336,8 @@ html.theme-dark #style-area .st-thumb {
         max-width: 240px;
     }
 }
+
+/* "Email me" line under the bio: red accent with WCAG AA contrast */
+.bio-contact { color: #c62828; font-style: italic; }
+.bio-contact a, html.theme-dark .bio-contact a:not(.btn) { color: inherit; text-decoration: underline; }
+html.theme-dark .bio-contact { color: #ff8a80; }

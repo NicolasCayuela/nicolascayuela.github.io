@@ -40,9 +40,9 @@
     /* rows */
     .tl-item { padding: .85rem 0; border-top: 1px solid var(--tl-line); }
     .tl-logo { display: flex; align-items: center; justify-content: center; height: 64px; }
-    .tl-logo img { max-height: 56px; max-width: 140px; object-fit: contain; transition: transform .15s ease; }
+    .tl-logo img { width: 140px; height: 56px; object-fit: contain; transition: transform .15s ease; }
     .tl-logo a:hover img { transform: scale(1.05); }
-    html.theme-dark .tl-logo img { background: #fff; border-radius: 6px; padding: 5px 8px; box-sizing: content-box; max-height: 46px; }
+    html.theme-dark .tl-logo img { background: #fff; border-radius: 6px; padding: 5px 8px; box-sizing: border-box; }
     .tl-title { font-size: .98rem; font-weight: 600; margin: 0; }
     .tl-org { font-size: .8rem; font-style: italic; color: var(--tl-muted); margin: .1rem 0 0; }
     .tl-note, .tl-points { font-size: .8rem; margin: .25rem 0 0; }
@@ -70,8 +70,8 @@
         .tl-axis, .tl-track { grid-column: 1 / -1; }
         .tl-legend { grid-column: 1 / -1; padding-bottom: .4rem; }
         .tl-logo { height: 44px; }
-        .tl-logo img { max-width: 60px; max-height: 40px; }
-        html.theme-dark .tl-logo img { max-height: 32px; padding: 3px 4px; }
+        .tl-logo img { width: 60px; height: 40px; }
+        html.theme-dark .tl-logo img { padding: 3px 4px; }
         .tl-track { min-height: 40px; margin-top: .5rem; }
         .tl-year:nth-child(even) { display: none; }      /* every other label on phones */
     }
@@ -104,7 +104,7 @@
                     <div class="tl-row tl-item tl-{{ it.kind }}{% if it_open %} tl-open{% endif %}">
                         <div class="tl-logo">
                             {% if it.url %}<a href="{{ it.url }}" target="_blank" rel="noopener" title="{{ it.org | strip_html }}">{% endif %}
-                            <img src="{{ it.logo | relative_url }}" alt="{{ it.org | strip_html }}" loading="lazy" decoding="async">
+                            <img src="{{ it.logo | relative_url }}" alt="{{ it.org | strip_html }}" width="140" height="56" loading="lazy" decoding="async">
                             {% if it.url %}</a>{% endif %}
                         </div>
                         <div class="tl-body">

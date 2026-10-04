@@ -32,6 +32,11 @@ jobs:
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
         env:
           JEKYLL_ENV: production
+      # sources stay readable in the repo; the deployed copies are minified
+      - name: Minify JS and CSS
+        run: |
+          for f in _site/assets/js/*.js; do npx --yes terser@5 "$f" --compress --mangle -o "$f"; done
+          npx --yes lightningcss-cli@1 --minify _site/assets/css/site.css -o _site/assets/css/site.css
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
 

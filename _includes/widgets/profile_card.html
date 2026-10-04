@@ -27,7 +27,7 @@
                                 {% endif %}
                             </p>
                           </div>
-                          <img src="{{ '/assets/images/etc/france.svg' | relative_url }}" alt="Nancy, France" class="ml-4 d-none d-sm-block" style="height: 130px; width: auto;">
+                          <img src="{{ '/assets/images/etc/france.svg' | relative_url }}" alt="Nancy, France" class="ml-4 d-none d-sm-block" width="134" height="130" loading="lazy" decoding="async" style="height: 130px; width: auto;">
                         </div>
                         <div class="row mt-2">
                             <div class="col">
@@ -112,6 +112,7 @@
                                 src="{{ site.data.profile.portrait_url }}"
                                 alt="Portrait of {{ site.data.profile.primary_name }}"
                                 class="figure-img img-fluid rounded-circle shadow-sm"
+                                width="180" height="180" decoding="async"
                                 style="width: 180px; height: 180px; object-fit: cover;"
                                 title="Hello!"
                             >
