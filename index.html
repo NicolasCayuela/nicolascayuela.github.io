@@ -6,6 +6,8 @@ num_selected: 10
 ---
 {% include widgets/profile_card.html %}
 
+{% include widgets/timeline.html %}
+
 {% include widgets/experience_card.html %}
 
 {% assign pubs = site.publications | sort: "date" | reverse | where: "selected", true %}

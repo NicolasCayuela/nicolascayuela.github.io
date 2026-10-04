@@ -22,48 +22,71 @@ short_bio: >-
 
 show_portrait: true
 portrait_url: assets/images/photos/profile.jpg
-education:
-  - name: "PhD: Sustainable architected metamaterials for elastic wave manipulation"
-    logo: assets/images/badges/ijl.jpg
-    url: "https://ijl.univ-lorraine.fr/"
-    dept: Nancy, France
-    position: '<em>Institut Jean Lamour, C2MP Doctoral School (Chemistry, Mechanics, Materials, Physics)</em>'
-    date: 2025 - present
-  - name: Master Smart Mechanics
-    logo: assets/images/badges/umlp.png
-    url: "https://www.umlp.fr/"
-    dept: Besançon, France
-    position: '<em>EIPHI-BFC Graduate School</em><br>Research Master in Smart Structures: vibroacoustic control (NVH), structural health monitoring, shape control and energy harvesting.'
-    date: 2023 - 2025
-  - name: Engineering degree
-    logo: assets/images/badges/ensmm.png
-    url: "https://www.supmicrotech.fr/"
-    dept: Besançon, France
-    position: '<em>SUPMICROTECH-ENSMM</em><br>National School of Mechanics and Microtechnology.'
-    date: 2021 - 2025
-  - name: CPGE TSI
+# One chronological timeline (education + work), drawn as an arrow 2019 -> 2028
+# by _includes/widgets/timeline.html. kind: study | work. end: a year, or
+# "present" with `until` = planned end (drawn dashed after today).
+timeline:
+  - title: CPGE TSI
+    org: Lycée Jean-Baptiste-Dumas
+    place: Alès, France
     logo: assets/images/badges/cpge.png
     url: "https://cpge-tsi-jbdumas.lycee-ales.fr/"
-    dept: Alès, France
-    position: '<em>Lycée Jean-Baptiste-Dumas</em><br>Preparatory classes for the French Grandes Écoles.'
-    date: 2019 - 2021
-
-experience:
-  - name: "PhD: Sustainable architected metamaterials for elastic wave manipulation"
-    logo: assets/images/badges/ijl.jpg
-    url: "https://ijl.univ-lorraine.fr/"
-    position: '<em>Institut Jean Lamour, UMR CNRS 7198<br>Nanomaterials, Electronics and the Living Department (N2EV), Metamaterials and Phononics group</em><br>&bull; Design of 3D piezoelectric metamaterials from pillar-based unit cells, with a piezoelectric tensor tunable through the micro-architecture<br>&bull; Elastodynamic characterization: band structures, Willis coupling, electro-momentum coupling<br>&bull; Machine learning (GNN, inverse design) to speed up prediction and optimization of wave-propagation properties<br>&bull; Applications: defect/impact detection, directional sensing, energy harvesting, non-Hermitian behaviour'
-    date: 2025 - 2028
-  - name: "Internship: Multi-physics optomechanical sensor study"
-    logo: assets/images/badges/leti.png
-    url: "https://www.leti-cea.fr/"
-    position: '<em>CEA-Leti, Université Grenoble Alpes</em><br>&bull; Gas sensing with optomechanical chips and a Mach&ndash;Zehnder reference<br>&bull; Experimental bench, capping encapsulation (PMMA + tape), RF probe measurements<br>&bull; Comsol/RSoft simulations of the optomechanical coupling and eigenmodes'
-    date: 2025
-  - name: "Internship: Dynamic mechanical characterization of elementary fibres for bio-sourced composites"
+    kind: study
+    start: 2019
+    end: 2021
+    note: Preparatory classes for the French Grandes Écoles.
+  - title: Engineering degree
+    org: SUPMICROTECH-ENSMM, National School of Mechanics and Microtechnology
+    place: Besançon, France
+    logo: assets/images/badges/ensmm.png
+    url: "https://www.supmicrotech.fr/"
+    kind: study
+    start: 2021
+    end: 2025
+  - title: Master Smart Mechanics
+    org: EIPHI-BFC Graduate School
+    place: Besançon, France
+    logo: assets/images/badges/umlp.png
+    url: "https://www.umlp.fr/"
+    kind: study
+    start: 2023
+    end: 2025
+    note: "Research Master in Smart Structures: vibroacoustic control (NVH), structural health monitoring, shape control and energy harvesting."
+  - title: "Internship: Dynamic mechanical characterization of elementary fibres for bio-sourced composites"
+    org: FEMTO-ST Institute, UMR CNRS 6174, Applied Mechanics Department
     logo: assets/images/badges/femto.svg
     url: "https://www.femto-st.fr/fr"
-    position: '<em>FEMTO-ST Institute, UMR CNRS 6174<br>Applied Mechanics Department</em><br>&bull; Dynamic testing (laser vibrometer, high-speed camera, vacuum pump) on flax fibres<br>&bull; Damping identified by logarithmic decrement; storage (stiffness) modulus via COMSOL'
-    date: 2024
+    kind: work
+    start: 2024
+    end: 2024
+    points:
+      - Dynamic testing (laser vibrometer, high-speed camera, vacuum pump) on flax fibres
+      - Damping identified by logarithmic decrement; storage (stiffness) modulus via COMSOL
+  - title: "Internship: Multi-physics optomechanical sensor study"
+    org: CEA-Leti, Université Grenoble Alpes
+    logo: assets/images/badges/leti.png
+    url: "https://www.leti-cea.fr/"
+    kind: work
+    start: 2025
+    end: 2025
+    points:
+      - Gas sensing with optomechanical chips and a Mach&ndash;Zehnder reference
+      - Experimental bench, capping encapsulation (PMMA + tape), RF probe measurements
+      - Comsol/RSoft simulations of the optomechanical coupling and eigenmodes
+  - title: "PhD: Sustainable architected metamaterials for elastic wave manipulation"
+    org: "Institut Jean Lamour, UMR CNRS 7198, N2EV department, Metamaterials and Phononics group · C2MP Doctoral School"
+    place: Nancy, France
+    logo: assets/images/badges/ijl.jpg
+    url: "https://ijl.univ-lorraine.fr/"
+    kind: work
+    start: 2025
+    end: present
+    until: 2028
+    points:
+      - Design of 3D piezoelectric metamaterials from pillar-based unit cells, with a piezoelectric tensor tunable through the micro-architecture
+      - "Elastodynamic characterization: band structures, Willis coupling, electro-momentum coupling"
+      - Machine learning (GNN, inverse design) to speed up prediction and optimization of wave-propagation properties
+      - "Applications: defect/impact detection, directional sensing, energy harvesting, non-Hermitian behaviour"
 
 # service:
 #   - name: "Reviewer for ..."

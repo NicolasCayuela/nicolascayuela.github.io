@@ -99,43 +99,6 @@ html.lang-active-fr .lang-fr {
     display: inline !important;
 }
 
-/* Language toggle switch */
-.lang-toggle {
-    display: inline-flex;
-    align-items: center;
-    border: 1px solid #d0dde8;
-    border-radius: 4px;
-    overflow: hidden;
-    font-size: 0.8rem;
-    margin-left: 0.75rem;
-    cursor: pointer;
-    vertical-align: middle;
-}
-
-.lang-toggle-label {
-    padding: 0.2rem 0.5rem;
-    color: #999;
-    transition: all 0.2s ease;
-    user-select: none;
-    line-height: 1.4;
-}
-
-.lang-toggle-label:hover {
-    color: #4a7298;
-}
-
-.lang-toggle-active {
-    background-color: #4a7298;
-    color: #fff !important;
-    font-weight: 500;
-}
-
-.lang-toggle-divider {
-    width: 1px;
-    background-color: #d0dde8;
-    height: 1rem;
-}
-
 /* ===== Dark theme toggle button ===== */
 .theme-toggle {
     display: inline-flex;
@@ -169,13 +132,11 @@ html.theme-dark .navbar.bg-light {
     background-color: #141414 !important;
 }
 
-html.theme-dark .navbar-light .navbar-brand,
 html.theme-dark .navbar-light .navbar-nav .nav-link,
 html.theme-dark .navbar-light .navbar-toggler {
     color: #d6d6d6;
 }
 
-html.theme-dark .navbar-light .navbar-brand:hover,
 html.theme-dark .navbar-light .navbar-nav .nav-link:hover,
 html.theme-dark .navbar-light .navbar-nav .active > .nav-link {
     color: #fff;
@@ -233,70 +194,7 @@ html.theme-dark .btn-dark {
     border-color: #e8e8e8;
 }
 
-html.theme-dark .lang-toggle,
 html.theme-dark .theme-toggle {
-    border-color: #3a3a3a;
-}
-
-html.theme-dark .lang-toggle-divider {
-    background-color: #3a3a3a;
-}
-
-/* CV items (education / experience) */
-html.theme-dark .cv-item {
-    border-bottom-color: #2a2a2a;
-}
-
-html.theme-dark .cv-item:hover {
-    background: #222;
-}
-
-html.theme-dark .cv-dept,
-html.theme-dark .cv-pos em {
-    color: #98a2b3;
-}
-
-/* logos are transparent PNGs with dark text: give them a white tile */
-html.theme-dark .cv-logo img {
-    background: #fff;
-    border-radius: 6px;
-    padding: 5px 8px;
-    box-sizing: content-box;
-}
-
-html.theme-dark .cv-when-txt {
-    color: #c3cbd8;
-}
-
-html.theme-dark .cv-when-arrow {
-    color: #6b7487;
-}
-
-html.theme-dark .cv-when-track {
-    background: repeating-linear-gradient(90deg, #343a46 0 1px, transparent 1px calc(100% / var(--n, 10))), #22262e;
-}
-
-html.theme-dark .cv-when-seg {
-    background: #5b8cff;
-}
-
-html.theme-dark .cv-when-open .cv-when-txt {
-    color: #5fd0a0;
-}
-
-html.theme-dark .cv-when-open .cv-when-seg {
-    background: linear-gradient(90deg, #2fbf80 55%, rgba(47, 191, 128, .25));
-}
-
-html.theme-dark .cv-when-open .cv-when-seg::after {
-    border-color: #2fbf80;
-    background: #1a1a1a;
-}
-
-/* chips & badges */
-html.theme-dark .blog-chip {
-    color: #aab4c8;
-    background: #242424;
     border-color: #3a3a3a;
 }
 
@@ -421,36 +319,6 @@ html.theme-dark #style-area .st-thumb {
 
     h1, .h1 {
         font-size: 2rem;
-    }
-
-    /* education / experience rows: small logo, title + date wrap */
-    .cv-item {
-        gap: .6rem;
-        padding: .7rem .15rem;
-    }
-
-    .cv-logo {
-        flex: 0 0 64px;
-    }
-
-    .cv-logo img {
-        height: 40px;
-        max-width: 64px;
-    }
-
-    .cv-title {
-        font-size: .92rem;
-    }
-
-    .cv-body > .d-flex {
-        flex-wrap: wrap;
-    }
-
-    .cv-when {
-        margin-left: 0;
-        margin-top: .35rem;
-        order: 2;
-        align-items: flex-start;
     }
 
     /* publications: stack the cover above the text */
