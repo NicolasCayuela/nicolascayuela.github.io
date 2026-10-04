@@ -7,7 +7,7 @@
     <div class="pub-cover">
         {% if has_cover %}
         <a href="{{ '/' | append: item.cover | relative_url }}" target="_blank" rel="noopener" class="pub-lightbox" title="{{ item.title }}">
-            <span class="pub-cover-zoom"><img src="{{ '/' | append: thumb | relative_url }}" alt="{{ item.title }}" loading="lazy" decoding="async"></span>
+            <span class="pub-cover-zoom"><img src="{{ '/' | append: thumb | relative_url }}" alt="{{ item.title }}" loading="lazy" decoding="async"{% if item.cover_w %} width="{{ item.cover_w }}" height="{{ item.cover_h }}"{% endif %}></span>
         </a>
         {% else %}
         <div class="pub-cover-placeholder"><i class="far fa-file-alt"></i></div>
@@ -15,7 +15,7 @@
     </div>
     <div class="pub-body">
         <div class="d-flex align-items-start" style="gap:.6rem;">
-            <h5 class="pub-title">{{ item.title }}</h5>
+            <h3 class="pub-title h5">{{ item.title }}</h3>
             {% if item.pub %}<span class="pub-badge">{{ item.pub }}</span>{% endif %}
         </div>
         <p class="pub-authors">{% include widgets/author_list.html authors=item.authors %}</p>
@@ -40,11 +40,11 @@
 <div class="pub-item d-md-none flex-column">
     {% if has_cover %}
     <a href="{{ '/' | append: item.cover | relative_url }}" target="_blank" rel="noopener" class="pub-cover-m pub-lightbox mb-2" title="{{ item.title }}">
-        <img src="{{ '/' | append: thumb | relative_url }}" alt="{{ item.title }}" class="w-100" loading="lazy" decoding="async">
+        <img src="{{ '/' | append: thumb | relative_url }}" alt="{{ item.title }}" class="w-100" loading="lazy" decoding="async"{% if item.cover_w %} width="{{ item.cover_w }}" height="{{ item.cover_h }}"{% endif %}>
     </a>
     {% endif %}
     <div>
-        <h5 class="pub-title">{{ item.title }} {% if item.pub %}<span class="pub-badge">{{ item.pub }}</span>{% endif %}</h5>
+        <h3 class="pub-title h5">{{ item.title }} {% if item.pub %}<span class="pub-badge">{{ item.pub }}</span>{% endif %}</h3>
         <p class="pub-authors">{% include widgets/author_list.html authors=item.authors %}</p>
         {% if item.abstract %}<p class="pub-abstract">{{ item.abstract }}</p>{% endif %}
         {% if item.links %}
