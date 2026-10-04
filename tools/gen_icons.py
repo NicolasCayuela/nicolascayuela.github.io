@@ -21,7 +21,8 @@ for root, dirs, files in os.walk(SITE):
                 if m.group(2) not in ("fa-lg", "fa-2x", "fa-3x", "fa-fw"):
                     used.add((STYLE_DIR[m.group(1)], m.group(2)[3:]))
 # swapped at runtime by JS (theme toggle, play/pause buttons)
-used |= {("solid", "sun"), ("solid", "moon"), ("solid", "play"), ("solid", "pause")}
+used |= {("solid", "sun"), ("solid", "moon"), ("solid", "play"), ("solid", "pause"),
+         ("solid", "school"), ("solid", "laptop-code")}   # cv.html section icons (built from a Liquid string)
 
 
 def svg_uri(style, name, fill=None):

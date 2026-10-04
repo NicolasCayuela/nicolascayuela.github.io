@@ -21,10 +21,10 @@ short_bio: >-
 
 show_portrait: true
 portrait_url: assets/images/photos/profile.webp
-# One chronological timeline (education + work), drawn as an arrow 2019 -> 2028
-# by _includes/widgets/timeline.html. kind: study | work. end: a year, or
-# "present" with `until` = planned end (drawn dashed after today).
-timeline:
+# CV entries, rendered by _includes/widgets/cv.html as two classic sections,
+# most recent first. kind: study (Education) | work (Experience).
+# end: a year, or "present" (with `until` = planned end, shown as "expected").
+cv:
   - title: CPGE TSI
     org: Lycée Jean-Baptiste-Dumas
     place: Alès, France
@@ -77,7 +77,7 @@ timeline:
     place: Nancy, France
     logo: assets/images/badges/ijl.webp
     url: "https://ijl.univ-lorraine.fr/"
-    kind: work
+    kind: study
     start: 2025
     end: present
     until: 2028
