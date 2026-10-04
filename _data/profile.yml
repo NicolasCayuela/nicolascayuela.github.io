@@ -18,7 +18,6 @@ short_bio: >-
   PhD student in phononics and metamaterials at <strong>Institut Jean Lamour</strong> in Nancy,
   France. I design phononic crystals and acoustic/elastic metamaterials, and use
   <strong>graph neural networks</strong> to predict how waves travel through them and to find geometries for a target response.
-  <br> <span class="bio-contact"><i class="far fa-envelope"></i>&nbsp; <a href="mailto:githubcontact.sublime067@simplelogin.com">Email me about research or collaborations.</a></span>
 
 show_portrait: true
 portrait_url: assets/images/photos/profile.webp

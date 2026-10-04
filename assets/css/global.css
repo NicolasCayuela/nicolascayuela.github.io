@@ -337,10 +337,5 @@ html.theme-dark #style-area .st-thumb {
     }
 }
 
-/* "Email me" line under the bio: red accent with WCAG AA contrast */
-.bio-contact { color: #c62828; font-style: italic; }
-.bio-contact a, html.theme-dark .bio-contact a:not(.btn) { color: inherit; text-decoration: underline; }
-html.theme-dark .bio-contact { color: #ff8a80; }
-
 /* publication covers carry width/height (reserved box, no layout shift): keep the ratio */
 .pub-cover img, .pub-cover-m img { height: auto; }
