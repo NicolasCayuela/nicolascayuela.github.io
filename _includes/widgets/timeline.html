@@ -4,7 +4,7 @@
   arrow header; faint year lines run from the arrow down through every row, so
   each bar reads straight off the arrow. Logos link to the institution.
   Ongoing entries ("end: present") are solid up to today, then dashed to
-  `until`. Years are inclusive (2021 -> 2025 covers 2021..2025).
+  `until`. Bars run from the start year line to the end year line.
 {% endcomment %}
 {% assign tl = site.data.profile.timeline %}
 {% if tl %}
@@ -94,8 +94,12 @@
                     {% comment %} rows in data order (authored chronologically; Ruby sort is not stable for ties) {% endcomment %}
                     {% for it in tl %}
                     {% if it.end == 'present' %}{% assign it_open = true %}{% assign it_end = it.until | default: tl_now_y %}{% else %}{% assign it_open = false %}{% assign it_end = it.end %}{% endif %}
-                    {% assign it_left = it.start | minus: tl_min | times: 100.0 | divided_by: tl_span | round: 2 %}
-                    {% assign it_width = it_end | minus: it.start | plus: 1 | times: 100.0 | divided_by: tl_span | round: 2 %}
+                    {% comment %} bars run from the start year to the end year (school years: 2019 -> 2021 is
+                       two years); a single-year entry (internship) is drawn as half a year mid-year {% endcomment %}
+                    {% assign it_dur = it_end | minus: it.start %}
+                    {% if it_dur == 0 %}{% assign it_l = it.start | plus: 0.25 %}{% assign it_dur = 0.5 %}{% else %}{% assign it_l = it.start %}{% endif %}
+                    {% assign it_left = it_l | minus: tl_min | times: 100.0 | divided_by: tl_span | round: 2 %}
+                    {% assign it_width = it_dur | times: 100.0 | divided_by: tl_span | round: 2 %}
                     {% assign it_solid = tl_now | minus: it_left | round: 2 %}
                     <div class="tl-row tl-item tl-{{ it.kind }}{% if it_open %} tl-open{% endif %}">
                         <div class="tl-logo">
