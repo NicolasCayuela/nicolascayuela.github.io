@@ -32,6 +32,12 @@ jobs:
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
         env:
           JEKYLL_ENV: production
+      # TeX -> inline SVG at build time; pages then ship without the MathJax runtime
+      - name: Pre-render math
+        run: |
+          npm i --no-save --no-package-lock --silent mathjax-full@3
+          pages=$(grep -rli --include=*.html "mathjax" _site || true)
+          [ -z "$pages" ] || node tools/prerender-math.js $pages
       # sources stay readable in the repo; the deployed copies are minified
       - name: Minify JS and CSS
         run: |

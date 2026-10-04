@@ -21,17 +21,18 @@ markdown: kramdown
 plugins:
   - jekyll-email-protect
 
-# Exclude from processing.
-# The following items will not be processed, by default. Create a custom list
-# to override the default setting.
-# exclude:
-#   - Gemfile
-#   - Gemfile.lock
-#   - node_modules
-#   - vendor/bundle/
-#   - vendor/cache/
-#   - vendor/gems/
-#   - vendor/ruby/
+# Not published: dev tooling, training/export scripts, local envs.
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - package.json
+  - package-lock.json
+  - vendor
+  - scripts
+  - tools
+  - README.md
+  - .venv-rocm
 
 # timezone: Asia/Shanghai
 
