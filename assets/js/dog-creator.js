@@ -31,7 +31,7 @@
   function setStatus(en, fr) {
     if (!statusEl) return;
     statusEl.innerHTML = en || fr
-      ? '<span class="lang-en">' + en + "</span><span class=\"lang-fr\">" + fr + "</span>"
+      ? '<span class="lang-en">' + en + "</span>"
       : "";
   }
 

@@ -1,5 +1,4 @@
 {%- comment -%}
-  Usage: {% include i18n.html key="education" %}
-  Outputs: <span class="lang-en">Education</span><span class="lang-fr">教育经历</span>
+  Usage: {% include i18n.html key="education" %} -> label from _data/i18n/en.yml
 {%- endcomment -%}
-<span class="lang-en">{{ site.data.i18n.en[include.key] }}</span><span class="lang-fr">{{ site.data.i18n.fr[include.key] }}</span>
+<span class="lang-en">{{ site.data.i18n.en[include.key] }}</span>

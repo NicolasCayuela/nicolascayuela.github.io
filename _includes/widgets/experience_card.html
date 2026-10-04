@@ -58,11 +58,11 @@
                         </div>
                         <div class="cv-body">
                             <div class="d-flex justify-content-between align-items-start">
-                                <p class="cv-title"><span class="lang-en">{{ item.name }}</span><span class="lang-fr">{{ site.data.profile.education_fr[forloop.index0].name }}</span></p>
+                                <p class="cv-title"><span class="lang-en">{{ item.name }}</span></p>
                                 {% if item.date %}{% include widgets/cv_when.html date=item.date min=cv_min max=cv_max %}{% endif %}
                             </div>
                             {% if item.dept %}<p class="cv-dept">{{ item.dept }}</p>{% endif %}
-                            <p class="cv-pos"><span class="lang-en">{{ item.position }}</span><span class="lang-fr">{{ site.data.profile.education_fr[forloop.index0].position }}</span></p>
+                            <p class="cv-pos"><span class="lang-en">{{ item.position }}</span></p>
                         </div>
                     </li>
                     {% endfor %}
@@ -92,11 +92,11 @@
                         </div>
                         <div class="cv-body">
                             <div class="d-flex justify-content-between align-items-start">
-                                <p class="cv-title"><span class="lang-en">{{ item.name }}</span><span class="lang-fr">{{ site.data.profile.experience_fr[forloop.index0].name }}</span></p>
+                                <p class="cv-title"><span class="lang-en">{{ item.name }}</span></p>
                                 {% if item.date %}{% include widgets/cv_when.html date=item.date min=cv_min max=cv_max %}{% endif %}
                             </div>
                             {% if item.dept %}<p class="cv-dept">{{ item.dept }}</p>{% endif %}
-                            <p class="cv-pos"><span class="lang-en">{{ item.position }}</span><span class="lang-fr">{{ site.data.profile.experience_fr[forloop.index0].position }}</span></p>
+                            <p class="cv-pos"><span class="lang-en">{{ item.position }}</span></p>
                         </div>
                     </li>
                     {% endfor %}
@@ -121,7 +121,7 @@
                                         {% for item in site.data.profile.service %}
                                         <div class="col-md-12">
                                             <li>
-                                                <em class="lang-en">{{ item.name }}</em><span class="lang-fr">{{ site.data.profile.service_fr[forloop.index0].name }}</span>
+                                                <em class="lang-en">{{ item.name }}</em>
                                             </li>
                                         </div>
                                         {% endfor %}
@@ -154,10 +154,10 @@
                                                 <strong class="mr-1">{{item.date}}.</strong>
                                                 {% if item.url %}
                                                     <a href="{{ item.url }}" target="_blank" class="text-black text-decoration-none">
-                                                        <em class="lang-en">{{ item.name }}</em><span class="lang-fr">{{ site.data.profile.awards_fr[forloop.index0].name }}</span>
+                                                        <em class="lang-en">{{ item.name }}</em>
                                                     </a>
                                                 {% else %}
-                                                    <em class="lang-en">{{ item.name }}</em><span class="lang-fr">{{ site.data.profile.awards_fr[forloop.index0].name }}</span>
+                                                    <em class="lang-en">{{ item.name }}</em>
                                                 {% endif %}
                                             </li>
                                         </div>
@@ -191,10 +191,10 @@
                                                 <strong class="mr-1">{{item.date}}.</strong>
                                                 {% if item.url %}
                                                     <a href="{{ item.url }}" target="_blank" class="text-black text-decoration-none">
-                                                        <em class="lang-en">{{ item.name }}</em><span class="lang-fr">{{ site.data.profile.news_fr[forloop.index0].name }}</span>
+                                                        <em class="lang-en">{{ item.name }}</em>
                                                     </a>
                                                 {% else %}
-                                                    <em class="lang-en">{{ item.name }}</em><span class="lang-fr">{{ site.data.profile.news_fr[forloop.index0].name }}</span>
+                                                    <em class="lang-en">{{ item.name }}</em>
                                                 {% endif %}
                                             </li>
                                         </div>

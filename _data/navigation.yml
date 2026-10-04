@@ -1,7 +1,5 @@
 pages:
 - name: Home
-  name_fr: Accueil
   url: ./
 - name: Playground
-  name_fr: Terrain de jeu
   url: playground

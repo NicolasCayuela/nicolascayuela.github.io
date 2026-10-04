@@ -4,40 +4,40 @@
             <div class="card-body p-4">
                 <h6>
                     <i class="fas fa-gamepad"></i> &nbsp;
-                    <span class="lang-en">Playground</span><span class="lang-fr">Terrain de jeu</span>
+                    <span class="lang-en">Playground</span>
                 </h6>
 
                 <!-- mode switch between all playground tabs -->
                 <div class="btn-group btn-group-sm mb-3 flex-wrap" role="group">
                     <button id="gol-mode-mms" type="button" class="btn btn-outline-dark active">
-                        <i class="fas fa-atom"></i> <span class="lang-en">Metamaterials space</span><span class="lang-fr">Espace métamatériaux</span>
+                        <i class="fas fa-atom"></i> <span class="lang-en">Metamaterials space</span>
                     </button>
                     <button id="gol-mode-ddpm" type="button" class="btn btn-outline-dark">
-                        <i class="fas fa-magic"></i> <span class="lang-en">Dog Diffusion</span><span class="lang-fr">Diffusion de chiens</span>
+                        <i class="fas fa-magic"></i> <span class="lang-en">Dog Diffusion</span>
                     </button>
                     <button id="gol-mode-cifar" type="button" class="btn btn-outline-dark">
-                        <i class="fas fa-image"></i> <span class="lang-en">CIFAR-100 Latent space</span><span class="lang-fr">Espace latent CIFAR-100</span>
+                        <i class="fas fa-image"></i> <span class="lang-en">CIFAR-100 Latent space</span>
                     </button>
                     <button id="gol-mode-w2v" type="button" class="btn btn-outline-dark">
-                        <i class="fas fa-font"></i> <span class="lang-en">Word embeddings</span><span class="lang-fr">Plongements de mots</span>
+                        <i class="fas fa-font"></i> <span class="lang-en">Word embeddings</span>
                     </button>
                     <button id="gol-mode-gd" type="button" class="btn btn-outline-dark">
-                        <i class="fas fa-mountain"></i> <span class="lang-en">Gradient descent</span><span class="lang-fr">Descente de gradient</span>
+                        <i class="fas fa-mountain"></i> <span class="lang-en">Gradient descent</span>
                     </button>
                     <button id="gol-mode-dog" type="button" class="btn btn-outline-dark">
-                        <i class="fas fa-dog"></i> <span class="lang-en">Dog Creator</span><span class="lang-fr">Créateur de chiens</span>
+                        <i class="fas fa-dog"></i> <span class="lang-en">Dog Creator</span>
                     </button>
                     <button id="gol-mode-style" type="button" class="btn btn-outline-dark">
-                        <i class="fas fa-palette"></i> <span class="lang-en">Style transfer</span><span class="lang-fr">Transfert de style</span>
+                        <i class="fas fa-palette"></i> <span class="lang-en">Style transfer</span>
                     </button>
                     <button id="gol-mode-life" type="button" class="btn btn-outline-dark">
-                        <i class="fas fa-border-all"></i> <span class="lang-en">Game of Life</span><span class="lang-fr">Jeu de la vie</span>
+                        <i class="fas fa-border-all"></i> <span class="lang-en">Game of Life</span>
                     </button>
                     <button id="gol-mode-fire" type="button" class="btn btn-outline-dark">
-                        <i class="fas fa-fire"></i> <span class="lang-en">Forest fire</span><span class="lang-fr">Feu de forêt</span>
+                        <i class="fas fa-fire"></i> <span class="lang-en">Forest fire</span>
                     </button>
                     <button id="gol-mode-sym" type="button" class="btn btn-outline-dark">
-                        <i class="fas fa-draw-polygon"></i> <span class="lang-en">Symmetry groups</span><span class="lang-fr">Groupes de symétrie</span>
+                        <i class="fas fa-draw-polygon"></i> <span class="lang-en">Symmetry groups</span>
                     </button>
                 </div>
 
@@ -45,7 +45,7 @@
                 <div id="mms-area">
                     <p class="small text-muted mb-2">
                         <span class="lang-en">About 600,000 <strong>metamaterials papers</strong> (1987-2026) gathered from Semantic Scholar, arXiv, OpenAlex, Crossref and HAL. Each paper is embedded with <strong>Qwen3-Embedding-4B</strong> and projected to 2D with <strong>UMAP</strong>: one dot per paper, and nearby dots share a topic (phononic crystals, acoustic and elastic metamaterials, photonics, mechanical lattices...).</span>
-                        <span class="lang-fr">Environ 600&nbsp;000 <strong>articles sur les métamatériaux</strong> (1987-2026) rassemblés depuis Semantic Scholar, arXiv, OpenAlex, Crossref et HAL. Chaque article est encodé avec <strong>Qwen3-Embedding-4B</strong> puis projeté en 2D avec <strong>UMAP</strong>&nbsp;: un point par article, et les points voisins partagent une thématique (cristaux phononiques, métamatériaux acoustiques et élastiques, photonique, réseaux mécaniques...).</span>
+
                     </p>
                     <div id="mms-wrap" style="position:relative; width:100%; height:76vh; min-height:520px; border-radius:8px; overflow:hidden; background:#0b0e14;">
                         <!-- iframe src is set by JS on desktop only; phones get the teaser instead -->
@@ -63,14 +63,22 @@
                         <!-- mobile: tap-to-open teaser, shown by JS in place of the heavy inline map -->
                         <div id="mms-teaser" style="display:none; position:absolute; inset:0; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:2.2rem 1.4rem; color:#cdd6e4;">
                             <i class="fas fa-atom fa-3x mb-3" style="color:#7aa0ff;"></i>
-                            <div class="mb-3" style="max-width:300px; font-size:.85rem; line-height:1.5; color:#aab4c5;">
+                            <div id="mms-msg-phone" class="mb-3" style="max-width:300px; font-size:.85rem; line-height:1.5; color:#aab4c5;">
                                 <span class="lang-en">The map is too heavy to run inside the page on a phone. Open it full-screen instead.</span>
-                                <span class="lang-fr">La carte est trop lourde pour tourner dans la page sur téléphone. Ouvre-la plutôt en plein écran.</span>
+
                             </div>
+                            <div id="mms-msg-weak" class="mb-3" style="display:none; max-width:340px; font-size:.85rem; line-height:1.5; color:#aab4c5;">
+                                <span class="lang-en">The map draws 600,000 points and can slow this computer down. Load it when you want to explore.</span>
+
+                            </div>
+                            <button id="mms-load" type="button" class="btn btn-light btn-sm mb-2" style="display:none; border-radius:20px; font-weight:600;">
+                                <i class="fas fa-play"></i>&nbsp;
+                                <span class="lang-en">Load the map here</span>
+                            </button>
                             <a href="https://nicolascayuela.github.io/metamaterials_space/" target="_blank" rel="noopener"
                                class="btn btn-light btn-sm" style="border-radius:20px; font-weight:600;">
                                 <i class="fas fa-expand"></i>&nbsp;
-                                <span class="lang-en">Open the map</span><span class="lang-fr">Ouvrir la carte</span>
+                                <span class="lang-en">Open the map</span>
                             </a>
                         </div>
                         <!-- No-JS fallback: the JS below never runs, so the iframe stays src-less
@@ -81,7 +89,7 @@
                                 <a href="https://nicolascayuela.github.io/metamaterials_space/" target="_blank" rel="noopener"
                                    class="btn btn-light btn-sm" style="border-radius:20px; font-weight:600;">
                                     <i class="fas fa-expand"></i>&nbsp;
-                                    <span class="lang-en">Open the map</span><span class="lang-fr">Ouvrir la carte</span>
+                                    <span class="lang-en">Open the map</span>
                                 </a>
                             </div>
                         </noscript>
@@ -94,18 +102,38 @@
                         var fsBtn = document.getElementById("mms-fs");
                         var isMobile = window.isMobileViewport ? window.isMobileViewport()
                             : !!(window.matchMedia && window.matchMedia("(max-width: 820px), (pointer: coarse)").matches);
-                        if (isMobile) {
-                            // Don't load the WebGL map inline on phones: show a tap-to-open teaser,
-                            // and shrink the box since there's no inline map to fill it.
+                        // weak desktops (<=4 cores or <=4 GB, same test as the background
+                        // waves) get the teaser too, plus a button to load the map inline
+                        var weak = !isMobile && ((navigator.hardwareConcurrency || 8) <= 4 ||
+                            (navigator.deviceMemory || 8) <= 4);
+                        var deferred = isMobile || weak;
+                        if (deferred) {
+                            // Don't load the WebGL map inline: show the teaser and shrink the
+                            // box since there's no inline map to fill it.
                             frame.style.display = "none";
                             fsBtn.style.display = "none";
                             teaser.style.display = "flex";
                             wrap.style.height = "auto";
                             wrap.style.minHeight = "300px";
                         }
-                        // desktop: load the map inline the first time its tab is shown
+                        if (weak) {
+                            document.getElementById("mms-msg-phone").style.display = "none";
+                            document.getElementById("mms-msg-weak").style.display = "";
+                            var loadBtn = document.getElementById("mms-load");
+                            loadBtn.style.display = "";
+                            loadBtn.onclick = function () {
+                                deferred = false;
+                                teaser.style.display = "none";
+                                frame.style.display = "block";
+                                fsBtn.style.display = "flex";
+                                wrap.style.height = "76vh";
+                                wrap.style.minHeight = "520px";
+                                frame.src = frame.getAttribute("data-src");
+                            };
+                        }
+                        // load the map inline the first time its tab is shown (not deferred)
                         window.__mmsShow = function () {
-                            if (!isMobile && !frame.getAttribute("src")) frame.src = frame.getAttribute("data-src");
+                            if (!deferred && !frame.getAttribute("src")) frame.src = frame.getAttribute("data-src");
                         };
                     })();
                     </script>
@@ -116,16 +144,16 @@
                     <!-- shared transport controls -->
                     <div class="d-flex flex-wrap mb-2" style="gap:.4rem;">
                         <button id="gol-play" class="btn btn-sm btn-dark">
-                            <i class="fas fa-play"></i> <span class="lang-en">Play</span><span class="lang-fr">Lancer</span>
+                            <i class="fas fa-play"></i> <span class="lang-en">Play</span>
                         </button>
                         <button id="gol-step" class="btn btn-sm btn-outline-dark">
-                            <i class="fas fa-step-forward"></i> <span class="lang-en">Step</span><span class="lang-fr">Pas</span>
+                            <i class="fas fa-step-forward"></i> <span class="lang-en">Step</span>
                         </button>
                         <button id="gol-random" class="btn btn-sm btn-outline-dark">
-                            <i class="fas fa-dice"></i> <span class="lang-en">Random</span><span class="lang-fr">Aléatoire</span>
+                            <i class="fas fa-dice"></i> <span class="lang-en">Random</span>
                         </button>
                         <button id="gol-clear" class="btn btn-sm btn-outline-dark">
-                            <i class="fas fa-trash"></i> <span class="lang-en">Clear</span><span class="lang-fr">Effacer</span>
+                            <i class="fas fa-trash"></i> <span class="lang-en">Clear</span>
                         </button>
                     </div>
 
@@ -133,10 +161,10 @@
                     <div id="gol-life-controls" class="mb-3">
                       <div class="d-flex flex-wrap align-items-center" style="gap:.4rem;">
                         <span class="small text-muted mr-1">
-                            <span class="lang-en">Patterns:</span><span class="lang-fr">Formes&nbsp;:</span>
+                            <span class="lang-en">Patterns:</span>
                         </span>
                         <button data-gol-pattern="" class="btn btn-sm btn-outline-secondary active">
-                            <i class="fas fa-pen"></i> <span class="lang-en">Pen</span><span class="lang-fr">Stylo</span>
+                            <i class="fas fa-pen"></i> <span class="lang-en">Pen</span>
                         </button>
                         <button data-gol-pattern="glider" class="btn btn-sm btn-outline-secondary">Glider</button>
                         <button data-gol-pattern="lwss" class="btn btn-sm btn-outline-secondary">LWSS</button>
@@ -153,7 +181,7 @@
                         <button data-gol-pattern="acorn" class="btn btn-sm btn-outline-secondary">Acorn</button>
                         <button data-gol-pattern="diehard" class="btn btn-sm btn-outline-secondary">Diehard</button>
                         <button data-gol-pattern="gun" class="btn btn-sm btn-outline-secondary">
-                            <span class="lang-en">Glider gun</span><span class="lang-fr">Canon à planeurs</span>
+                            <span class="lang-en">Glider gun</span>
                         </button>
                       </div>
                     </div>
@@ -162,22 +190,22 @@
                     <div id="gol-fire-controls" class="d-none mb-3">
                         <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.4rem;">
                             <span class="small text-muted mr-1">
-                                <span class="lang-en">Brush:</span><span class="lang-fr">Pinceau&nbsp;:</span>
+                                <span class="lang-en">Brush:</span>
                             </span>
                             <button data-gol-fire="plant" class="btn btn-sm btn-outline-success active">
-                                <i class="fas fa-tree"></i> <span class="lang-en">Plant trees</span><span class="lang-fr">Planter</span>
+                                <i class="fas fa-tree"></i> <span class="lang-en">Plant trees</span>
                             </button>
                             <button data-gol-fire="ignite" class="btn btn-sm btn-outline-danger">
-                                <i class="fas fa-fire"></i> <span class="lang-en">Ignite</span><span class="lang-fr">Enflammer</span>
+                                <i class="fas fa-fire"></i> <span class="lang-en">Ignite</span>
                             </button>
                         </div>
                         <div class="d-flex flex-wrap align-items-center" style="gap:1rem;">
                             <label class="small text-muted mb-0">
-                                <span class="lang-en">Growth</span><span class="lang-fr">Croissance</span>
+                                <span class="lang-en">Growth</span>
                                 <input id="gol-growth" type="range" min="0" max="100" value="30" style="vertical-align:middle; width:110px;">
                             </label>
                             <label class="small text-muted mb-0">
-                                <span class="lang-en">Lightning</span><span class="lang-fr">Foudre</span>
+                                <span class="lang-en">Lightning</span>
                                 <input id="gol-light" type="range" min="0" max="100" value="30" style="vertical-align:middle; width:110px;">
                             </label>
                         </div>
@@ -188,7 +216,7 @@
                     </div>
                     <p class="small text-muted mt-2 mb-0">
                         <span class="lang-en">Game of Life: J. H. Conway (1970), popularized by <a href="https://web.stanford.edu/class/sts145/Library/life.pdf" target="_blank" rel="noopener">M. Gardner, Scientific American</a>. Forest fire: <a href="https://doi.org/10.1103/PhysRevLett.69.1629" target="_blank" rel="noopener">Drossel &amp; Schwabl (1992)</a>.</span>
-                        <span class="lang-fr">Jeu de la vie : J. H. Conway (1970), popularisé par <a href="https://web.stanford.edu/class/sts145/Library/life.pdf" target="_blank" rel="noopener">M. Gardner, Scientific American</a>. Feu de forêt : <a href="https://doi.org/10.1103/PhysRevLett.69.1629" target="_blank" rel="noopener">Drossel &amp; Schwabl (1992)</a>.</span>
+
                     </p>
                 </div>
 
@@ -196,16 +224,16 @@
                 <div id="sym-area" class="d-none">
                     <p class="small text-muted mx-1 mb-3">
                         <span class="lang-en">Draw in the white area: each stroke is copied by the symmetries of the selected group, among the <strong>17 wallpaper groups</strong> and <strong>7 frieze groups</strong>.</span>
-                        <span class="lang-fr">Dessine dans la zone blanche&nbsp;: chaque trait est recopié par les symétries du groupe choisi, parmi les <strong>17 groupes de papier peint</strong> et les <strong>7 groupes de frise</strong>.</span>
+
                     </p>
 
                     <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.5rem;">
                         <label class="small text-muted mb-0">
-                            <span class="lang-en">Translation amount</span><span class="lang-fr">Translation</span>
+                            <span class="lang-en">Translation amount</span>
                             <input id="sym-trans" type="number" min="20" max="600" value="150" style="width:74px;">
                         </label>
                         <button id="sym-apply" class="btn btn-sm btn-outline-dark">
-                            <span class="lang-en">Apply</span><span class="lang-fr">Appliquer</span>
+                            <span class="lang-en">Apply</span>
                         </button>
                     </div>
 
@@ -213,7 +241,7 @@
                         <!-- left: group -->
                         <div style="min-width:120px;">
                             <div class="small font-weight-bold mb-1">
-                                <span class="lang-en">Wallpaper group</span><span class="lang-fr">Groupe papier peint</span>
+                                <span class="lang-en">Wallpaper group</span>
                             </div>
                             <div id="sym-groups" class="small" style="line-height:1.7;">
                                 <div><label class="mb-0"><input type="radio" name="sym-group" value="p1"> p1</label></div>
@@ -235,7 +263,7 @@
                                 <div><label class="mb-0"><input type="radio" name="sym-group" value="p6m"> p6m</label></div>
 
                                 <div class="font-weight-bold mt-3 mb-1">
-                                    <span class="lang-en">Frieze Symmetry</span><span class="lang-fr">Symétrie de frise</span>
+                                    <span class="lang-en">Frieze Symmetry</span>
                                 </div>
                                 <div><label class="mb-0"><input type="radio" name="sym-group" value="f_p111"> p111</label></div>
                                 <div><label class="mb-0"><input type="radio" name="sym-group" value="f_p112"> p112</label></div>
@@ -251,24 +279,24 @@
                         <div id="sym-wrap" style="flex:1 1 320px; min-width:260px;">
                             <canvas id="sym-canvas" style="background:#fff; border:1px solid #ccc; border-radius:4px; touch-action:none; cursor:crosshair; width:100%;"></canvas>
                             <div class="d-flex flex-wrap align-items-center mt-2" style="gap:.6rem;">
-                                <button id="sym-undo" class="btn btn-sm btn-outline-dark"><i class="fas fa-undo"></i> <span class="lang-en">Undo</span><span class="lang-fr">Annuler</span></button>
-                                <button id="sym-redo" class="btn btn-sm btn-outline-dark"><i class="fas fa-redo"></i> <span class="lang-en">Redo</span><span class="lang-fr">Refaire</span></button>
-                                <button id="sym-clear" class="btn btn-sm btn-outline-dark"><i class="fas fa-trash"></i> <span class="lang-en">Clear</span><span class="lang-fr">Effacer</span></button>
-                                <label class="small text-muted mb-0 ml-1"><input id="sym-grid" type="checkbox" checked> <span class="lang-en">Show grid</span><span class="lang-fr">Grille</span></label>
+                                <button id="sym-undo" class="btn btn-sm btn-outline-dark"><i class="fas fa-undo"></i> <span class="lang-en">Undo</span></button>
+                                <button id="sym-redo" class="btn btn-sm btn-outline-dark"><i class="fas fa-redo"></i> <span class="lang-en">Redo</span></button>
+                                <button id="sym-clear" class="btn btn-sm btn-outline-dark"><i class="fas fa-trash"></i> <span class="lang-en">Clear</span></button>
+                                <label class="small text-muted mb-0 ml-1"><input id="sym-grid" type="checkbox" checked> <span class="lang-en">Show grid</span></label>
                             </div>
                         </div>
 
                         <!-- right: tool / width / color -->
                         <div class="small" style="min-width:130px; line-height:1.7;">
-                            <div class="font-weight-bold mb-1"><span class="lang-en">Tool</span><span class="lang-fr">Outil</span></div>
-                            <div><label class="mb-0"><input type="radio" name="sym-tool" value="line"> <span class="lang-en">Line</span><span class="lang-fr">Ligne</span></label></div>
-                            <div><label class="mb-0"><input type="radio" name="sym-tool" value="rect"> <span class="lang-en">Rectangle</span><span class="lang-fr">Rectangle</span></label></div>
-                            <div><label class="mb-0"><input type="radio" name="sym-tool" value="oval"> <span class="lang-en">Oval</span><span class="lang-fr">Ovale</span></label></div>
-                            <div><label class="mb-0"><input type="radio" name="sym-tool" value="frect"> <span class="lang-en">Filled Rect</span><span class="lang-fr">Rect plein</span></label></div>
-                            <div><label class="mb-0"><input type="radio" name="sym-tool" value="foval"> <span class="lang-en">Filled Oval</span><span class="lang-fr">Ovale plein</span></label></div>
-                            <div><label class="mb-0"><input type="radio" name="sym-tool" value="freehand" checked> <span class="lang-en">Freehand</span><span class="lang-fr">Main levée</span></label></div>
+                            <div class="font-weight-bold mb-1"><span class="lang-en">Tool</span></div>
+                            <div><label class="mb-0"><input type="radio" name="sym-tool" value="line"> <span class="lang-en">Line</span></label></div>
+                            <div><label class="mb-0"><input type="radio" name="sym-tool" value="rect"> <span class="lang-en">Rectangle</span></label></div>
+                            <div><label class="mb-0"><input type="radio" name="sym-tool" value="oval"> <span class="lang-en">Oval</span></label></div>
+                            <div><label class="mb-0"><input type="radio" name="sym-tool" value="frect"> <span class="lang-en">Filled Rect</span></label></div>
+                            <div><label class="mb-0"><input type="radio" name="sym-tool" value="foval"> <span class="lang-en">Filled Oval</span></label></div>
+                            <div><label class="mb-0"><input type="radio" name="sym-tool" value="freehand" checked> <span class="lang-en">Freehand</span></label></div>
 
-                            <div class="font-weight-bold mt-2 mb-1"><span class="lang-en">Line width</span><span class="lang-fr">Épaisseur</span></div>
+                            <div class="font-weight-bold mt-2 mb-1"><span class="lang-en">Line width</span></div>
                             <div class="d-flex flex-wrap" style="gap:.1rem .8rem;">
                                 <label class="mb-0"><input type="radio" name="sym-width" value="1"> 1</label>
                                 <label class="mb-0"><input type="radio" name="sym-width" value="2"> 2</label>
@@ -279,25 +307,25 @@
                                 <label class="mb-0"><input type="radio" name="sym-width" value="20"> 20</label>
                             </div>
 
-                            <div class="font-weight-bold mt-2 mb-1"><span class="lang-en">Color</span><span class="lang-fr">Couleur</span></div>
-                            <div><label class="mb-0" style="color:#000;"><input type="radio" name="sym-color" value="Black" checked> <span class="lang-en">Black</span><span class="lang-fr">Noir</span></label></div>
-                            <div><label class="mb-0" style="color:#e51c23;"><input type="radio" name="sym-color" value="Red"> <span class="lang-en">Red</span><span class="lang-fr">Rouge</span></label></div>
-                            <div><label class="mb-0" style="color:#0a8f1a;"><input type="radio" name="sym-color" value="Green"> <span class="lang-en">Green</span><span class="lang-fr">Vert</span></label></div>
-                            <div><label class="mb-0" style="color:#1c54e5;"><input type="radio" name="sym-color" value="Blue"> <span class="lang-en">Blue</span><span class="lang-fr">Bleu</span></label></div>
+                            <div class="font-weight-bold mt-2 mb-1"><span class="lang-en">Color</span></div>
+                            <div><label class="mb-0" style="color:#000;"><input type="radio" name="sym-color" value="Black" checked> <span class="lang-en">Black</span></label></div>
+                            <div><label class="mb-0" style="color:#e51c23;"><input type="radio" name="sym-color" value="Red"> <span class="lang-en">Red</span></label></div>
+                            <div><label class="mb-0" style="color:#0a8f1a;"><input type="radio" name="sym-color" value="Green"> <span class="lang-en">Green</span></label></div>
+                            <div><label class="mb-0" style="color:#1c54e5;"><input type="radio" name="sym-color" value="Blue"> <span class="lang-en">Blue</span></label></div>
                             <div><label class="mb-0" style="color:#10b9c9;"><input type="radio" name="sym-color" value="Cyan"> Cyan</label></div>
                             <div><label class="mb-0" style="color:#d61fb5;"><input type="radio" name="sym-color" value="Magenta"> Magenta</label></div>
-                            <div><label class="mb-0" style="color:#d4ad00;"><input type="radio" name="sym-color" value="Yellow"> <span class="lang-en">Yellow</span><span class="lang-fr">Jaune</span></label></div>
-                            <div><label class="mb-0" style="color:#f57c00;"><input type="radio" name="sym-color" value="Orange"> <span class="lang-en">Orange</span><span class="lang-fr">Orange</span></label></div>
-                            <div><label class="mb-0" style="color:#8e24aa;"><input type="radio" name="sym-color" value="Purple"> <span class="lang-en">Purple</span><span class="lang-fr">Violet</span></label></div>
-                            <div><label class="mb-0" style="color:#795548;"><input type="radio" name="sym-color" value="Brown"> <span class="lang-en">Brown</span><span class="lang-fr">Marron</span></label></div>
+                            <div><label class="mb-0" style="color:#d4ad00;"><input type="radio" name="sym-color" value="Yellow"> <span class="lang-en">Yellow</span></label></div>
+                            <div><label class="mb-0" style="color:#f57c00;"><input type="radio" name="sym-color" value="Orange"> <span class="lang-en">Orange</span></label></div>
+                            <div><label class="mb-0" style="color:#8e24aa;"><input type="radio" name="sym-color" value="Purple"> <span class="lang-en">Purple</span></label></div>
+                            <div><label class="mb-0" style="color:#795548;"><input type="radio" name="sym-color" value="Brown"> <span class="lang-en">Brown</span></label></div>
                         </div>
                     </div>
                     <p class="small text-muted mt-3 mb-0">
                         <span class="lang-en">The classification of the <a href="https://en.wikipedia.org/wiki/Wallpaper_group" target="_blank" rel="noopener">17 wallpaper groups</a> was proven complete by Fedorov (1891).</span>
-                        <span class="lang-fr">La classification des <a href="https://fr.wikipedia.org/wiki/Groupe_de_papier_peint" target="_blank" rel="noopener">17 groupes de papier peint</a> a été démontrée complète par Fedorov (1891).</span>
+
                         &nbsp;<i class="fab fa-youtube"></i>
                         <a href="https://www.youtube.com/watch?v=C_konuQKGtQ" target="_blank" rel="noopener">
-                            <span class="lang-en">More info</span><span class="lang-fr">En savoir plus</span>
+                            <span class="lang-en">More info</span>
                         </a>
                     </p>
                 </div>
@@ -306,32 +334,32 @@
                 <div id="gd-area" class="d-none">
                     <p class="small text-muted mx-1 mb-3">
                         <span class="lang-en">A marker rolls down a 3D loss surface following its gradient. <strong>Drag</strong> to rotate the view. Pick a surface and an optimiser, and tune the learning rate. SGD: <a href="https://doi.org/10.1214/aoms/1177729586" target="_blank" rel="noopener">Robbins &amp; Monro (1951)</a>; Momentum: <a href="https://doi.org/10.1016/0041-5553(64)90137-5" target="_blank" rel="noopener">Polyak (1964)</a>; Adam: <a href="https://arxiv.org/abs/1412.6980" target="_blank" rel="noopener">Kingma &amp; Ba (2014)</a>.</span>
-                        <span class="lang-fr">Une bille descend une surface de perte 3D en suivant son gradient. <strong>Glisse</strong> pour tourner la vue. Choisis une surface, un optimiseur et règle le taux d'apprentissage. SGD : <a href="https://doi.org/10.1214/aoms/1177729586" target="_blank" rel="noopener">Robbins &amp; Monro (1951)</a> ; Momentum : <a href="https://doi.org/10.1016/0041-5553(64)90137-5" target="_blank" rel="noopener">Polyak (1964)</a> ; Adam : <a href="https://arxiv.org/abs/1412.6980" target="_blank" rel="noopener">Kingma &amp; Ba (2014)</a>.</span>
+
                     </p>
                     <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.4rem;">
-                        <span class="small text-muted mr-1"><span class="lang-en">Surface:</span><span class="lang-fr">Surface&nbsp;:</span></span>
+                        <span class="small text-muted mr-1"><span class="lang-en">Surface:</span></span>
                         <button data-gd-surf="bowl" class="btn btn-sm btn-outline-dark">Bowl</button>
                         <button data-gd-surf="saddle" class="btn btn-sm btn-outline-dark">Saddle</button>
                         <button data-gd-surf="ripples" class="btn btn-sm btn-outline-dark active">Ripples</button>
                         <button data-gd-surf="rosenbrock" class="btn btn-sm btn-outline-dark">Rosenbrock</button>
                         <button data-gd-surf="volcano" class="btn btn-sm btn-outline-dark">Volcano</button>
-                        <button data-gd-surf="fourwells" class="btn btn-sm btn-outline-dark"><span class="lang-en">Four wells</span><span class="lang-fr">Quatre puits</span></button>
-                        <button data-gd-surf="monkey" class="btn btn-sm btn-outline-dark"><span class="lang-en">Monkey saddle</span><span class="lang-fr">Selle de singe</span></button>
+                        <button data-gd-surf="fourwells" class="btn btn-sm btn-outline-dark"><span class="lang-en">Four wells</span></button>
+                        <button data-gd-surf="monkey" class="btn btn-sm btn-outline-dark"><span class="lang-en">Monkey saddle</span></button>
                     </div>
                     <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.4rem;">
-                        <span class="small text-muted mr-1"><span class="lang-en">Optimiser:</span><span class="lang-fr">Optimiseur&nbsp;:</span></span>
+                        <span class="small text-muted mr-1"><span class="lang-en">Optimiser:</span></span>
                         <button data-gd-opt="sgd" class="btn btn-sm btn-outline-secondary active">SGD</button>
                         <button data-gd-opt="momentum" class="btn btn-sm btn-outline-secondary">Momentum</button>
                         <button data-gd-opt="adam" class="btn btn-sm btn-outline-secondary">Adam</button>
                         <label class="small text-muted mb-0 ml-2">
-                            <span class="lang-en">Learning rate</span><span class="lang-fr">Taux d'apprentissage</span>
+                            <span class="lang-en">Learning rate</span>
                             <input id="gd-lr" type="range" min="1" max="100" value="50" style="vertical-align:middle; width:110px;">
                         </label>
                     </div>
                     <div class="d-flex flex-wrap align-items-center mb-2" style="gap:.6rem;">
-                        <button id="gd-play" class="btn btn-sm btn-dark"><i class="fas fa-pause"></i> <span class="lang-en">Pause</span><span class="lang-fr">Pause</span></button>
-                        <button id="gd-restart" class="btn btn-sm btn-outline-dark"><i class="fas fa-redo"></i> <span class="lang-en">Restart</span><span class="lang-fr">Relancer</span></button>
-                        <button id="gd-resetview" class="btn btn-sm btn-outline-dark"><i class="fas fa-cube"></i> <span class="lang-en">Reset view</span><span class="lang-fr">Vue iso</span></button>
+                        <button id="gd-play" class="btn btn-sm btn-dark"><i class="fas fa-pause"></i> <span class="lang-en">Pause</span></button>
+                        <button id="gd-restart" class="btn btn-sm btn-outline-dark"><i class="fas fa-redo"></i> <span class="lang-en">Restart</span></button>
+                        <button id="gd-resetview" class="btn btn-sm btn-outline-dark"><i class="fas fa-cube"></i> <span class="lang-en">Reset view</span></button>
                     </div>
                     <div id="gd-wrap" style="width:100%;">
                         <canvas id="gd-canvas" style="background:#fff; border-radius:4px; touch-action:none; cursor:grab; width:100%;"></canvas>
@@ -342,7 +370,7 @@
                 <div id="cifar-area" class="d-none">
                     <p class="small text-muted mx-1 mb-3">
                         <span class="lang-en">Every CIFAR-100 image as a point in a 3D <strong>latent space</strong>, coloured by class (100 classes); similar images sit close together. Drag to rotate, scroll to zoom, and move the cursor: the left panel shows the nearest image. Dataset: <a href="https://www.cs.toronto.edu/~kriz/cifar.html" target="_blank" rel="noopener">CIFAR-100</a> (Krizhevsky, 2009).</span>
-                        <span class="lang-fr">Chaque image CIFAR-100 est un point dans un <strong>espace latent</strong> 3D, coloré selon sa classe (100 classes)&nbsp;; les images semblables sont voisines. Glisse pour tourner, molette pour zoomer, déplace le curseur&nbsp;: le panneau de gauche montre l'image la plus proche. Jeu de données : <a href="https://www.cs.toronto.edu/~kriz/cifar.html" target="_blank" rel="noopener">CIFAR-100</a> (Krizhevsky, 2009).</span>
+
                     </p>
                     <div class="d-flex flex-wrap align-items-start justify-content-center" style="gap:1.4rem;">
                     <style>
@@ -355,7 +383,7 @@
                             <div id="cifar-vec" style="margin:0 auto; width:fit-content;"></div>
                             <div class="small text-muted mt-1 text-center">
                                 <span class="lang-en">latent vector of the selected point</span>
-                                <span class="lang-fr">vecteur latent du point sélectionné</span>
+
                             </div>
                         </div>
                         <div id="cifar-mapwrap" style="flex:0 1 360px; width:360px; max-width:100%;">
@@ -410,19 +438,19 @@
                     </style>
                     <p class="small text-muted mx-1 mb-3">
                         <span class="lang-en">Convolutional <strong>autoencoder</strong> (PyTorch) trained on AFHQ dog faces, with <strong>PCA</strong> on its latent codes. The 64 sliders are the top principal components, most important first; the decoder redraws the dog as you move them. <em>Double-click a slider to reset it.</em> Data: <a href="https://arxiv.org/abs/1912.01865" target="_blank" rel="noopener">AFHQ (Choi et al., 2020)</a>.</span>
-                        <span class="lang-fr"><strong>Auto-encodeur</strong> convolutif (PyTorch) entraîné sur des visages de chiens AFHQ, avec une <strong>ACP</strong> sur ses codes latents. Les 64 curseurs sont les premières composantes principales, les plus importantes d'abord&nbsp;; le décodeur redessine le chien quand tu les bouges. <em>Double-clique sur un curseur pour le remettre à zéro.</em> Données : <a href="https://arxiv.org/abs/1912.01865" target="_blank" rel="noopener">AFHQ (Choi et al., 2020)</a>.</span>
+
                     </p>
                     <div class="d-flex flex-wrap justify-content-center" style="gap:1.2rem;">
                         <!-- left: sliders -->
                         <div class="dg-panel dg-sliders" id="dog-sliders-wrap">
                             <div class="dg-head">
-                                <span class="lang-en">Principal components</span><span class="lang-fr">Composantes principales</span>
+                                <span class="lang-en">Principal components</span>
                             </div>
                             <div id="dog-sliders">
                                 <div class="dg-placeholder">
                                     <i class="fas fa-paw fa-2x mb-2 d-block"></i>
                                     <span class="lang-en">The 64 sliders appear once the model is loaded.</span>
-                                    <span class="lang-fr">Les 64 curseurs apparaissent une fois le modèle chargé.</span>
+
                                 </div>
                             </div>
                         </div>
@@ -433,10 +461,10 @@
                             <div id="dog-status" class="small text-muted mt-2">&nbsp;</div>
                             <div class="d-flex flex-wrap justify-content-center mt-1" style="gap:.4rem;">
                                 <button id="dog-random" class="btn btn-sm btn-dark">
-                                    <i class="fas fa-dice"></i> <span class="lang-en">Random Dog</span><span class="lang-fr">Chien aléatoire</span>
+                                    <i class="fas fa-dice"></i> <span class="lang-en">Random Dog</span>
                                 </button>
                                 <button id="dog-random-ds" class="btn btn-sm btn-outline-dark">
-                                    <i class="fas fa-database"></i> <span class="lang-en">Random Dog (From Dataset)</span><span class="lang-fr">Chien aléatoire (du dataset)</span>
+                                    <i class="fas fa-database"></i> <span class="lang-en">Random Dog (From Dataset)</span>
                                 </button>
                             </div>
                             <div id="dog-history" class="dg-hist"></div>
@@ -448,14 +476,14 @@
                 <div id="ddpm-area" class="d-none" data-base="{{ '/assets/models/' | relative_url }}">
                     <p class="small text-muted mx-1 mb-3">
                         <span class="lang-en"><strong>Diffusion model</strong> trained in PyTorch on AFHQ dog faces (128&times;128). Starting from pure noise, a UNet removes a little noise at each step until a dog is left. Click <strong>Generate</strong>. DDPM: <a href="https://arxiv.org/abs/2006.11239" target="_blank" rel="noopener">Ho et al. (2020)</a>; DDIM sampler: <a href="https://arxiv.org/abs/2010.02502" target="_blank" rel="noopener">Song et al. (2020)</a>; data: <a href="https://arxiv.org/abs/1912.01865" target="_blank" rel="noopener">AFHQ (Choi et al., 2020)</a>.</span>
-                        <span class="lang-fr"><strong>Modèle de diffusion</strong> entraîné avec PyTorch sur des visages de chiens AFHQ (128&times;128). En partant de bruit pur, un UNet retire un peu de bruit à chaque étape jusqu'à ce qu'il ne reste qu'un chien. Clique sur <strong>Générer</strong>. DDPM : <a href="https://arxiv.org/abs/2006.11239" target="_blank" rel="noopener">Ho et al. (2020)</a> ; échantillonneur DDIM : <a href="https://arxiv.org/abs/2010.02502" target="_blank" rel="noopener">Song et al. (2020)</a> ; données : <a href="https://arxiv.org/abs/1912.01865" target="_blank" rel="noopener">AFHQ (Choi et al., 2020)</a>.</span>
+
                     </p>
                     <div class="d-flex flex-wrap justify-content-center">
                         <div class="text-center">
                             <canvas id="ddpm-canvas" width="256" height="256" style="border-radius:14px; box-shadow:0 6px 22px rgba(25,40,80,.15); width:256px; height:256px; background:#eee;"></canvas>
                             <div id="ddpm-status" class="small text-muted mt-2">&nbsp;</div>
                             <button id="ddpm-generate" class="btn btn-sm btn-dark mt-1" style="border-radius:20px;">
-                                <i class="fas fa-magic"></i> <span class="lang-en">Generate</span><span class="lang-fr">Générer</span>
+                                <i class="fas fa-magic"></i> <span class="lang-en">Generate</span>
                             </button>
                         </div>
                     </div>
@@ -468,7 +496,7 @@
                      data-sample="{{ '/assets/images/style_sample.jpg' | relative_url }}?v=2">
                     <p class="small text-muted mx-1 mb-3">
                         <span class="lang-en"><strong>Style transfer</strong>. The preset styles use feed-forward networks (<a href="https://arxiv.org/abs/1603.08155" target="_blank" rel="noopener">Johnson et al.</a>, trained in PyTorch); the painting thumbnails use <strong>AdaIN</strong> (<a href="https://arxiv.org/abs/1703.06868" target="_blank" rel="noopener">Huang &amp; Belongie</a>), one network that takes any painting as the style. Pick a style and upload a photo; it never leaves your device. Weights: <a href="https://github.com/igreat/fast-style-transfer" target="_blank" rel="noopener">igreat/fast-style-transfer</a> and <a href="https://github.com/naoto0804/pytorch-AdaIN" target="_blank" rel="noopener">naoto0804/pytorch-AdaIN</a> (MIT); paintings via Wikimedia Commons (public domain).</span>
-                        <span class="lang-fr"><strong>Transfert de style</strong>. Les styles prédéfinis utilisent des réseaux feed-forward (<a href="https://arxiv.org/abs/1603.08155" target="_blank" rel="noopener">Johnson et al.</a>, entraînés avec PyTorch)&nbsp;; les vignettes de tableaux utilisent <strong>AdaIN</strong> (<a href="https://arxiv.org/abs/1703.06868" target="_blank" rel="noopener">Huang &amp; Belongie</a>), un seul réseau qui prend n'importe quel tableau comme style. Choisis un style et charge une photo&nbsp;; elle ne quitte pas ton appareil. Poids : <a href="https://github.com/igreat/fast-style-transfer" target="_blank" rel="noopener">igreat/fast-style-transfer</a> et <a href="https://github.com/naoto0804/pytorch-AdaIN" target="_blank" rel="noopener">naoto0804/pytorch-AdaIN</a> (MIT) ; tableaux via Wikimedia Commons (domaine public).</span>
+
                     </p>
                     <style>
                         #style-area .st-panel { background:#f8f9fb; border:1px solid #e9ecf2; border-radius:12px;
@@ -493,7 +521,7 @@
                     <div class="st-panel">
                         <div class="st-head">
                             <i class="fas fa-palette"></i>&nbsp;
-                            <span class="lang-en">Paintings, oldest first</span><span class="lang-fr">Tableaux, du plus ancien au plus récent</span>
+                            <span class="lang-en">Paintings, oldest first</span>
                         </div>
                         <div class="st-grid">
                         {% assign adain_styles_a = "mosaic-byz|Byzantine mosaic - Ravenna (around 547)|Mosaïque byzantine - Ravenne (vers 547),vitrail|Stained glass - Sainte-Chapelle (around 1248)|Vitrail - Sainte-Chapelle (vers 1248),botticelli|The Birth of Venus - Botticelli (1485)|La Naissance de Vénus - Botticelli (1485),bosch|The Garden of Earthly Delights - Bosch (around 1500)|Le Jardin des délices - Bosch (vers 1500),bruegel|The Tower of Babel - Bruegel (1563)|La Tour de Babel - Bruegel (1563),vermeer|Girl with a Pearl Earring - Vermeer (1665)|La Jeune Fille à la perle - Vermeer (1665),friedrich|Wanderer above the Sea of Fog - Friedrich (1818)|Le Voyageur contemplant une mer de nuages - Friedrich (1818),wave|The Great Wave - Hokusai (1831)|La Grande Vague de Kanagawa - Hokusai (1831),red-fuji|Red Fuji - Hokusai (1831)|Fuji rouge - Hokusai (1831),turner|The Fighting Temeraire - Turner (1839)|Le Téméraire - Turner (1839),hiroshige|Sudden Shower - Hiroshige (1857)|Averse soudaine - Hiroshige (1857),seurat|La Grande Jatte - Seurat (1884)|Un dimanche à la Grande Jatte - Seurat (1884),cezanne|Mont Sainte-Victoire - Cezanne (around 1887)|Mont Sainte-Victoire - Cézanne (vers 1887),cafe-terrace|Cafe Terrace at Night - Van Gogh (1888)|Terrasse du café le soir - Van Gogh (1888),sunflowers|Sunflowers - Van Gogh (1888)|Les Tournesols - Van Gogh (1888)" | split: "," %}
@@ -530,24 +558,24 @@
                     <div class="d-flex flex-wrap align-items-start justify-content-center" style="gap:1.2rem;">
                         <div class="text-center">
                             <canvas id="style-src" width="280" height="280" style="border:1px solid #ccc; border-radius:4px; width:280px; height:280px;"></canvas>
-                            <div class="small text-muted mt-1"><span class="lang-en">original</span><span class="lang-fr">originale</span></div>
+                            <div class="small text-muted mt-1"><span class="lang-en">original</span></div>
                             <label class="btn btn-sm btn-outline-dark mt-1 mb-0">
-                                <i class="fas fa-upload"></i> <span class="lang-en">Upload your image</span><span class="lang-fr">Charger ton image</span>
+                                <i class="fas fa-upload"></i> <span class="lang-en">Upload your image</span>
                                 <input id="style-file" type="file" accept="image/*" style="display:none;">
                             </label>
                         </div>
                         <div class="text-center">
-                            <img id="style-painting" src="{{ '/assets/images/styles/starry-night.jpg' | relative_url }}" alt="The Starry Night - Van Gogh"
+                            <img id="style-painting" src="{{ '/assets/images/styles/starry-night.jpg' | relative_url }}" alt="The Starry Night - Van Gogh" loading="lazy"
                                  style="border:1px solid #ccc; border-radius:4px; width:280px; height:280px; object-fit:cover;">
-                            <div id="style-painting-name" class="small text-muted mt-1"><span class="lang-en">The Starry Night - Van Gogh</span><span class="lang-fr">La Nuit étoilée - Van Gogh</span></div>
+                            <div id="style-painting-name" class="small text-muted mt-1"><span class="lang-en">The Starry Night - Van Gogh</span></div>
                         </div>
                         <div class="text-center">
                             <canvas id="style-out" width="280" height="280" style="border:1px solid #ccc; border-radius:4px; width:280px; height:280px; background:#eee;"></canvas>
                             <div id="style-progress" class="st-progress"><span></span></div>
-                            <div class="small text-muted mt-1"><span class="lang-en">stylized</span><span class="lang-fr">stylisée</span></div>
+                            <div class="small text-muted mt-1"><span class="lang-en">stylized</span></div>
                             <div class="d-flex align-items-center justify-content-center mt-1" style="gap:.4rem;">
                                 <label class="small text-muted mb-0">
-                                    <span class="lang-en">Intensity</span><span class="lang-fr">Intensité</span>
+                                    <span class="lang-en">Intensity</span>
                                     <input id="style-strength" type="range" min="10" max="100" value="100" style="vertical-align:middle; width:140px;">
                                 </label>
                                 <span id="style-strength-val" class="small text-muted">100%</span>
@@ -561,7 +589,7 @@
                 <div id="w2v-area" class="d-none" data-json="{{ '/assets/models/word_embeddings.json' | relative_url }}?v=2">
                     <p class="small text-muted mx-1 mb-3">
                         <span class="lang-en"><strong>Word embeddings</strong>: <a href="https://nlp.stanford.edu/projects/glove/" target="_blank" rel="noopener">GloVe</a> 50d vectors, same idea as <a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">word2vec</a>. Similar words sit close, and some directions carry meaning: <em>king - man + woman ≈ queen</em>. Shown: the 20,000 most frequent words, projected to 3D with PCA. Drag to rotate, scroll to zoom, search a word to list its neighbours, or try vector arithmetic. word2vec: <a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">Mikolov et al. (2013)</a>; GloVe: <a href="https://aclanthology.org/D14-1162/" target="_blank" rel="noopener">Pennington, Socher &amp; Manning (2014)</a>.</span>
-                        <span class="lang-fr"><strong>Plongements de mots</strong>&nbsp;: vecteurs <a href="https://nlp.stanford.edu/projects/glove/" target="_blank" rel="noopener">GloVe</a> 50d, même principe que <a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">word2vec</a>. Les mots similaires sont proches, et certaines directions portent du sens&nbsp;: <em>king - man + woman ≈ queen</em>. Affichés&nbsp;: les 20&nbsp;000 mots les plus fréquents, projetés en 3D par ACP. Glisse pour tourner, molette pour zoomer, cherche un mot pour lister ses voisins, ou essaie l'arithmétique vectorielle. word2vec : <a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">Mikolov et al. (2013)</a> ; GloVe : <a href="https://aclanthology.org/D14-1162/" target="_blank" rel="noopener">Pennington, Socher &amp; Manning (2014)</a>.</span>
+
                     </p>
                     <style>
                         #w2v-area .wv-panel { background:#f8f9fb; border:1px solid #e9ecf2; border-radius:12px; padding:.8rem .9rem; }
@@ -587,19 +615,19 @@
                         </div>
                         <div class="d-flex flex-column align-self-stretch" style="width:330px; max-width:100%; gap:1rem;">
                             <div class="wv-panel" style="flex:1;">
-                                <div class="wv-head"><i class="fas fa-search"></i> <span class="lang-en">Nearest neighbours</span><span class="lang-fr">Plus proches voisins</span></div>
+                                <div class="wv-head"><i class="fas fa-search"></i> <span class="lang-en">Nearest neighbours</span></div>
                                 <div class="d-flex mb-1" style="gap:.3rem;">
                                     <input id="w2v-search" type="text" class="form-control form-control-sm" placeholder="dog, music, paris…" style="max-width:160px;">
                                     <button id="w2v-search-btn" class="btn btn-sm btn-dark" style="border-radius:8px;"><i class="fas fa-search"></i></button>
                                 </div>
                                 <div class="mb-1">
-                                    <span class="small text-muted"><span class="lang-en">try:</span><span class="lang-fr">essaie&nbsp;:</span></span>
+                                    <span class="small text-muted"><span class="lang-en">try:</span></span>
                                     <span class="wv-ex" data-w2v-word="dog">dog</span><span class="wv-ex" data-w2v-word="music">music</span><span class="wv-ex" data-w2v-word="einstein">einstein</span><span class="wv-ex" data-w2v-word="coffee">coffee</span>
                                 </div>
                                 <div id="w2v-neighbors"></div>
                             </div>
                             <div class="wv-panel" style="flex:1;">
-                                <div class="wv-head"><i class="fas fa-calculator"></i> <span class="lang-en">Vector arithmetic</span><span class="lang-fr">Arithmétique vectorielle</span></div>
+                                <div class="wv-head"><i class="fas fa-calculator"></i> <span class="lang-en">Vector arithmetic</span></div>
                                 <div class="d-flex align-items-center mb-1 flex-wrap" style="gap:.25rem;">
                                     <input id="w2v-a" type="text" class="form-control form-control-sm" style="width:76px;">
                                     <span class="small font-weight-bold">-</span>
@@ -609,7 +637,7 @@
                                     <button id="w2v-math-btn" class="btn btn-sm btn-dark" style="border-radius:8px;">=</button>
                                 </div>
                                 <div class="mb-1">
-                                    <span class="small text-muted"><span class="lang-en">try:</span><span class="lang-fr">essaie&nbsp;:</span></span>
+                                    <span class="small text-muted"><span class="lang-en">try:</span></span>
                                     <span class="wv-ex" data-w2v-analogy="paris,france,italy">paris - france + italy</span>
                                     <span class="wv-ex" data-w2v-analogy="king,man,woman">king - man + woman</span>
                                     <span class="wv-ex" data-w2v-analogy="actor,man,woman">actor - man + woman</span>
@@ -627,13 +655,13 @@
     </div>
 </div>
 
-<script src="{{ '/assets/js/game-of-life.js' | relative_url }}?v=22"></script>
+<script src="{{ '/assets/js/game-of-life.js' | relative_url }}?v=23"></script>
 <script src="{{ '/assets/js/symmetry.js' | relative_url }}?v=9"></script>
-<script src="{{ '/assets/js/gradient-descent.js' | relative_url }}?v=15"></script>
+<script src="{{ '/assets/js/gradient-descent.js' | relative_url }}?v=16"></script>
 <script src="{{ '/assets/js/cifar.js' | relative_url }}?v=12"></script>
-<script src="{{ '/assets/js/dog-creator.js' | relative_url }}?v=17"></script>
-<script src="{{ '/assets/js/dog-diffusion.js' | relative_url }}?v=20"></script>
-<script src="{{ '/assets/js/style-transfer.js' | relative_url }}?v=12"></script>
-<script src="{{ '/assets/js/word2vec.js' | relative_url }}?v=8"></script>
+<script src="{{ '/assets/js/dog-creator.js' | relative_url }}?v=18"></script>
+<script src="{{ '/assets/js/dog-diffusion.js' | relative_url }}?v=21"></script>
+<script src="{{ '/assets/js/style-transfer.js' | relative_url }}?v=13"></script>
+<script src="{{ '/assets/js/word2vec.js' | relative_url }}?v=9"></script>
 <!-- Metamaterials space is the default open tab: load its map on page load -->
 <script>if (window.__mmsShow) window.__mmsShow();</script>

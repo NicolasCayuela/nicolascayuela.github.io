@@ -276,8 +276,8 @@
   if ($("gd-play")) $("gd-play").addEventListener("click", function () {
     paused = !paused;
     this.innerHTML = paused
-      ? '<i class="fas fa-play"></i> <span class="lang-en">Play</span><span class="lang-fr">Lancer</span>'
-      : '<i class="fas fa-pause"></i> <span class="lang-en">Pause</span><span class="lang-fr">Pause</span>';
+      ? '<i class="fas fa-play"></i> <span class="lang-en">Play</span>'
+      : '<i class="fas fa-pause"></i> <span class="lang-en">Pause</span>';
   });
   if ($("gd-restart")) $("gd-restart").addEventListener("click", function () { restart(); dirty = true; });
   if ($("gd-resetview")) $("gd-resetview").addEventListener("click", function () { yaw = ISO_YAW; pitch = ISO_PITCH; dirty = true; });

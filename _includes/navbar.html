@@ -1,15 +1,15 @@
 <nav class="navbar navbar-expand-sm navbar-light bg-light fixed-top mb-5 shadow-sm">
     <div class="container">
-        <button class="navbar-toggler ml-auto" style="font-size: 1em; padding: 0.5em;" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-            <i class="fas fa-map"></i> <span class="lang-en">Menu</span><span class="lang-fr">Menu</span>
+        <button class="navbar-toggler" style="font-size: 1em; padding: 0.5em;" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="fas fa-map"></i> <span class="lang-en">Menu</span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarResponsive">
-            <ul class="navbar-nav ml-auto">
+            <ul class="navbar-nav mr-auto">
                 {% for item in site.data.navigation.pages %}
                 <li class="nav-item {% if item.name == page.navbar_name %}active{% endif %}">
                     <a class="nav-link" href="{{ item.url }}">
-                        <span class="lang-en">{{ item.name }}</span><span class="lang-fr">{{ item.name_fr }}</span>
+                        <span class="lang-en">{{ item.name }}</span>
                         {% if item.url == page.url %}<span class="sr-only">(current)</span>{% endif %}
                     </a>
                 </li>

@@ -37,7 +37,7 @@
   function setStatus(en, fr) {
     if (!statusEl) return;
     statusEl.innerHTML = en || fr
-      ? '<span class="lang-en">' + en + "</span><span class=\"lang-fr\">" + fr + "</span>"
+      ? '<span class="lang-en">' + en + "</span>"
       : "&nbsp;";
   }
 
@@ -240,7 +240,7 @@
     if (name) {
       var en = btn.getAttribute("data-name-en") || btn.title || "";
       var fr = btn.getAttribute("data-name-fr") || en;
-      name.innerHTML = '<span class="lang-en"></span><span class="lang-fr"></span>';
+      name.innerHTML = '<span class="lang-en"></span>';
       name.firstChild.textContent = en;
       name.lastChild.textContent = fr;
     }

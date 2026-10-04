@@ -6,11 +6,6 @@ positions:
   - '<i class="fas fa-flask"></i> &nbsp;Institut Jean Lamour'
   - <i class="fas fa-map-marker-alt"></i> &nbsp; Nancy, France
 
-positions_fr:
-  - '<i class="fas fa-user-graduate"></i> &nbsp;Doctorant en phononique & métamatériaux'
-  - '<i class="fas fa-flask"></i> &nbsp;Institut Jean Lamour'
-  - <i class="fas fa-map-marker-alt"></i> &nbsp; Nancy, France
-
 email: "githubcontact.sublime067@simplelogin.com"
 #gscholar: XXXXXXXXXXXX        # your Google Scholar user id (uncomment to enable)
 #orcid: 0000-0000-0000-0000
@@ -24,12 +19,6 @@ short_bio: >-
   France. I design phononic crystals and acoustic/elastic metamaterials, and use
   <strong>graph neural networks</strong> to predict how waves travel through them and to find geometries for a target response.
   <br> <span style="color: red; font-style: italic;"><i class="far fa-envelope"></i>&nbsp; <a href="mailto:githubcontact.sublime067@simplelogin.com" style="color: inherit; text-decoration: underline;">Email me about research or collaborations.</a></span>
-
-short_bio_fr: >-
-  Doctorant en phononique et métamatériaux à l'<strong>Institut Jean Lamour</strong> à Nancy.
-  Je conçois des cristaux phononiques et des métamatériaux acoustiques/élastiques, et j'utilise des
-  <strong>réseaux de neurones sur graphes</strong> pour prédire la propagation des ondes et trouver des géométries pour une réponse cible.
-  <br> <span style="color: red; font-style: italic;"><i class="far fa-envelope"></i>&nbsp; <a href="mailto:githubcontact.sublime067@simplelogin.com" style="color: inherit; text-decoration: underline;">Écrivez-moi pour échanger ou collaborer.</a></span>
 
 show_portrait: true
 portrait_url: assets/images/photos/profile.jpg
@@ -59,16 +48,6 @@ education:
     position: '<em>Lycée Jean-Baptiste-Dumas</em><br>Preparatory classes for the French Grandes Écoles.'
     date: 2019 - 2021
 
-education_fr:
-  - name: "Doctorat : Métamatériaux à architecture durable pour la manipulation des ondes élastiques"
-    position: '<em>Institut Jean Lamour, École doctorale C2MP (Chimie, Mécanique, Matériaux, Physique)</em>'
-  - name: Master Smart Mechanics
-    position: '<em>EIPHI-BFC Graduate School</em><br>Master Recherche dans le domaine des Smart Structures, pour le contrôle vibroacoustique (NVH), la surveillance de la santé des structures, le contrôle de forme et la collecte d''énergie.'
-  - name: Diplôme d'ingénieur
-    position: '<em>SUPMICROTECH-ENSMM</em><br>École Nationale Supérieure de Mécanique et des Microtechniques.'
-  - name: CPGE TSI
-    position: '<em>Lycée Jean-Baptiste-Dumas</em><br>Classes Préparatoires aux Grandes Écoles.'
-
 experience:
   - name: "PhD: Sustainable architected metamaterials for elastic wave manipulation"
     logo: assets/images/badges/ijl.jpg
@@ -85,14 +64,6 @@ experience:
     url: "https://www.femto-st.fr/fr"
     position: '<em>FEMTO-ST Institute, UMR CNRS 6174<br>Applied Mechanics Department</em><br>&bull; Dynamic testing (laser vibrometer, high-speed camera, vacuum pump) on flax fibres<br>&bull; Damping identified by logarithmic decrement; storage (stiffness) modulus via COMSOL'
     date: 2024
-
-experience_fr:
-  - name: "Doctorat : Métamatériaux à architecture durable pour la manipulation des ondes élastiques"
-    position: '<em>Institut Jean Lamour, UMR CNRS 7198<br>Département Nanomatériaux, Électronique Et Vivant (N2EV), Équipe Métamatériaux et Phononique</em><br>&bull; Conception de métamatériaux piézoélectriques 3D à base de cellules unitaires à montants, tenseur piézoélectrique personnalisable par la microarchitecture<br>&bull; Caractérisation élastodynamique : structures de bandes, couplage de Willis, couplage électromomentum<br>&bull; Apprentissage automatique (GNN, design inverse) pour accélérer prédiction et optimisation des propriétés de propagation<br>&bull; Applications : détection de défauts/impacts, détection directionnelle, récupération d''énergie, comportement non hermitien'
-  - name: "Stage : Étude d'un capteur multi-physique optomécanique"
-    position: '<em>CEA-Leti, Université Grenoble Alpes</em><br>&bull; Mesure de gaz avec des puces optomécaniques et Mach&ndash;Zehnder en référence<br>&bull; Banc expérimental, encapsulation par capots (PMMA + scotch), mesures RF par pointes<br>&bull; Simulations Comsol/RSoft du couplage optomécanique et des modes propres'
-  - name: "Stage : Caractérisation mécanique dynamique de fibres élémentaires pour les matériaux composites biosourcés"
-    position: '<em>Institut FEMTO-ST, UMR CNRS 6174<br>Département de mécanique appliquée</em><br>&bull; Essais dynamiques (vibromètre laser, caméra rapide, pompe à vide) sur des fibres de lin<br>&bull; Amortissement identifié par décrément logarithmique ; module de stockage (rigidité) par COMSOL'
 
 # service:
 #   - name: "Reviewer for ..."
@@ -116,4 +87,3 @@ experience_fr:
 #     url: "https://example.com"
 
 footer_text: ""
-footer_text_fr: ""
