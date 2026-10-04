@@ -2,15 +2,6 @@ pages:
 - name: Home
   name_fr: Accueil
   url: ./
-- name: Publications
-  name_fr: Publications
-  url: publications
-- name: Metamaterials space
-  name_fr: Espace métamatériaux
-  url: metamaterials-space
 - name: Playground
   name_fr: Terrain de jeu
   url: playground
-- name: Blog
-  name_fr: Blog
-  url: blog

@@ -272,6 +272,8 @@
     if (stBtn) stBtn.classList.toggle("active", m === "style");
     var wvBtn = document.getElementById("gol-mode-w2v");
     if (wvBtn) wvBtn.classList.toggle("active", m === "w2v");
+    var mmBtn = document.getElementById("gol-mode-mms");
+    if (mmBtn) mmBtn.classList.toggle("active", m === "mms");
 
     show("gol-area", m === "life" || m === "fire");
     show("sym-area", m === "sym");
@@ -281,6 +283,7 @@
     show("ddpm-area", m === "ddpm");
     show("style-area", m === "style");
     show("w2v-area", m === "w2v");
+    show("mms-area", m === "mms");
     if (m === "sym") { if (window.__symResize) window.__symResize(); return; }
     if (m === "gd") { if (window.__gdResize) window.__gdResize(); return; }
     if (m === "cifar") { if (window.__cifarResize) window.__cifarResize(); return; }
@@ -288,6 +291,7 @@
     if (m === "ddpm") { if (window.__ddpmShow) window.__ddpmShow(); return; }
     if (m === "style") { if (window.__styleShow) window.__styleShow(); return; }
     if (m === "w2v") { if (window.__w2vShow) window.__w2vShow(); return; }
+    if (m === "mms") { if (window.__mmsShow) window.__mmsShow(); return; }
 
     mode = m;
     show("gol-life-controls", m === "life");
@@ -313,6 +317,7 @@
   on("gol-mode-ddpm", function () { setMode("ddpm"); });
   on("gol-mode-style", function () { setMode("style"); });
   on("gol-mode-w2v", function () { setMode("w2v"); });
+  on("gol-mode-mms", function () { setMode("mms"); });
 
   // ---- init ----
   var rt;

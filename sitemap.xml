@@ -12,16 +12,8 @@ layout: null
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>{{ site.url }}{{ site.baseurl }}/metamaterials-space</loc>
-    <priority>0.5</priority>
-  </url>
-  <url>
     <loc>{{ site.url }}{{ site.baseurl }}/playground</loc>
-    <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>{{ site.url }}{{ site.baseurl }}/blog</loc>
-    <priority>0.3</priority>
+    <priority>0.8</priority>
   </url>
   {% comment %} The publications collection has no output pages; do not list them. {% endcomment %}
 </urlset>
