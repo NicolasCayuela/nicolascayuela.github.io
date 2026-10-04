@@ -30,6 +30,11 @@ h1, h2, h3, h4, h5, h6,
     opacity: 0.95;
 }
 
+/* expanded mobile menu sits over the page: no see-through */
+.navbar.menu-open {
+    opacity: 1;
+}
+
 .inline-badge {
     height: 16px;
     vertical-align: -10%;

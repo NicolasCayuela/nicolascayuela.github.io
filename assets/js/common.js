@@ -8,6 +8,7 @@
         btn.addEventListener("click", function () {
             var open = menu.classList.toggle("show");
             btn.setAttribute("aria-expanded", open ? "true" : "false");
+            btn.closest(".navbar").classList.toggle("menu-open", open);   // opaque while open
         });
     }
 
