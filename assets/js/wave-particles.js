@@ -20,10 +20,14 @@
  *
  * Perf: links and nodes are bucketed by colour level into one typed array
  * (counting sort, no per-frame allocation) and drawn with one path per level;
- * the centre vignette is a CSS mask, not a canvas pass. Weak devices (phones,
- * <=4 cores or <=4 GB) start on a low tier (DPR 1, 30 fps), and any device
- * whose frames run slow is stepped down at runtime. <body data-waves="static">
- * renders a single frozen frame (used on pages with heavy demos).
+ * the centre vignette is a CSS mask, not a canvas pass. Profiling on a
+ * throttled CPU without GPU showed ~80% of the cost is the browser rasterising
+ * and uploading the full-screen canvas each frame (not our JS), so the tiers
+ * mostly trade canvas resolution and frame rate. Weak devices (phones, <=4
+ * cores or <=4 GB) start on tier 1. Any device whose rAF loop runs slow (a
+ * saturated main thread, raster included) steps down at runtime, down to a
+ * frozen frame. <body data-waves="static"> renders a single frozen frame
+ * (used on pages with heavy demos).
  */
 (function () {
   "use strict";
@@ -32,12 +36,14 @@
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (document.body && document.body.getAttribute("data-waves") === "static") reduce = true;
 
-  // quality tier: 0 = full, 1 = low (DPR 1, 30 fps), 2 = minimal (20 fps, no bloom)
+  // quality tier -> canvas resolution (x CSS px), frame rate, bloom.
+  // 0 full | 1 low: 0.75x, 30 fps | 2 minimal: 0.6x, 20 fps | 3 frozen frame
   var nav = window.navigator || {};
   var weak = (window.isMobileViewport && window.isMobileViewport()) ||
     (nav.hardwareConcurrency || 8) <= 4 || (nav.deviceMemory || 8) <= 4;
   var tier = weak ? 1 : 0;
-  var TIER_FPS = [60, 30, 20];
+  var TIER_FPS = [60, 30, 20, 20];
+  var TIER_RES = [0, 0.75, 0.6, 0.6];      // 0 = device DPR (capped at 1.5)
 
   var CFG = {
     spacing: 46,        // lattice pitch in px (unit-cell size)
@@ -109,7 +115,7 @@
   }
 
   function build() {
-    DPR = tier ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
+    DPR = TIER_RES[tier] || Math.min(window.devicePixelRatio || 1, 1.5);
     W = window.innerWidth;
     H = window.innerHeight;
     canvas.width = W * DPR;
@@ -290,15 +296,22 @@
 
   var last = 0, acc = 0, autoTimer = 0, nextAuto = 0;
   var frameInterval = 1 / TIER_FPS[tier];
-  // runtime step-down: smoothed cost of one simulate+draw, in ms
-  var workEMA = 0, workFrames = 0;
+  // runtime step-down: smoothed rAF interval vs the fastest interval seen (the
+  // display refresh). When the main thread is saturated (our JS + canvas
+  // raster + the page) rAF slows down, which catches raster cost that timing
+  // our own code cannot see. Relative, so a browser that caps rAF at 30 Hz
+  // (battery saver) is not mistaken for a slow one.
+  var rafEMA = 0, rafFrames = 0, rafMin = 1e9;
   function setTier(t) {
     if (t === tier) return;
     tier = t;
     frameInterval = 1 / TIER_FPS[tier];
-    workEMA = 0; workFrames = 0;
+    rafEMA = 0; rafFrames = 0;
     build();                      // DPR change needs a canvas rebuild
+    if (tier === 3) draw(REF);    // final frozen frame (the loop stops drawing)
   }
+
+  window.__waveTier = function () { return tier; };   // for perf debugging
 
   function scheduleAuto() {
     nextAuto = CFG.autoMin + Math.random() * (CFG.autoMax - CFG.autoMin);
@@ -334,6 +347,13 @@
     if (!last) last = now;
     var dt = (now - last) / 1000;
     last = now;
+    if (dt > 0 && dt < 0.5) {          // ignore tab-switch gaps
+      var ms = dt * 1000;
+      if (ms > 4 && ms < rafMin) rafMin = ms;
+      rafEMA = rafFrames ? rafEMA * 0.95 + ms * 0.05 : ms;
+      if (++rafFrames > 90 && tier < 3 && rafEMA > 1.45 * rafMin && rafEMA > 21) setTier(tier + 1);
+    }
+    if (tier === 3) return;            // frozen
     if (dt > 0.1) dt = 0.1;            // clamp after tab switch
     acc += dt;
     if (acc < frameInterval) return;   // throttle to target fps
@@ -350,13 +370,8 @@
       if (waves[wI].t >= waves[wI].life) waves.splice(wI, 1);
     }
 
-    var t0 = performance.now();
     displaceNodes();
     draw(REF);                    // normalise node colour/size against the crest reference
-    var cost = performance.now() - t0;
-    workEMA = workFrames ? workEMA * 0.9 + cost * 0.1 : cost;
-    // after a warm-up, step down when one frame eats too much of the budget
-    if (++workFrames > 45 && tier < 2 && workEMA > (tier ? 9 : 7)) setTier(tier + 1);
   }
 
   var fadeAmt = reduce ? 1 : 0; // load fade-in multiplier (0 -> 1 over CFG.fadeIn)
@@ -443,9 +458,9 @@
 
     // crest bloom: re-stroke the brightest buckets wide and faint with additive
     // blending so wavefronts glow where they overlap. Few links live up here,
-    // so it is cheap. Strongest on dark; a gentle touch on light. Off on tier 2.
+    // so it is cheap. Strongest on dark; a gentle touch on light. Tier 0 only.
     ctx.globalCompositeOperation = "lighter";
-    if (tier < 2) {
+    if (tier === 0) {
       for (bb = (LEVELS * 0.72) | 0; bb < LEVELS; bb++) {
         if (!levelCount[bb]) continue;
         ctx.strokeStyle = bloomStyle[bb];
@@ -512,6 +527,7 @@
     resizeTimer = setTimeout(function () {
       build();
       if (reduce) renderStatic();
+      else if (tier === 3) { displaceNodes(); draw(REF); }
     }, 150);
   });
 

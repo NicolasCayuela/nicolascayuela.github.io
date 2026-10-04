@@ -65,24 +65,40 @@
     var s = zoom * FOV / (CAM - z);
     return { sx: SIZE * (0.5 + x * s), sy: SIZE * (0.5 - y * s), z: z };
   }
+  // The 20k dots are blended straight into a pixel buffer and pushed with one
+  // putImageData: far cheaper than rasterising 20k canvas rects per frame,
+  // which dominated on slow CPUs / software rendering.
+  var img = null, img32 = null;
   function render() {
     if (!ready) return;
     var dark = document.documentElement.classList.contains("theme-dark");
-    ctx.clearRect(0, 0, SIZE, SIZE);
-    ctx.fillStyle = dark ? "#101216" : "#fff"; ctx.fillRect(0, 0, SIZE, SIZE);
-    var i, pr;
-    // all 20k dots in one path: same projection as project(), inlined so it
-    // allocates nothing per point
+    var cw = canvas.width, ch = canvas.height, i, pr;
+    if (!img || img.width !== cw || img.height !== ch) {
+      img = ctx.createImageData(cw, ch);
+      img32 = new Uint32Array(img.data.buffer);
+    }
+    var px = img.data;
+    var col = dark ? [160, 170, 190] : [90, 100, 120], a = dark ? 0.5 : 0.45;
+    // background in one fill (RGBA bytes read as a little-endian uint32 = ABGR)
+    img32.fill(dark ? 0xff161210 : 0xffffffff);
+    // same projection as project(), inlined (no per-point allocation)
     var cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
-    var xyz = data.xyz, f = zoom * FOV, half = SIZE * 0.5;
-    ctx.fillStyle = dark ? "rgba(160,170,190,0.5)" : "rgba(90,100,120,0.45)";
-    ctx.beginPath();
+    var xyz = data.xyz, f = zoom * FOV, half = SIZE * 0.5, k = SIZE * DPR;
+    var d = Math.max(1, Math.round(2 * DPR));            // 2 CSS px square
+    var cr = col[0] * a, cg = col[1] * a, cb = col[2] * a, ia = 1 - a;
     for (i = 0; i < xyz.length; i++) {
       var q = xyz[i], z1 = -q[0] * sy + q[2] * cy;
       var s = f / (CAM - (q[1] * sp + z1 * cp));
-      ctx.rect(half + (q[0] * cy + q[2] * sy) * s * SIZE - 1, half - (q[1] * cp - z1 * sp) * s * SIZE - 1, 2, 2);
+      var x0 = ((half / SIZE + (q[0] * cy + q[2] * sy) * s) * k - d * 0.5) | 0;
+      var y0 = ((half / SIZE - (q[1] * cp - z1 * sp) * s) * k - d * 0.5) | 0;
+      for (var yy = y0 < 0 ? 0 : y0, ye = Math.min(ch, y0 + d); yy < ye; yy++) {
+        for (var xx = x0 < 0 ? 0 : x0, xe = Math.min(cw, x0 + d); xx < xe; xx++) {
+          var o = (yy * cw + xx) * 4;
+          px[o] = px[o] * ia + cr; px[o + 1] = px[o + 1] * ia + cg; px[o + 2] = px[o + 2] * ia + cb;
+        }
+      }
     }
-    ctx.fill();
+    ctx.putImageData(img, 0, 0);
     // highlighted words on top, with labels
     for (i = 0; i < highlights.length; i++) {
       var h = highlights[i];
@@ -96,10 +112,17 @@
       ctx.fillText(data.words[h.i], pr.sx + 7, pr.sy - 6);
     }
   }
-  function tick() {
+  // idle auto-spin at 30 fps (same speed as before, time-based)
+  var lastSpin = 0;
+  function tick(now) {
     requestAnimationFrame(tick);
-    if (canvas.offsetParent === null) return;        // tab hidden -> idle
-    if (autoSpin && !dragging) { yaw += 0.0035; render(); }
+    if (canvas.offsetParent === null) { lastSpin = 0; return; }   // tab hidden -> idle
+    if (!autoSpin || dragging) { lastSpin = 0; return; }
+    if (!lastSpin) lastSpin = now;
+    if (now - lastSpin < 31) return;
+    yaw += 0.0035 * Math.min(4, (now - lastSpin) / 16.7);
+    lastSpin = now;
+    render();
   }
   window.addEventListener("themechange", function () { render(); });
 

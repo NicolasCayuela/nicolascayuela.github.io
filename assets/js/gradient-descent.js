@@ -97,10 +97,21 @@
     render();
   }
 
-  function render() {
-    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    ctx.clearRect(0, 0, W, H);
-
+  // The mesh only changes with the view, the surface, the size or the theme,
+  // so it is drawn once into an offscreen canvas and blitted every frame;
+  // only the trail and the marker are redrawn live.
+  var surfC = document.createElement("canvas"), surfX = surfC.getContext("2d"), surfKey = "";
+  function drawSurface() {
+    var dark = document.documentElement.classList.contains("theme-dark");
+    var key = surf + "|" + yaw + "|" + pitch + "|" + W + "|" + H + "|" + DPR + "|" + dark;
+    if (key === surfKey) return;
+    surfKey = key;
+    if (surfC.width !== canvas.width || surfC.height !== canvas.height) {
+      surfC.width = canvas.width; surfC.height = canvas.height;
+    }
+    var c = surfX;
+    c.setTransform(DPR, 0, 0, DPR, 0, 0);
+    c.clearRect(0, 0, W, H);
     var f = SURF[surf].f, quads = [], i, j;
     for (i = 0; i < N; i++) {
       for (j = 0; j < N; j++) {
@@ -115,15 +126,25 @@
       }
     }
     quads.sort(function (a, b) { return b.depth - a.depth; });   // painter: far (larger depth) first
+    c.strokeStyle = "rgba(0,0,0,0.12)"; c.lineWidth = 0.5;
     for (i = 0; i < quads.length; i++) {
       var q = quads[i].p;
-      ctx.beginPath();
-      ctx.moveTo(q[0].X, q[0].Y);
-      ctx.lineTo(q[1].X, q[1].Y); ctx.lineTo(q[2].X, q[2].Y); ctx.lineTo(q[3].X, q[3].Y);
-      ctx.closePath();
-      ctx.fillStyle = jet(quads[i].t); ctx.fill();
-      ctx.strokeStyle = "rgba(0,0,0,0.12)"; ctx.lineWidth = 0.5; ctx.stroke();
+      c.beginPath();
+      c.moveTo(q[0].X, q[0].Y);
+      c.lineTo(q[1].X, q[1].Y); c.lineTo(q[2].X, q[2].Y); c.lineTo(q[3].X, q[3].Y);
+      c.closePath();
+      c.fillStyle = jet(quads[i].t); c.fill();
+      c.stroke();
     }
+  }
+
+  function render() {
+    drawSurface();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(surfC, 0, 0);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    var f = SURF[surf].f, i;
 
     // trail
     if (trail.length > 1) {
@@ -200,15 +221,15 @@
   }
 
   // ---- animation ----
-  var frame = 0, settleHold = 0;
+  var frame = 0, settleHold = 0, dirty = true;
   function loop() {
     requestAnimationFrame(loop);
     if (canvas.offsetParent === null) return;     // hidden tab -> idle
     if (!paused) {
-      if (!settled) { frame++; if (frame % 3 === 0) step(); }
-      else { settleHold++; if (settleHold > 90) restart(); }    // ~1.5s after converging -> relaunch
+      if (!settled) { frame++; if (frame % 3 === 0) { step(); dirty = true; } }
+      else { settleHold++; if (settleHold > 90) { restart(); dirty = true; } }   // ~1.5s after converging -> relaunch
     }
-    render();
+    if (dirty) { dirty = false; render(); }      // nothing moved -> keep the last frame
   }
 
   // ---- rotate by drag ----
@@ -218,7 +239,7 @@
     if (!dragging) return;
     yaw -= (e.clientX - lx) * 0.01;
     pitch += (e.clientY - ly) * 0.01;
-    lx = e.clientX; ly = e.clientY;
+    lx = e.clientX; ly = e.clientY; dirty = true;
   });
   window.addEventListener("mouseup", function () { dragging = false; });
   canvas.addEventListener("touchstart", function (e) { dragging = true; lx = e.touches[0].clientX; ly = e.touches[0].clientY; }, { passive: true });
@@ -226,7 +247,7 @@
     if (!dragging) return;
     yaw -= (e.touches[0].clientX - lx) * 0.01;
     pitch += (e.touches[0].clientY - ly) * 0.01;
-    lx = e.touches[0].clientX; ly = e.touches[0].clientY;
+    lx = e.touches[0].clientX; ly = e.touches[0].clientY; dirty = true;
   }, { passive: true });
   canvas.addEventListener("touchend", function () { dragging = false; });
 
@@ -236,7 +257,7 @@
     surf = name;
     var bs = document.querySelectorAll("[data-gd-surf]");
     for (var i = 0; i < bs.length; i++) bs[i].classList.toggle("active", bs[i] === btn);
-    computeZRange(); computeTarget(); restart();
+    computeZRange(); computeTarget(); restart(); dirty = true;
   }
   var sbtn = document.querySelectorAll("[data-gd-surf]");
   for (var si = 0; si < sbtn.length; si++) (function (b) {
@@ -248,7 +269,7 @@
     b.addEventListener("click", function () {
       optimizer = b.getAttribute("data-gd-opt");
       for (var i = 0; i < obtn.length; i++) obtn[i].classList.toggle("active", obtn[i] === b);
-      restart();
+      restart(); dirty = true;
     });
   })(obtn[oi]);
 
@@ -258,8 +279,8 @@
       ? '<i class="fas fa-play"></i> <span class="lang-en">Play</span><span class="lang-fr">Lancer</span>'
       : '<i class="fas fa-pause"></i> <span class="lang-en">Pause</span><span class="lang-fr">Pause</span>';
   });
-  if ($("gd-restart")) $("gd-restart").addEventListener("click", restart);
-  if ($("gd-resetview")) $("gd-resetview").addEventListener("click", function () { yaw = ISO_YAW; pitch = ISO_PITCH; });
+  if ($("gd-restart")) $("gd-restart").addEventListener("click", function () { restart(); dirty = true; });
+  if ($("gd-resetview")) $("gd-resetview").addEventListener("click", function () { yaw = ISO_YAW; pitch = ISO_PITCH; dirty = true; });
 
   // ---- init ----
   var rt;

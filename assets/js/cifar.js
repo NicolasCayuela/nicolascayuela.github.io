@@ -235,13 +235,21 @@
     updateVec();
   }
 
-  function tick() {
+  // Redraw only when the view or the highlighted point changed; the idle
+  // auto-spin advances at 30 fps (same speed as before, time-based).
+  var lastSpin = 0, drawnKey = "";
+  function tick(now) {
     requestAnimationFrame(tick);
-    if (mapC.offsetParent === null) return;          // tab hidden -> idle
-    if (autoSpin && !dragging) yaw += 0.004;
-    render();
+    if (mapC.offsetParent === null) { lastSpin = 0; return; }   // tab hidden -> idle
+    if (autoSpin && !dragging) {
+      if (!lastSpin) lastSpin = now;
+      if (now - lastSpin >= 31) { yaw += 0.004 * Math.min(4, (now - lastSpin) / 16.7); lastSpin = now; }
+    }
+    var key = yaw + "|" + pitch + "|" + zoom + "|" + nearest + "|" + SIZE;
+    if (key !== drawnKey) { drawnKey = key; render(); }
     pickNearest();
   }
+  window.addEventListener("themechange", function () { drawnKey = ""; });
 
   // ---- pointer: drag rotates, move picks nearest ----
   var dragging = false, lastX = 0, lastY = 0;
