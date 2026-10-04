@@ -26,8 +26,9 @@
  * mostly trade canvas resolution and frame rate. Weak devices (phones, <=4
  * cores or <=4 GB) start on tier 1. Any device whose rAF loop runs slow (a
  * saturated main thread, raster included) steps down at runtime, down to a
- * frozen frame. <body data-waves="static"> renders a single frozen frame
- * (used on pages with heavy demos).
+ * frozen frame, and steps back up once the page is smooth again (a load
+ * spike, e.g. a heavy demo starting, must not freeze the background for
+ * good). <body data-waves="static"> renders a single frozen frame.
  */
 (function () {
   "use strict";
@@ -302,11 +303,15 @@
   // our own code cannot see. Relative, so a browser that caps rAF at 30 Hz
   // (battery saver) is not mistaken for a slow one.
   var rafEMA = 0, rafFrames = 0, rafMin = 1e9;
+  // step-up: after `upWait` ms of smooth rAF, go back one tier (never above
+  // the starting tier). The wait doubles on each step-up so a device that
+  // really cannot keep up does not oscillate.
+  var baseTier = tier, goodMs = 0, upWait = 4000;
   function setTier(t) {
     if (t === tier) return;
     tier = t;
     frameInterval = 1 / TIER_FPS[tier];
-    rafEMA = 0; rafFrames = 0;
+    rafEMA = 0; rafFrames = 0; goodMs = 0;
     build();                      // DPR change needs a canvas rebuild
     if (tier === 3) draw(REF);    // final frozen frame (the loop stops drawing)
   }
@@ -352,6 +357,10 @@
       if (ms > 4 && ms < rafMin) rafMin = ms;
       rafEMA = rafFrames ? rafEMA * 0.95 + ms * 0.05 : ms;
       if (++rafFrames > 90 && tier < 3 && rafEMA > 1.45 * rafMin && rafEMA > 21) setTier(tier + 1);
+      else if (tier > baseTier && rafFrames > 30) {
+        goodMs = rafEMA < 1.2 * rafMin ? goodMs + ms : 0;
+        if (goodMs > upWait) { upWait = Math.min(upWait * 2, 60000); setTier(tier - 1); }
+      }
     }
     if (tier === 3) return;            // frozen
     if (dt > 0.1) dt = 0.1;            // clamp after tab switch
