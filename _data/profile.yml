@@ -20,33 +20,25 @@ linkedin: nicolas-cayuela
 #resume: assets/cv/Resume_Nicolas_Cayuela.pdf
 
 short_bio: >-
-  My name is <strong>Nicolas Cayuela</strong>, a PhD student in phononics and metamaterials
-  at <strong>Institut Jean Lamour</strong> in Nancy, France. My research focuses on the design
-  and study of phononic crystals and acoustic/elastic metamaterials using
-  <strong>machine learning with graphs</strong>.
-  <br> <span style="color: red; font-style: italic;"><i class="far fa-envelope"></i>&nbsp; <a href="mailto:githubcontact.sublime067@simplelogin.com" style="color: inherit; text-decoration: underline;">Feel free to reach out to discuss or collaborate.</a></span>
+  PhD student in phononics and metamaterials at <strong>Institut Jean Lamour</strong> in Nancy,
+  France. I design phononic crystals and acoustic/elastic metamaterials, and use
+  <strong>graph neural networks</strong> to predict how waves travel through them and to find geometries for a target response.
+  <br> <span style="color: red; font-style: italic;"><i class="far fa-envelope"></i>&nbsp; <a href="mailto:githubcontact.sublime067@simplelogin.com" style="color: inherit; text-decoration: underline;">Email me about research or collaborations.</a></span>
 
 short_bio_fr: >-
-  Je m'appelle <strong>Nicolas Cayuela</strong>, doctorant en phononique et métamatériaux
-  à l'<strong>Institut Jean Lamour</strong> à Nancy. Mes recherches portent sur la conception
-  et l'étude des cristaux phononiques et des métamatériaux acoustiques/élastiques à l'aide du
-  <strong>machine learning sur graphes</strong>.
-  <br> <span style="color: red; font-style: italic;"><i class="far fa-envelope"></i>&nbsp; <a href="mailto:githubcontact.sublime067@simplelogin.com" style="color: inherit; text-decoration: underline;">N'hésitez pas à me contacter pour échanger ou collaborer.</a></span>
+  Doctorant en phononique et métamatériaux à l'<strong>Institut Jean Lamour</strong> à Nancy.
+  Je conçois des cristaux phononiques et des métamatériaux acoustiques/élastiques, et j'utilise des
+  <strong>réseaux de neurones sur graphes</strong> pour prédire la propagation des ondes et trouver des géométries pour une réponse cible.
+  <br> <span style="color: red; font-style: italic;"><i class="far fa-envelope"></i>&nbsp; <a href="mailto:githubcontact.sublime067@simplelogin.com" style="color: inherit; text-decoration: underline;">Écrivez-moi pour échanger ou collaborer.</a></span>
 
 show_portrait: true
 portrait_url: assets/images/photos/profile.jpg
-portrait_caption: >-
-  I'm Nicolas Cayuela. Welcome to my homepage!
-
-portrait_caption_fr: >-
-  Je suis Nicolas Cayuela. Bienvenue sur ma page !
-
 education:
   - name: "PhD: Sustainable architected metamaterials for elastic wave manipulation"
     logo: assets/images/badges/ijl.jpg
     url: "https://ijl.univ-lorraine.fr/"
     dept: Nancy, France
-    position: '<em>Institut Jean Lamour - C2MP Doctoral School (Chemistry - Mechanics - Materials - Physics)</em>'
+    position: '<em>Institut Jean Lamour, C2MP Doctoral School (Chemistry, Mechanics, Materials, Physics)</em>'
     date: 2025 - present
   - name: Master Smart Mechanics
     logo: assets/images/badges/umlp.png
@@ -69,7 +61,7 @@ education:
 
 education_fr:
   - name: "Doctorat : Métamatériaux à architecture durable pour la manipulation des ondes élastiques"
-    position: '<em>Institut Jean Lamour - École doctorale C2MP (Chimie - Mécanique - Matériaux - Physique)</em>'
+    position: '<em>Institut Jean Lamour, École doctorale C2MP (Chimie, Mécanique, Matériaux, Physique)</em>'
   - name: Master Smart Mechanics
     position: '<em>EIPHI-BFC Graduate School</em><br>Master Recherche dans le domaine des Smart Structures, pour le contrôle vibroacoustique (NVH), la surveillance de la santé des structures, le contrôle de forme et la collecte d''énergie.'
   - name: Diplôme d'ingénieur
@@ -78,28 +70,28 @@ education_fr:
     position: '<em>Lycée Jean-Baptiste-Dumas</em><br>Classes Préparatoires aux Grandes Écoles.'
 
 experience:
-  - name: "PhD - Sustainable architected metamaterials for elastic wave manipulation"
+  - name: "PhD: Sustainable architected metamaterials for elastic wave manipulation"
     logo: assets/images/badges/ijl.jpg
     url: "https://ijl.univ-lorraine.fr/"
-    position: '<em>Institut Jean Lamour, UMR CNRS 7198<br>Nanomaterials, Electronics and the Living Department (N2EV) - Metamaterials and Phononics group</em><br>&bull; Design of 3D piezoelectric metamaterials from pillar-based unit cells, with a piezoelectric tensor tunable through the micro-architecture<br>&bull; Elastodynamic characterization: band structures, Willis coupling, electro-momentum coupling<br>&bull; Machine learning (GNN, inverse design) to speed up prediction and optimization of wave-propagation properties<br>&bull; Applications: defect/impact detection, directional sensing, energy harvesting, non-Hermitian behaviour'
+    position: '<em>Institut Jean Lamour, UMR CNRS 7198<br>Nanomaterials, Electronics and the Living Department (N2EV), Metamaterials and Phononics group</em><br>&bull; Design of 3D piezoelectric metamaterials from pillar-based unit cells, with a piezoelectric tensor tunable through the micro-architecture<br>&bull; Elastodynamic characterization: band structures, Willis coupling, electro-momentum coupling<br>&bull; Machine learning (GNN, inverse design) to speed up prediction and optimization of wave-propagation properties<br>&bull; Applications: defect/impact detection, directional sensing, energy harvesting, non-Hermitian behaviour'
     date: 2025 - 2028
-  - name: "Internship - Multi-physics optomechanical sensor study"
+  - name: "Internship: Multi-physics optomechanical sensor study"
     logo: assets/images/badges/leti.png
     url: "https://www.leti-cea.fr/"
     position: '<em>CEA-Leti, Université Grenoble Alpes</em><br>&bull; Gas sensing with optomechanical chips and a Mach&ndash;Zehnder reference<br>&bull; Experimental bench, capping encapsulation (PMMA + tape), RF probe measurements<br>&bull; Comsol/RSoft simulations of the optomechanical coupling and eigenmodes'
     date: 2025
-  - name: "Internship - Dynamic mechanical characterization of elementary fibres for bio-sourced composites"
+  - name: "Internship: Dynamic mechanical characterization of elementary fibres for bio-sourced composites"
     logo: assets/images/badges/femto.svg
     url: "https://www.femto-st.fr/fr"
     position: '<em>FEMTO-ST Institute, UMR CNRS 6174<br>Applied Mechanics Department</em><br>&bull; Dynamic testing (laser vibrometer, high-speed camera, vacuum pump) on flax fibres<br>&bull; Damping identified by logarithmic decrement; storage (stiffness) modulus via COMSOL'
     date: 2024
 
 experience_fr:
-  - name: "Doctorat - Métamatériaux à architecture durable pour la manipulation des ondes élastiques"
-    position: '<em>Institut Jean Lamour, UMR CNRS 7198<br>Département Nanomatériaux, Électronique Et Vivant (N2EV) - Équipe Métamatériaux et Phononique</em><br>&bull; Conception de métamatériaux piézoélectriques 3D à base de cellules unitaires à montants, tenseur piézoélectrique personnalisable par la microarchitecture<br>&bull; Caractérisation élastodynamique : structures de bandes, couplage de Willis, couplage électromomentum<br>&bull; Apprentissage automatique (GNN, design inverse) pour accélérer prédiction et optimisation des propriétés de propagation<br>&bull; Applications : détection de défauts/impacts, détection directionnelle, récupération d''énergie, comportement non hermitien'
-  - name: "Stage - Étude d'un capteur multi-physique optomécanique"
+  - name: "Doctorat : Métamatériaux à architecture durable pour la manipulation des ondes élastiques"
+    position: '<em>Institut Jean Lamour, UMR CNRS 7198<br>Département Nanomatériaux, Électronique Et Vivant (N2EV), Équipe Métamatériaux et Phononique</em><br>&bull; Conception de métamatériaux piézoélectriques 3D à base de cellules unitaires à montants, tenseur piézoélectrique personnalisable par la microarchitecture<br>&bull; Caractérisation élastodynamique : structures de bandes, couplage de Willis, couplage électromomentum<br>&bull; Apprentissage automatique (GNN, design inverse) pour accélérer prédiction et optimisation des propriétés de propagation<br>&bull; Applications : détection de défauts/impacts, détection directionnelle, récupération d''énergie, comportement non hermitien'
+  - name: "Stage : Étude d'un capteur multi-physique optomécanique"
     position: '<em>CEA-Leti, Université Grenoble Alpes</em><br>&bull; Mesure de gaz avec des puces optomécaniques et Mach&ndash;Zehnder en référence<br>&bull; Banc expérimental, encapsulation par capots (PMMA + scotch), mesures RF par pointes<br>&bull; Simulations Comsol/RSoft du couplage optomécanique et des modes propres'
-  - name: "Stage - Caractérisation mécanique dynamique de fibres élémentaires pour les matériaux composites biosourcés"
+  - name: "Stage : Caractérisation mécanique dynamique de fibres élémentaires pour les matériaux composites biosourcés"
     position: '<em>Institut FEMTO-ST, UMR CNRS 6174<br>Département de mécanique appliquée</em><br>&bull; Essais dynamiques (vibromètre laser, caméra rapide, pompe à vide) sur des fibres de lin<br>&bull; Amortissement identifié par décrément logarithmique ; module de stockage (rigidité) par COMSOL'
 
 # service:
