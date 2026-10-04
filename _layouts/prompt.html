@@ -8,7 +8,8 @@
 
     <script>
         (function() {
-            var lang = localStorage.getItem('site-lang') || 'en';
+            var lang = 'en';   // site is English-only; drop any stale FR choice
+            try { localStorage.removeItem('site-lang'); } catch (e) {}
             var html = document.documentElement;
             html.className = html.className.replace(/lang-active-\w+/g, '').trim();
             html.classList.add('lang-active-' + lang);

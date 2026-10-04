@@ -39,7 +39,8 @@
 
     <script>
         (function() {
-            var lang = localStorage.getItem('site-lang') || 'en';
+            var lang = 'en';   // site is English-only; drop any stale FR choice
+            try { localStorage.removeItem('site-lang'); } catch (e) {}
             var html = document.documentElement;
             html.className = html.className.replace(/lang-active-\w+/g, '').trim();
             html.classList.add('lang-active-' + lang);
@@ -120,7 +121,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/js/bootstrap.min.js" integrity="sha512-XKa9Hemdy1Ui3KSGgJdgMyYlUg1gM+QhL6cnlyTe2qzMCYm4nAZ1PsVerQzTTXzonUR+dmswHqgJPuwCq1MaAg==" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/github-buttons/2.14.2/buttons.min.js" integrity="sha512-OYwZx04hKFeFNYrWxIyo3atgGpb+cxU0ENWBZs72X7T9U+NoHPM1ftUn/Mfw7dRDXrqWA6M1wBg6z6fGE32aeA==" crossorigin="anonymous"></script>
     <script src="assets/js/common.js?v=1"></script>
-    <script src="assets/js/i18n.js?v=fr"></script>
     <script src="assets/js/theme.js?v=2"></script>
 
     <!-- Elastic-wave metamaterial background on every page (bump ?v= to bust cache) -->
