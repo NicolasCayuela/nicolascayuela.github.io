@@ -1,12 +1,13 @@
 {% assign item = include.item %}
 {% assign has_cover = true %}
+{% assign thumb = item.cover_thumb | default: item.cover %}
 {% if item.cover == nil or item.cover == "" or item.cover contains "empty_300x200" %}{% assign has_cover = false %}{% endif %}
 
 <div class="pub-item d-none d-md-flex">
     <div class="pub-cover">
         {% if has_cover %}
         <a href="{{ '/' | append: item.cover | relative_url }}" target="_blank" rel="noopener" class="pub-lightbox" title="{{ item.title }}">
-            <span class="pub-cover-zoom"><img data-src="{{ '/' | append: item.cover | relative_url }}" alt="{{ item.title }}" class="lazy" src="{{ '/assets/images/empty_300x200.png' | relative_url }}"></span>
+            <span class="pub-cover-zoom"><img data-src="{{ '/' | append: thumb | relative_url }}" alt="{{ item.title }}" class="lazy" src="{{ '/assets/images/empty_300x200.png' | relative_url }}"></span>
         </a>
         {% else %}
         <div class="pub-cover-placeholder"><i class="far fa-file-alt"></i></div>
@@ -39,7 +40,7 @@
 <div class="pub-item d-md-none flex-column">
     {% if has_cover %}
     <a href="{{ '/' | append: item.cover | relative_url }}" target="_blank" rel="noopener" class="pub-cover-m pub-lightbox mb-2" title="{{ item.title }}">
-        <img data-src="{{ '/' | append: item.cover | relative_url }}" alt="{{ item.title }}" class="lazy w-100" src="{{ '/assets/images/empty_300x200.png' | relative_url }}">
+        <img data-src="{{ '/' | append: thumb | relative_url }}" alt="{{ item.title }}" class="lazy w-100" src="{{ '/assets/images/empty_300x200.png' | relative_url }}">
     </a>
     {% endif %}
     <div>

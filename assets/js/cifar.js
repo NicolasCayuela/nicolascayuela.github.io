@@ -71,18 +71,24 @@
   var base = mapC.getAttribute("data-json");
   var spriteUrl = mapC.getAttribute("data-sprite");
 
-  fetch(base).then(function (r) {
-    if (!r.ok) throw new Error("cifar data HTTP " + r.status);
-    return r.json();
-  }).then(function (j) {
-    data = j;
-    makeColors(data.classes.length);
-    build3D();
-    sprite = new Image();
-    sprite.onload = function () { ready = true; drawImg(); requestAnimationFrame(tick); };
-    sprite.onerror = function () { console.error("cifar: sprite failed to load", spriteUrl); };
-    sprite.src = spriteUrl;
-  }).catch(function (e) { console.error("cifar: load failed", e); });
+  // data + 2 MB sprite are fetched the first time the tab is opened, not on page load
+  var started = false;
+  function load() {
+    if (started) return;
+    started = true;
+    fetch(base).then(function (r) {
+      if (!r.ok) throw new Error("cifar data HTTP " + r.status);
+      return r.json();
+    }).then(function (j) {
+      data = j;
+      makeColors(data.classes.length);
+      build3D();
+      sprite = new Image();
+      sprite.onload = function () { ready = true; drawImg(); requestAnimationFrame(tick); };
+      sprite.onerror = function () { console.error("cifar: sprite failed to load", spriteUrl); };
+      sprite.src = spriteUrl;
+    }).catch(function (e) { started = false; console.error("cifar: load failed", e); });
+  }
 
   function layoutSize() {
     var w = mapC.parentNode.clientWidth || 360;
@@ -230,10 +236,11 @@
   }
 
   function tick() {
+    requestAnimationFrame(tick);
+    if (mapC.offsetParent === null) return;          // tab hidden -> idle
     if (autoSpin && !dragging) yaw += 0.004;
     render();
     pickNearest();
-    requestAnimationFrame(tick);
   }
 
   // ---- pointer: drag rotates, move picks nearest ----
@@ -306,5 +313,5 @@
   var rt;
   window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(resize, 200); });
   layoutSize(); sizeCanvas();
-  window.__cifarResize = resize;
+  window.__cifarResize = function () { load(); resize(); };
 })();

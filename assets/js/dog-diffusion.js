@@ -21,7 +21,7 @@
   var running = false;
   var pendingGen = false;
   // Old phones lag on the ~54 MB model + onnxruntime init. On mobile we skip the
-  // eager prefetch / auto-init and load the model only when the user taps Generate.
+  // auto-init and load the model only when the user taps Generate.
   // isMobileViewport() is the shared phone-breakpoint test defined in the layout <head>.
   var isMobile = window.isMobileViewport ? window.isMobileViewport()
     : !!(window.matchMedia && window.matchMedia("(max-width: 820px), (pointer: coarse)").matches);
@@ -160,26 +160,6 @@
     pendingGen = true;
     if (!loading) init();
   });
-
-  // Warm the HTTP cache for the large 128px model in the background as soon as
-  // the page is idle, so opening the tab / first Generate doesn't wait on the
-  // full ~54 MB download. The WebGPU session is still compiled lazily on show.
-  function prefetchModel() {
-    // Don't front-load 54 MB on phones, metered or slow links: those users get
-    // the model lazily on demand (when they tap Generate) instead.
-    if (isMobile) return;
-    var c = navigator.connection;
-    if (c && (c.saveData || /^(slow-2g|2g|3g)$/.test(c.effectiveType || ""))) return;
-    var base = area.getAttribute("data-base");
-    try {
-      fetch(base + "dog_diffusion.onnx?v=7", { priority: "low" }).catch(function () {});
-      fetch(base + "dog_diffusion.json?v=7").catch(function () {});
-    } catch (e) {}
-  }
-  if (!isMobile) {
-    if (window.requestIdleCallback) window.requestIdleCallback(prefetchModel, { timeout: 4000 });
-    else setTimeout(prefetchModel, 2000);
-  }
 
   // Desktop: warm/compile the model when the tab is shown (current behaviour).
   // Mobile: stay idle and prompt the user to tap Generate, which triggers init().

@@ -17,12 +17,27 @@
  *
  * Pointer move injects small ripples; click emits a stronger pulse (cooldown).
  * Pure <canvas>, no dependency. Runs behind the page content.
+ *
+ * Perf: links and nodes are bucketed by colour level into one typed array
+ * (counting sort, no per-frame allocation) and drawn with one path per level;
+ * the centre vignette is a CSS mask, not a canvas pass. Weak devices (phones,
+ * <=4 cores or <=4 GB) start on a low tier (DPR 1, 30 fps), and any device
+ * whose frames run slow is stepped down at runtime. <body data-waves="static">
+ * renders a single frozen frame (used on pages with heavy demos).
  */
 (function () {
   "use strict";
 
   var reduce = window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (document.body && document.body.getAttribute("data-waves") === "static") reduce = true;
+
+  // quality tier: 0 = full, 1 = low (DPR 1, 30 fps), 2 = minimal (20 fps, no bloom)
+  var nav = window.navigator || {};
+  var weak = (window.isMobileViewport && window.isMobileViewport()) ||
+    (nav.hardwareConcurrency || 8) <= 4 || (nav.deviceMemory || 8) <= 4;
+  var tier = weak ? 1 : 0;
+  var TIER_FPS = [60, 30, 20];
 
   var CFG = {
     spacing: 46,        // lattice pitch in px (unit-cell size)
@@ -34,7 +49,7 @@
     edgeSpeedFrac: 0.80,  // topological edge mode speed, fraction of P
     fadeIn: 1.1,        // seconds to ramp the canvas in on load
     waveLife: 18,       // seconds a ripple stays alive
-    maxWaves: 50,       // perf backstop only; high so live ripples are never cut
+    maxWaves: 50,       // perf backstop; lowered on weak tiers
     autoMin: 1,         // min seconds between random excitations
     autoMax: 2,         // max seconds between random excitations
     planeProb: 0.34,    // share of auto excitations that are sweeping plane waves
@@ -66,9 +81,15 @@
 
   var canvas = document.createElement("canvas");
   canvas.setAttribute("aria-hidden", "true");
+  // legibility vignette: dim the field inside a central ellipse so it does not
+  // compete with the page text. Done once by the compositor as a CSS mask
+  // (alpha vigMin at the centre, 1 at the ellipse edge and beyond).
+  var vig = "radial-gradient(ellipse " + (50 * CFG.vigAx) + "% " + (50 * CFG.vigAy) +
+    "% at 50% 50%, rgba(0,0,0," + CFG.vigMin + ") 0%, #000 100%)";
   canvas.style.cssText =
     "position:fixed;top:0;left:0;width:100%;height:100%;" +
-    "z-index:-1;pointer-events:none;opacity:" + CFG.opacity;
+    "z-index:-1;pointer-events:none;opacity:0;" +
+    "-webkit-mask-image:" + vig + ";mask-image:" + vig;
   var ctx = canvas.getContext("2d");
   (document.body || document.documentElement).appendChild(canvas);
 
@@ -77,6 +98,8 @@
   var cols = 0, rows = 0;
   var links = [];       // [iA, iB] precomputed neighbour pairs
   var waves = [];       // {kind, x, y, nx, ny, t, amp, k, life}
+  var linkLv, linkBuf, nodeLv, nodeBuf;   // per-frame level + level-sorted coords
+  var levelCount = new Int32Array(32), levelStart = new Int32Array(32);
   var SIG2 = 2 * CFG.frontWidth * CFG.frontWidth;
 
   // deterministic pseudo-random so the lattice disorder is stable across resizes
@@ -86,7 +109,7 @@
   }
 
   function build() {
-    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    DPR = tier ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
     W = window.innerWidth;
     H = window.innerHeight;
     canvas.width = W * DPR;
@@ -128,12 +151,18 @@
         }
       }
     }
+    linkLv = new Uint8Array(links.length);
+    linkBuf = new Float32Array(links.length * 4);
+    nodeLv = new Uint8Array(nodes.length);
+    nodeBuf = new Float32Array(nodes.length * 2);
   }
+
+  function maxWaves() { return tier ? 24 : CFG.maxWaves; }
 
   // lon/sh are the longitudinal and transverse (shear) weights of the wave.
   // P-wave: lon=1, sh=CFG.shear. Shear-dominant: lon small, sh large.
   function spawnRadial(x, y, amp, lon, sh, speed) {
-    if (waves.length >= CFG.maxWaves) waves.shift();
+    if (waves.length >= maxWaves()) waves.shift();
     waves.push({
       kind: 0, x: x, y: y, nx: 0, ny: 0, t: 0,
       amp: amp, k: (2 * Math.PI) / CFG.wavelength, life: CFG.waveLife,
@@ -145,7 +174,7 @@
   // plane wave: a flat front entering from one edge and sweeping across, the
   // origin point sits just outside that edge so the front crosses the screen.
   function spawnPlane(amp, lon, sh, speed) {
-    if (waves.length >= CFG.maxWaves) waves.shift();
+    if (waves.length >= maxWaves()) waves.shift();
     var ang = Math.random() * Math.PI * 2;
     var nx = Math.cos(ang), ny = Math.sin(ang);
     var cx = W * 0.5, cy = H * 0.5, span = Math.sqrt(W * W + H * H) * 0.5;
@@ -163,7 +192,7 @@
   // around the path. The rest of the lattice stays still, like a chiral edge
   // state in a topological phononic insulator.
   function spawnEdge(amp, speed) {
-    if (waves.length >= CFG.maxWaves) waves.shift();
+    if (waves.length >= maxWaves()) waves.shift();
     var m = CFG.spacing * 2.2;            // channel inset from the border
     var pts = [[m, m], [W - m, m], [W - m, H - m], [m, H - m]];
     var segs = [], arc = 0;
@@ -260,7 +289,16 @@
   }
 
   var last = 0, acc = 0, autoTimer = 0, nextAuto = 0;
-  var frameInterval = 1 / CFG.fps;
+  var frameInterval = 1 / TIER_FPS[tier];
+  // runtime step-down: smoothed cost of one simulate+draw, in ms
+  var workEMA = 0, workFrames = 0;
+  function setTier(t) {
+    if (t === tier) return;
+    tier = t;
+    frameInterval = 1 / TIER_FPS[tier];
+    workEMA = 0; workFrames = 0;
+    build();                      // DPR change needs a canvas rebuild
+  }
 
   function scheduleAuto() {
     nextAuto = CFG.autoMin + Math.random() * (CFG.autoMax - CFG.autoMin);
@@ -312,8 +350,13 @@
       if (waves[wI].t >= waves[wI].life) waves.splice(wI, 1);
     }
 
+    var t0 = performance.now();
     displaceNodes();
     draw(REF);                    // normalise node colour/size against the crest reference
+    var cost = performance.now() - t0;
+    workEMA = workFrames ? workEMA * 0.9 + cost * 0.1 : cost;
+    // after a warm-up, step down when one frame eats too much of the budget
+    if (++workFrames > 45 && tier < 2 && workEMA > (tier ? 9 : 7)) setTier(tier + 1);
   }
 
   var fadeAmt = reduce ? 1 : 0; // load fade-in multiplier (0 -> 1 over CFG.fadeIn)
@@ -323,14 +366,12 @@
   // wavefront reaches red all the way round; interference just stays clamped at red.
   var REF = CFG.amp * 0.95;       // sets where the colormap saturates; lower -> more orange/yellow at the fronts
   var HUECAP = 0.82;              // compress colormap so the top is bright orange-red, not dark red
-  function draw(maxStrain) {
-    ctx.clearRect(0, 0, W, H);
-
+  // colour strings per level, rebuilt only when the theme flips
+  var styleDark = null, linkStyle = [], bloomStyle = [], nodeStyle = [];
+  function buildStyles(dark) {
+    styleDark = dark;
     // dark theme: the jet low end (dark blue) vanishes on black, so lift the
     // colormap floor and the resting opacity to keep the lattice visible
-    var dark = document.documentElement.classList.contains("theme-dark");
-    // whole-canvas opacity: theme target scaled by the load fade-in
-    canvas.style.opacity = ((dark ? 0.9 : CFG.opacity) * fadeAmt).toFixed(3);
     var tFloor = dark ? 0.10 : 0;
     var baseA = dark ? 0.7 : CFG.baseAlpha;
     // pure jet blue is too dim on black: blend resting colors toward white,
@@ -344,86 +385,100 @@
         (col[2] + (255 - col[2]) * f) | 0
       ];
     }
-
-    // links bucketed by field amplitude -> COMSOL Rainbow (jet) colormap
-    var paths = [], li, bb;
-    for (bb = 0; bb < LEVELS; bb++) paths.push([]);
-
-    for (li = 0; li < links.length; li++) {
-      var a = nodes[links[li][0]], c = nodes[links[li][1]];
-      var s = (a.strain + c.strain) * 0.5 / REF; // 0..1 normalised amplitude
-      if (s > 1) s = 1;
-      var lv = (s * (LEVELS - 1) + 0.5) | 0;
-      paths[lv].push(a.x, a.y, c.x, c.y);
-    }
-
-    for (bb = 0; bb < LEVELS; bb++) {
-      var arr = paths[bb];
-      if (!arr.length) continue;
+    function rgba(c, al) { return "rgba(" + c[0] + "," + c[1] + "," + c[2] + "," + al.toFixed(3) + ")"; }
+    for (var bb = 0; bb < LEVELS; bb++) {
       var t = bb / (LEVELS - 1);
-      var col = lift(jet(tFloor + t * (HUECAP - tFloor)), t);
-      var alpha = baseA + (CFG.peakAlpha - baseA) * t;
-      ctx.strokeStyle = "rgba(" + col[0] + "," + col[1] + "," + col[2] + "," + alpha.toFixed(3) + ")";
-      ctx.lineWidth = 0.6 + t * 1.6;
+      var raw = jet(tFloor + t * (HUECAP - tFloor)), col = lift(raw, t);
+      linkStyle[bb] = rgba(col, baseA + (CFG.peakAlpha - baseA) * t);
+      bloomStyle[bb] = rgba(raw, (dark ? 0.16 : 0.08) * t);
+      nodeStyle[bb] = rgba(col, (dark ? 0.9 : CFG.nodeAlpha) * (0.4 + 0.6 * t));
+    }
+  }
+
+  // counting sort of n items by level lv[] into out (stride floats each);
+  // get(i, out, offset) writes item i's coords. Leaves levelStart/levelCount set.
+  function bucket(n, lv, out, stride, get) {
+    var bb, i, sum = 0;
+    for (bb = 0; bb < LEVELS; bb++) levelCount[bb] = 0;
+    for (i = 0; i < n; i++) levelCount[lv[i]]++;
+    for (bb = 0; bb < LEVELS; bb++) { levelStart[bb] = sum; sum += levelCount[bb]; }
+    for (bb = 0; bb < LEVELS; bb++) levelCount[bb] = levelStart[bb];    // reuse as write cursor
+    for (i = 0; i < n; i++) get(i, out, levelCount[lv[i]]++ * stride);
+    for (bb = 0; bb < LEVELS; bb++) levelCount[bb] -= levelStart[bb];   // back to counts
+  }
+  function getLink(i, out, o) {
+    var a = nodes[links[i][0]], c = nodes[links[i][1]];
+    out[o] = a.x; out[o + 1] = a.y; out[o + 2] = c.x; out[o + 3] = c.y;
+  }
+  function getNode(i, out, o) { out[o] = nodes[i].x; out[o + 1] = nodes[i].y; }
+
+  var shownOpacity = -1;
+  function draw(maxStrain) {
+    ctx.clearRect(0, 0, W, H);
+    var dark = document.documentElement.classList.contains("theme-dark");
+    if (dark !== styleDark) buildStyles(dark);
+    // whole-canvas opacity: theme target scaled by the load fade-in (only
+    // touch the style when it changes, to avoid a style recalc every frame)
+    var op = Math.round((dark ? 0.9 : CFG.opacity) * fadeAmt * 100) / 100;
+    if (op !== shownOpacity) { canvas.style.opacity = op; shownOpacity = op; }
+
+    var i, bb, j, e, top = LEVELS - 1;
+    // links bucketed by field amplitude -> COMSOL Rainbow (jet) colormap
+    for (i = 0; i < links.length; i++) {
+      var s = (nodes[links[i][0]].strain + nodes[links[i][1]].strain) * 0.5 / REF;
+      linkLv[i] = s >= 1 ? top : (s * top + 0.5) | 0;
+    }
+    bucket(links.length, linkLv, linkBuf, 4, getLink);
+    for (bb = 0; bb < LEVELS; bb++) {
+      if (!levelCount[bb]) continue;
+      ctx.strokeStyle = linkStyle[bb];
+      ctx.lineWidth = 0.6 + (bb / top) * 1.6;
       ctx.beginPath();
-      for (var j = 0; j < arr.length; j += 4) {
-        ctx.moveTo(arr[j], arr[j + 1]);
-        ctx.lineTo(arr[j + 2], arr[j + 3]);
+      for (j = levelStart[bb] * 4, e = j + levelCount[bb] * 4; j < e; j += 4) {
+        ctx.moveTo(linkBuf[j], linkBuf[j + 1]);
+        ctx.lineTo(linkBuf[j + 2], linkBuf[j + 3]);
       }
       ctx.stroke();
     }
 
     // crest bloom: re-stroke the brightest buckets wide and faint with additive
     // blending so wavefronts glow where they overlap. Few links live up here,
-    // so it is cheap. Strongest on dark; a gentle touch on light.
-    var bloomFrom = (LEVELS * 0.72) | 0;
+    // so it is cheap. Strongest on dark; a gentle touch on light. Off on tier 2.
     ctx.globalCompositeOperation = "lighter";
-    for (bb = bloomFrom; bb < LEVELS; bb++) {
-      var barr = paths[bb];
-      if (!barr.length) continue;
-      var bt = bb / (LEVELS - 1);
-      var bcol = jet(tFloor + bt * (HUECAP - tFloor));
-      ctx.strokeStyle = "rgba(" + bcol[0] + "," + bcol[1] + "," + bcol[2] + "," +
-        ((dark ? 0.16 : 0.08) * bt).toFixed(3) + ")";
-      ctx.lineWidth = 3 + bt * 5;
-      ctx.beginPath();
-      for (var bj = 0; bj < barr.length; bj += 4) {
-        ctx.moveTo(barr[bj], barr[bj + 1]);
-        ctx.lineTo(barr[bj + 2], barr[bj + 3]);
+    if (tier < 2) {
+      for (bb = (LEVELS * 0.72) | 0; bb < LEVELS; bb++) {
+        if (!levelCount[bb]) continue;
+        ctx.strokeStyle = bloomStyle[bb];
+        ctx.lineWidth = 3 + (bb / top) * 5;
+        ctx.beginPath();
+        for (j = levelStart[bb] * 4, e = j + levelCount[bb] * 4; j < e; j += 4) {
+          ctx.moveTo(linkBuf[j], linkBuf[j + 1]);
+          ctx.lineTo(linkBuf[j + 2], linkBuf[j + 3]);
+        }
+        ctx.stroke();
       }
-      ctx.stroke();
     }
 
     // nodes coloured by the same colormap, brighter/larger where the field is
-    // strong. Additive so crossing wavefronts bloom at the nodes too.
-    for (var ni = 0; ni < nodes.length; ni++) {
-      var nd = nodes[ni];
-      var ns = nd.strain / maxStrain; if (ns > 1) ns = 1;
-      var nc = lift(jet(tFloor + ns * (HUECAP - tFloor)), ns);
-      ctx.fillStyle = "rgba(" + nc[0] + "," + nc[1] + "," + nc[2] + "," +
-        ((dark ? 0.9 : CFG.nodeAlpha) * (0.4 + 0.6 * ns)).toFixed(3) + ")";
-      var rad = 0.9 + ns * 1.9;
+    // strong. Additive so crossing wavefronts bloom at the nodes too. One path
+    // per level; resting nodes (the vast majority) are drawn as cheap squares.
+    for (i = 0; i < nodes.length; i++) {
+      var ns = nodes[i].strain / maxStrain;
+      nodeLv[i] = ns >= 1 ? top : (ns * top + 0.5) | 0;
+    }
+    bucket(nodes.length, nodeLv, nodeBuf, 2, getNode);
+    for (bb = 0; bb < LEVELS; bb++) {
+      if (!levelCount[bb]) continue;
+      var rad = 0.9 + (bb / top) * 1.9;
+      ctx.fillStyle = nodeStyle[bb];
       ctx.beginPath();
-      ctx.arc(nd.x, nd.y, rad, 0, 6.2832);
+      for (j = levelStart[bb] * 2, e = j + levelCount[bb] * 2; j < e; j += 2) {
+        if (bb < 3) { ctx.rect(nodeBuf[j] - rad, nodeBuf[j + 1] - rad, rad * 2, rad * 2); continue; }
+        ctx.moveTo(nodeBuf[j] + rad, nodeBuf[j + 1]);
+        ctx.arc(nodeBuf[j], nodeBuf[j + 1], rad, 0, 6.2832);
+      }
       ctx.fill();
     }
-    ctx.globalCompositeOperation = "source-over";
-
-    // legibility vignette: fade the whole field inside a central ellipse so it
-    // does not compete with the page text. One destination-out gradient pass,
-    // removing up to (1 - vigMin) of the centre and nothing at the edges.
-    ctx.save();
-    ctx.globalCompositeOperation = "destination-out";
-    ctx.translate(W * 0.5, H * 0.5);
-    ctx.scale(W * 0.5 * CFG.vigAx, H * 0.5 * CFG.vigAy);
-    var vg = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
-    vg.addColorStop(0, "rgba(0,0,0," + (1 - CFG.vigMin).toFixed(3) + ")");
-    vg.addColorStop(1, "rgba(0,0,0,0)");
-    ctx.fillStyle = vg;
-    ctx.beginPath();
-    ctx.arc(0, 0, 1, 0, 6.2832);
-    ctx.fill();
-    ctx.restore();
     ctx.globalCompositeOperation = "source-over";
   }
 

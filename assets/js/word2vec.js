@@ -71,11 +71,18 @@
     ctx.clearRect(0, 0, SIZE, SIZE);
     ctx.fillStyle = dark ? "#101216" : "#fff"; ctx.fillRect(0, 0, SIZE, SIZE);
     var i, pr;
+    // all 20k dots in one path: same projection as project(), inlined so it
+    // allocates nothing per point
+    var cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
+    var xyz = data.xyz, f = zoom * FOV, half = SIZE * 0.5;
     ctx.fillStyle = dark ? "rgba(160,170,190,0.5)" : "rgba(90,100,120,0.45)";
-    for (i = 0; i < data.xyz.length; i++) {
-      pr = project(data.xyz[i]);
-      ctx.fillRect(pr.sx - 1, pr.sy - 1, 2, 2);
+    ctx.beginPath();
+    for (i = 0; i < xyz.length; i++) {
+      var q = xyz[i], z1 = -q[0] * sy + q[2] * cy;
+      var s = f / (CAM - (q[1] * sp + z1 * cp));
+      ctx.rect(half + (q[0] * cy + q[2] * sy) * s * SIZE - 1, half - (q[1] * cp - z1 * sp) * s * SIZE - 1, 2, 2);
     }
+    ctx.fill();
     // highlighted words on top, with labels
     for (i = 0; i < highlights.length; i++) {
       var h = highlights[i];
@@ -90,8 +97,9 @@
     }
   }
   function tick() {
-    if (autoSpin && !dragging) { yaw += 0.0035; render(); }
     requestAnimationFrame(tick);
+    if (canvas.offsetParent === null) return;        // tab hidden -> idle
+    if (autoSpin && !dragging) { yaw += 0.0035; render(); }
   }
   window.addEventListener("themechange", function () { render(); });
 

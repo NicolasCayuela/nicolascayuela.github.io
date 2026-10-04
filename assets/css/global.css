@@ -259,17 +259,33 @@ html.theme-dark .cv-logo img {
     box-sizing: content-box;
 }
 
-html.theme-dark .cv-date {
-    color: #8fb9e8;
-    background: #16243f;
-    border-color: #2a3f63;
-    box-shadow: none;
+html.theme-dark .cv-when-txt {
+    color: #c3cbd8;
 }
 
-html.theme-dark .cv-date-now {
+html.theme-dark .cv-when-arrow {
+    color: #6b7487;
+}
+
+html.theme-dark .cv-when-track {
+    background: repeating-linear-gradient(90deg, #343a46 0 1px, transparent 1px calc(100% / var(--n, 10))), #22262e;
+}
+
+html.theme-dark .cv-when-seg {
+    background: #5b8cff;
+}
+
+html.theme-dark .cv-when-open .cv-when-txt {
     color: #5fd0a0;
-    background: #0e2a1f;
-    border-color: #1e4a37;
+}
+
+html.theme-dark .cv-when-open .cv-when-seg {
+    background: linear-gradient(90deg, #2fbf80 55%, rgba(47, 191, 128, .25));
+}
+
+html.theme-dark .cv-when-open .cv-when-seg::after {
+    border-color: #2fbf80;
+    background: #1a1a1a;
 }
 
 /* chips & badges */
@@ -425,10 +441,11 @@ html.theme-dark #style-area .st-thumb {
         flex-wrap: wrap;
     }
 
-    .cv-date {
+    .cv-when {
         margin-left: 0;
-        margin-top: .3rem;
+        margin-top: .35rem;
         order: 2;
+        align-items: flex-start;
     }
 
     /* publications: stack the cover above the text */
